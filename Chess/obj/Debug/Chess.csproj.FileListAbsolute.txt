@@ -25,7 +25,6 @@ C:\Users\geras\source\repos\Chess\Chess\bin\Debug\Images\wn.png
 C:\Users\geras\source\repos\Chess\Chess\bin\Debug\Images\wp.png
 C:\Users\geras\source\repos\Chess\Chess\bin\Debug\Images\wq.png
 C:\Users\geras\source\repos\Chess\Chess\bin\Debug\Images\wr.png
-C:\Users\geras\source\repos\Chess\Chess\bin\Debug\Images\table.png
 C:\Users\geras\source\repos\Chess\Chess\bin\Debug\Chess.exe.config
 C:\Users\geras\source\repos\Chess\Chess\bin\Debug\Chess.exe
 C:\Users\geras\source\repos\Chess\Chess\bin\Debug\Chess.pdb

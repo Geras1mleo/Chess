@@ -23,7 +23,6 @@ namespace Chess.ChessBackEnd
         {
             get
             {
-                
                 string colorLetter = "";
                 string typeLetter = "";
 

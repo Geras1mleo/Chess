@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Chess.ChessBackEnd;
 
 namespace Chess
@@ -10,17 +11,20 @@ namespace Chess
     public partial class CustomChessTable : Window
     {
         private TableButton[,] buttons;
+        private Label[] letterLables;
+        private Label[] numberLables;
         private Board board;
 
         private FigureColor playerColor = FigureColor.Black;
+        private TableColor tableColor = TableColor.Blue;
 
         public CustomChessTable()
         {
             InitializeComponent();
-            InitializeBoard(playerColor);
+            InitializeBoard(playerColor, tableColor);
         }
         
-        private void InitializeBoard(FigureColor playerColor)
+        private void InitializeBoard(FigureColor playerColor, TableColor tableColor)
         {
             buttons = new TableButton[8, 8];
             board = new Board();
@@ -36,7 +40,7 @@ namespace Chess
                     button.DragLeave += DragLeave;
                     button.Drop += DropFigure;
 
-                    // We rotate table depending on Figure Color of player
+                    // We rotate table depending on Figure Color of player / board position
                     if(playerColor == FigureColor.White)
                     {
                         Grid.SetRow(button, j);
@@ -59,8 +63,39 @@ namespace Chess
                     buttons[i, j].Image = board.Figures[i, j]?.Image;
                 // Setting for each button an icon/figure that was made in Board constructor
             }
-        }
 
+            ImageBrush image = new ImageBrush();
+            string darkLabelStyleResource;
+            string lightLabelStyleResource = "DefLabelStyleStyle";
+
+            if(tableColor == TableColor.Blue)
+            {
+                image.ImageSource = new BitmapImage(new Uri($@"pack://application:,,,/Chess;component/Images/table_blue.png", UriKind.RelativeOrAbsolute));
+                darkLabelStyleResource = "BlueLabelStyle";
+            }
+            else
+            {
+                image.ImageSource = new BitmapImage(new Uri($@"pack://application:,,,/Chess;component/Images/table_green.png", UriKind.RelativeOrAbsolute));
+                darkLabelStyleResource = "GreenLabelStyle";
+            }
+            table.Background = image;
+
+            letterLables = new Label[] { la, lb, lc, ld, le, lf, lg, lh };
+            numberLables = new Label[] { n1, n2, n3, n4, n5, n6, n7, n8 };
+
+            string[] lettets = {"a", "b", "c", "d", "e", "f", "g", "h"};
+
+            for (int i = 0, j = letterLables.Length - 1; i < letterLables.Length; i++, j--)
+            {
+                // Setting numbers of board and letters depending on board position / player color
+                numberLables[i].Content = playerColor == FigureColor.White ? i+1 : j+1;
+                letterLables[i].Content = playerColor == FigureColor.White ? lettets[i] : lettets[j];
+
+                // Setting Style from resources depending on label position
+                numberLables[i].Style = (Style)FindResource(i % 2 == 0 ? lightLabelStyleResource : darkLabelStyleResource);
+                letterLables[i].Style = (Style)FindResource(i % 2 == 0 ? lightLabelStyleResource : darkLabelStyleResource);
+            }
+        }
 
         private new void DragLeave(object sender, DragEventArgs e)
         {

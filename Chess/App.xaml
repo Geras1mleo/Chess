@@ -8,6 +8,7 @@
             <Style TargetType="{x:Type local:TableButton}" x:Key="TableButtonStyle">
                 <Setter Property="Background" Value="Transparent" />
                 <Setter Property="BorderBrush" Value="{x:Null}" />
+                <Setter Property="Opacity" Value="0.95"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
@@ -38,6 +39,17 @@
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
+            </Style>
+            <Style TargetType="Label" x:Key="DefLabelStyleStyle">
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="FontWeight" Value="Medium" />
+                <Setter Property="Foreground" Value="White" />
+            </Style>
+            <Style BasedOn="{StaticResource  DefLabelStyleStyle}" x:Key="BlueLabelStyle" TargetType="Label">
+                <Setter Property="Foreground" Value="#566996"/>
+            </Style>
+            <Style BasedOn="{StaticResource  DefLabelStyleStyle}" x:Key="GreenLabelStyle" TargetType="Label">
+                <Setter Property="Foreground" Value="#769656"/>
             </Style>
         </ResourceDictionary>
     </Application.Resources>

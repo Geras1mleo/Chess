@@ -20,6 +20,5 @@
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/wp.png")]
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/wq.png")]
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/wr.png")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/table.png")]
 
 

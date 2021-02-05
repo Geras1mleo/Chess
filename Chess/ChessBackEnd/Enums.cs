@@ -14,4 +14,9 @@
         Queen,
         King
     }
+    public enum TableColor : short
+    {
+        Green,
+        Blue
+    }
 }

@@ -7,7 +7,7 @@
         public Board()
         {
             Figures = new Figure[8, 8];
-
+            
             Figures[0, 0] = new Figure(FigureColor.White, FigureType.Rook);
             Figures[0, 1] = new Figure(FigureColor.White, FigureType.Knight);
             Figures[0, 2] = new Figure(FigureColor.White, FigureType.Bishop);
