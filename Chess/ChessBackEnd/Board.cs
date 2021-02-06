@@ -44,6 +44,5 @@
             Figures[7, 6] = new Figure(FigureColor.Black, FigureType.Knight);
             Figures[7, 7] = new Figure(FigureColor.Black, FigureType.Rook);
         }
-
     }
 }

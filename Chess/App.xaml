@@ -13,11 +13,11 @@
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
                             <Border Name="border" 
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        Padding="{TemplateBinding Padding}" 
-                        BorderBrush="{TemplateBinding BorderBrush}" 
-                        CornerRadius="5"
-                        Background="{TemplateBinding Background}">
+                                    BorderThickness="0"
+                                    Padding="{TemplateBinding Padding}" 
+                                    BorderBrush="{TemplateBinding BorderBrush}" 
+                                    CornerRadius="0"
+                                    Background="{TemplateBinding Background}">
                                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Border>
                             <ControlTemplate.Triggers>

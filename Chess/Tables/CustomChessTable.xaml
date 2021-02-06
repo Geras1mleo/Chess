@@ -5,8 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Chess"
         mc:Ignorable="d"
+        Name="window"
         Title="Chess" Height="700" Width="700" Background="#FF1A1A1A" Foreground="#FF343434">
-    <Canvas>
+    <Canvas x:Name="canvas">
         <Grid x:Name="table" Margin="100" AllowDrop="True" >
 
             <Grid.RowDefinitions>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -79,6 +80,8 @@ namespace Chess.ChessBackEnd
                 {
                     var image = new Image()
                     {
+                        Width = 56,
+                        Height = 56,
                         Source = new BitmapImage(new Uri(value, UriKind.RelativeOrAbsolute)),
                         VerticalAlignment = VerticalAlignment.Center,
                         Stretch = Stretch.Uniform
