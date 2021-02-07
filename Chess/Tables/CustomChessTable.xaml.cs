@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -32,17 +30,20 @@ namespace Chess
             get { return currentTableColor; }
             set
             {
-                var image = new ImageBrush();
-                string darkLabelStyleResource = "";
+                ImageBrush image = new ImageBrush();
+                SolidColorBrush color = new SolidColorBrush();
+
                 switch (value)
                 {
                     case TableColor.Green:
                         image.ImageSource = new BitmapImage(new Uri($@"pack://application:,,,/Chess;component/Images/table_green.png", UriKind.RelativeOrAbsolute));
-                        darkLabelStyleResource = "GreenLabelStyle";
+                        ChangeTableColorButton.Background = (SolidColorBrush)Application.Current.Resources["BlueTable"];
+                        color = (SolidColorBrush)Application.Current.Resources["GreenTable"];
                         break;
                     case TableColor.Blue:
                         image.ImageSource = new BitmapImage(new Uri($@"pack://application:,,,/Chess;component/Images/table_blue.png", UriKind.RelativeOrAbsolute));
-                        darkLabelStyleResource = "BlueLabelStyle";
+                        ChangeTableColorButton.Background = (SolidColorBrush)Application.Current.Resources["GreenTable"];
+                        color = (SolidColorBrush)Application.Current.Resources["BlueTable"];
                         break;
                 }
                 table.Background = image;
@@ -53,11 +54,18 @@ namespace Chess
                 letterLables = new Label[] { la, lb, lc, ld, le, lf, lg, lh };
                 numberLables = new Label[] { n1, n2, n3, n4, n5, n6, n7, n8 };
 
+                Style style = (Style)FindResource("DefLabelStyle");
+
                 for (int i = 0; i < letterLables.Length; i++)
                 {
                     // Setting Style from resources depending on label position => Dark, light, dark, light, dark
-                    numberLables[i].Style = (Style)FindResource(i % 2 == 0 ? "DefLabelStyleStyle" : darkLabelStyleResource);
-                    letterLables[i].Style = (Style)FindResource(i % 2 == 0 ? "DefLabelStyleStyle" : darkLabelStyleResource);
+                    numberLables[i].Style = style;
+                    letterLables[i].Style = style;
+                    if(i % 2 != 0)
+                    {
+                        numberLables[i].Foreground = color;
+                        letterLables[i].Foreground = color;
+                    }
                 }
             }
         }
@@ -65,13 +73,12 @@ namespace Chess
         public CustomChessTable()
         {
             InitializeComponent();
-
-            TableColor = TableColor.Blue;
-            InitializeBoard(playerColor);
+            InitializeBoard(playerColor, TableColor.Blue);
         }
         
-        private void InitializeBoard(FigureColor playerColor)
+        private void InitializeBoard(FigureColor playerColor, TableColor tableColor)
         {
+            TableColor = tableColor;
             buttons = new TableButton[8, 8];
             board = new Board();
 
@@ -242,15 +249,17 @@ namespace Chess
             buttons[dragButton.PosVertical, dragButton.PosHorizontal].Image = null;
         }
 
-        private void ChangeColorButton_MouseDown(object sender, MouseButtonEventArgs e)
+        private void ChangeTableColorButton_MouseDown(object sender, MouseButtonEventArgs e)
         {
             switch (TableColor)
             {
                 case TableColor.Green:
                     TableColor = TableColor.Blue;
+                    ChangeTableColorButton.Background = (SolidColorBrush)Application.Current.Resources["GreenTable"];
                     break;
                 case TableColor.Blue:
                     TableColor = TableColor.Green;
+                    ChangeTableColorButton.Background = (SolidColorBrush)Application.Current.Resources["BlueTable"];
                     break;
             }
         }

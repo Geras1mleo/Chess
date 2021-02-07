@@ -40,17 +40,13 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-            <Style TargetType="Label" x:Key="DefLabelStyleStyle">
+            <Style TargetType="Label" x:Key="DefLabelStyle">
                 <Setter Property="FontSize" Value="14"/>
                 <Setter Property="FontWeight" Value="Medium" />
                 <Setter Property="Foreground" Value="White" />
             </Style>
-            <Style BasedOn="{StaticResource  DefLabelStyleStyle}" x:Key="BlueLabelStyle" TargetType="Label">
-                <Setter Property="Foreground" Value="#566996"/>
-            </Style>
-            <Style BasedOn="{StaticResource  DefLabelStyleStyle}" x:Key="GreenLabelStyle" TargetType="Label">
-                <Setter Property="Foreground" Value="#769656"/>
-            </Style>
+            <SolidColorBrush x:Key="GreenTable">#769656</SolidColorBrush>
+            <SolidColorBrush x:Key="BlueTable">#566996</SolidColorBrush>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

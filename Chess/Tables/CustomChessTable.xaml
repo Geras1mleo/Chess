@@ -112,10 +112,10 @@
                    HorizontalAlignment="Right"
                    VerticalAlignment="Bottom"/>
         </Grid>
-        <Button x:Name="ChangeColorButton"
+        <Button x:Name="ChangeTableColorButton"
                 Content="Change Board Color"
                 Canvas.Left="458" Canvas.Top="73"
                 Width="122" Height="27"
-                PreviewMouseDown="ChangeColorButton_MouseDown"/>
+                PreviewMouseDown="ChangeTableColorButton_MouseDown"/>
     </Canvas>
 </Window>
