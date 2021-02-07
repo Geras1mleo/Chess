@@ -7,8 +7,8 @@
         mc:Ignorable="d"
         Name="window"
         Title="Chess" Height="700" Width="700" Background="#FF1A1A1A" Foreground="#FF343434">
-    <Canvas x:Name="canvas">
-        <Grid x:Name="table" Margin="100" AllowDrop="True" >
+    <Canvas x:Name="canvas" DragOver="Canvas_DragOver">
+        <Grid x:Name="table" Margin="100" AllowDrop="True">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="60"/>
@@ -70,7 +70,7 @@
                    Grid.Column="0"
                    HorizontalAlignment="Left"
                    VerticalAlignment="Top"/>
-            
+
             <Label Name="la"
                    Grid.Row="7"
                    Grid.Column="0"
@@ -112,5 +112,10 @@
                    HorizontalAlignment="Right"
                    VerticalAlignment="Bottom"/>
         </Grid>
+        <Button x:Name="ChangeColorButton"
+                Content="Change Board Color"
+                Canvas.Left="458" Canvas.Top="73"
+                Width="122" Height="27"
+                PreviewMouseDown="ChangeColorButton_MouseDown"/>
     </Canvas>
 </Window>

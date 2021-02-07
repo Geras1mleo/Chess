@@ -12,23 +12,65 @@ namespace Chess
 {
     public partial class CustomChessTable : Window
     {
+        // Hardcoded player color
+        private readonly FigureColor playerColor = FigureColor.White;
+
         private TableButton[,] buttons;
-        private Label[] letterLables, numberLables;
         private Board board;
 
         private TableButton dragButton;
+        private TableButton coloredOldBut, coloredNewBut;
         private Image dragImage;
 
-        private FigureColor playerColor = FigureColor.White;
-        private TableColor tableColor = TableColor.Blue;
+        private Label[] letterLables, numberLables;
+        private TableColor currentTableColor;
+
+        private bool userDragedFigureOutOfTable;
+
+        public TableColor TableColor
+        {
+            get { return currentTableColor; }
+            set
+            {
+                var image = new ImageBrush();
+                string darkLabelStyleResource = "";
+                switch (value)
+                {
+                    case TableColor.Green:
+                        image.ImageSource = new BitmapImage(new Uri($@"pack://application:,,,/Chess;component/Images/table_green.png", UriKind.RelativeOrAbsolute));
+                        darkLabelStyleResource = "GreenLabelStyle";
+                        break;
+                    case TableColor.Blue:
+                        image.ImageSource = new BitmapImage(new Uri($@"pack://application:,,,/Chess;component/Images/table_blue.png", UriKind.RelativeOrAbsolute));
+                        darkLabelStyleResource = "BlueLabelStyle";
+                        break;
+                }
+                table.Background = image;
+                currentTableColor = value;
+
+                // Setting color to numbers and letters
+
+                letterLables = new Label[] { la, lb, lc, ld, le, lf, lg, lh };
+                numberLables = new Label[] { n1, n2, n3, n4, n5, n6, n7, n8 };
+
+                for (int i = 0; i < letterLables.Length; i++)
+                {
+                    // Setting Style from resources depending on label position => Dark, light, dark, light, dark
+                    numberLables[i].Style = (Style)FindResource(i % 2 == 0 ? "DefLabelStyleStyle" : darkLabelStyleResource);
+                    letterLables[i].Style = (Style)FindResource(i % 2 == 0 ? "DefLabelStyleStyle" : darkLabelStyleResource);
+                }
+            }
+        }
 
         public CustomChessTable()
         {
             InitializeComponent();
-            InitializeBoard(playerColor, tableColor);
+
+            TableColor = TableColor.Blue;
+            InitializeBoard(playerColor);
         }
         
-        private void InitializeBoard(FigureColor playerColor, TableColor tableColor)
+        private void InitializeBoard(FigureColor playerColor)
         {
             buttons = new TableButton[8, 8];
             board = new Board();
@@ -40,7 +82,7 @@ namespace Chess
                 {
                     var button = new TableButton((short)i, (short)k);
 
-                    button.PreviewMouseDown += DragFigure;
+                    button.PreviewMouseLeftButtonDown += DragFigure;
                     button.DragOver += DragOver;
                     button.DragLeave += DragLeave;
                     button.Drop += DropFigure;
@@ -69,27 +111,8 @@ namespace Chess
                     buttons[i, j].Image = board.Figures[i, j]?.Image;
             }
 
-            
-            ImageBrush image = new ImageBrush();
-            string darkLabelStyleResource;
-            string lightLabelStyleResource = "DefLabelStyleStyle";
-
-            if(tableColor == TableColor.Blue)
-            {
-                image.ImageSource = new BitmapImage(new Uri($@"pack://application:,,,/Chess;component/Images/table_blue.png", UriKind.RelativeOrAbsolute));
-                darkLabelStyleResource = "BlueLabelStyle";
-            }
-            else
-            {
-                image.ImageSource = new BitmapImage(new Uri($@"pack://application:,,,/Chess;component/Images/table_green.png", UriKind.RelativeOrAbsolute));
-                darkLabelStyleResource = "GreenLabelStyle";
-            }
-            table.Background = image;
 
             // Setting right letter/number on right position on board
-            letterLables = new Label[] { la, lb, lc, ld, le, lf, lg, lh };
-            numberLables = new Label[] { n1, n2, n3, n4, n5, n6, n7, n8 };
-
             string[] lettets = {"a", "b", "c", "d", "e", "f", "g", "h"};
 
             for (int i = 0, j = letterLables.Length - 1; i < letterLables.Length; i++, j--)
@@ -97,10 +120,6 @@ namespace Chess
                 // Setting numbers/letters depending on player color => board rotation
                 numberLables[i].Content = playerColor == FigureColor.White ? i+1 : j+1;
                 letterLables[i].Content = playerColor == FigureColor.White ? lettets[i] : lettets[j];
-
-                // Setting Style from resources depending on label position => Dark, light, dark, light, dark
-                numberLables[i].Style = (Style)FindResource(i % 2 == 0 ? lightLabelStyleResource : darkLabelStyleResource);
-                letterLables[i].Style = (Style)FindResource(i % 2 == 0 ? lightLabelStyleResource : darkLabelStyleResource);
             }
 
             dragImage = new Image()
@@ -115,33 +134,37 @@ namespace Chess
         private new void DragLeave(object sender, DragEventArgs e)
         {
             var button = sender as TableButton;
-            button.Background = Brushes.Transparent;
-            button.Opacity = 0.95;
-            e.Handled = true;
+            if(dragButton != button)
+            {
+                button.Background = Brushes.Transparent;
+                button.Opacity = 0.95;
+            }
         }
 
         private new void DragOver(object sender, DragEventArgs e)
         {
             var button = sender as TableButton;
-            button.Background = Brushes.Yellow;
-            button.Opacity = 0.6;
-            e.Handled = true;
+            if(dragButton != button)
+            {
+                button.Background = Brushes.Yellow;
+                button.Opacity = 0.6;
+            }
         }
 
         private void DragFigure(object sender, MouseEventArgs e)
         {
-            // First we will check if the button has figure and then remember and allow drag
             var button = sender as TableButton;
-            if (e.LeftButton == MouseButtonState.Pressed && board.Figures[button.PosVertical, button.PosHorizontal] != null)
+            // First we will check if the button has figure and then remember and allow drag
+            if (board.Figures[button.PosVertical, button.PosHorizontal] != null)
             {
+                button.Background = Brushes.Yellow;
+
                 // Remembering button/position/figure that has been draged
                 dragButton = button;
 
-                // Animation of draging figure
-                button.Image = null;
+                // Start animation of draging figure
+                dragButton.Image = null;
                 dragImage.Source = new BitmapImage(new Uri(board.Figures[dragButton.PosVertical, dragButton.PosHorizontal].Image, UriKind.Relative));
-
-                DragAsync();
 
                 // DO NOT DELETE THIS!!! we wont use it later but otherwise drag & drop doesn't work
                 var data = new DataObject();
@@ -150,48 +173,86 @@ namespace Chess
                 DragDrop.DoDragDrop(button, data, DragDropEffects.Move);
             }
         }
-        int i = 0;
-        /// <summary>
-        /// Doesnt work yet
-        /// </summary>
-        private async void DragAsync()
-        {
-            await Task.Run(() =>
-            {
-                i = 0;
-                while (dragButton != null)
-                {
-                    Thread.Sleep(10);
-                    Dispatcher.Invoke(new Action(() =>
-                    {
-                        //dragImage.SetValue(Canvas.TopProperty, Mouse.GetPosition(Application.Current.MainWindow).Y - 28);
-                        //dragImage.SetValue(Canvas.LeftProperty, Mouse.GetPosition(Application.Current.MainWindow).X - 28);
-                        Canvas.SetTop(dragImage, i);
-                        Canvas.SetLeft(dragImage, i);
-                    }));
-                    i++;
-                }
-            });
-        }
 
         private void DropFigure(object sender, DragEventArgs e)
         {
             var newbutton = sender as TableButton;
             newbutton.Opacity = 0.95;
 
-            if(dragButton != null && !(dragButton.PosVertical == newbutton.PosVertical && dragButton.PosHorizontal == newbutton.PosHorizontal))
+            if(userDragedFigureOutOfTable)
             {
-                // Copying to the new position
-                board.Figures[newbutton.PosVertical, newbutton.PosHorizontal] = board.Figures[dragButton.PosVertical, dragButton.PosHorizontal];
-                newbutton.Image = board.Figures[newbutton.PosVertical, newbutton.PosHorizontal]?.Image;
-
-                // Clearing old position
-                board.Figures[dragButton.PosVertical, dragButton.PosHorizontal] = null;
-                buttons[dragButton.PosVertical, dragButton.PosHorizontal].Image = null;
+                newbutton.Background = Brushes.Transparent;
+                userDragedFigureOutOfTable = false;
+                return;
             }
-            else newbutton.Image = board.Figures[newbutton.PosVertical, newbutton.PosHorizontal]?.Image;
+
+            if (!(dragButton.PosVertical == newbutton.PosVertical && dragButton.PosHorizontal == newbutton.PosHorizontal))
+            {
+                DropFigureToNewPosition(newbutton);
+            }
+            else
+            {
+                // Setting image back on button if user dropped figure on same position
+                newbutton.Image = board.Figures[newbutton.PosVertical, newbutton.PosHorizontal].Image;
+            }
+
+            // Coloring last move
+            if (coloredOldBut != null)
+                coloredOldBut.Background = Brushes.Transparent;
+            if (coloredNewBut != null)
+                coloredNewBut.Background = Brushes.Transparent;
+
+            newbutton.Background = Brushes.Yellow;
+            dragButton.Background = Brushes.Yellow;
+
+            coloredOldBut = dragButton;
+            coloredNewBut = newbutton;
+
             dragButton = null;
             dragImage.Source = null;
+        }
+
+        private void Canvas_DragOver(object sender, DragEventArgs e)
+        {
+            var pos = e.GetPosition(canvas);
+            Canvas.SetTop(dragImage, pos.Y - 28);
+            Canvas.SetLeft(dragImage, pos.X - 28);
+
+            var tablePos = e.GetPosition(this.table);
+
+            if ((tablePos.X < 10 || tablePos.X + 10 > table.ActualWidth|| tablePos.Y < 10 || tablePos.Y + 10> table.ActualHeight) && dragButton != null)
+            {
+                dragButton.Image = board.Figures[dragButton.PosVertical, dragButton.PosHorizontal].Image;
+
+                userDragedFigureOutOfTable = true;
+                
+                dragButton = null;
+                dragImage.Source = null;
+            }
+        }
+
+        private void DropFigureToNewPosition(TableButton newbutton)
+        {
+            // Copying to the new position
+            board.Figures[newbutton.PosVertical, newbutton.PosHorizontal] = board.Figures[dragButton.PosVertical, dragButton.PosHorizontal];
+            newbutton.Image = board.Figures[newbutton.PosVertical, newbutton.PosHorizontal].Image;
+
+            // Clearing old position
+            board.Figures[dragButton.PosVertical, dragButton.PosHorizontal] = null;
+            buttons[dragButton.PosVertical, dragButton.PosHorizontal].Image = null;
+        }
+
+        private void ChangeColorButton_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            switch (TableColor)
+            {
+                case TableColor.Green:
+                    TableColor = TableColor.Blue;
+                    break;
+                case TableColor.Blue:
+                    TableColor = TableColor.Green;
+                    break;
+            }
         }
     }
 }
