@@ -1,11 +1,15 @@
 ﻿namespace Chess.ChessBackEnd
 {
-    class Board
+    public partial class Board
     {
         public Figure[,] Figures { get; set; }
 
-        public Board()
+        //We need this buttons only for En Passant to clear image from button
+        private TableButton[,] buttons;
+
+        public Board(TableButton[,] buttons)
         {
+            this.buttons = buttons;
             Figures = new Figure[8, 8];
             
             Figures[0, 0] = new Figure(FigureColor.White, FigureType.Rook);

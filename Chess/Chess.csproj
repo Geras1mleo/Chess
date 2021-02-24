@@ -65,6 +65,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ChessBackEnd\Board.cs" />
+    <Compile Include="ChessBackEnd\OperationValidation.cs" />
     <Compile Include="ChessBackEnd\Enums.cs" />
     <Compile Include="ChessBackEnd\Figure.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

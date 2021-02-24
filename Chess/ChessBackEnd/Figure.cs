@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -10,7 +9,8 @@ namespace Chess.ChessBackEnd
     public class Figure
     {
         public FigureColor Color { get; }
-        public FigureType Type { get; }
+        public FigureType Type { get; set; }
+
         public Figure(FigureColor color, FigureType type)
         {
             Color = color;
@@ -18,7 +18,7 @@ namespace Chess.ChessBackEnd
         }
 
         /// <summary>
-        /// Returns an icon of this figure
+        /// Returns a path to icon of this figure
         /// </summary>
         public string Image
         {
@@ -70,7 +70,7 @@ namespace Chess.ChessBackEnd
         public short PosHorizontal { get;}
         
         /// <summary>
-        /// Sets an icon to a button
+        /// Sets an icon to a button by given path
         /// </summary>
         public string Image
         {

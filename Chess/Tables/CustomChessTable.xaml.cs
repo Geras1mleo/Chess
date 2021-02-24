@@ -11,7 +11,7 @@ namespace Chess
     public partial class CustomChessTable : Window
     {
         // Hardcoded player color
-        private readonly FigureColor playerColor = FigureColor.White;
+        private readonly FigureColor playerColor = FigureColor.Black;
 
         private TableButton[,] buttons;
         private Board board;
@@ -70,6 +70,9 @@ namespace Chess
             }
         }
 
+        // Reminds whitch player now can move figures
+        public static FigureColor PlayerMove { get; set; } = FigureColor.White;
+
         public CustomChessTable()
         {
             InitializeComponent();
@@ -80,7 +83,7 @@ namespace Chess
         {
             TableColor = tableColor;
             buttons = new TableButton[8, 8];
-            board = new Board();
+            board = new Board(buttons);
 
             // Creating and setting buttons on right position here
             for (int i = 0, j = table.RowDefinitions.Count - 1; i < table.RowDefinitions.Count; i++, j--)
@@ -141,7 +144,7 @@ namespace Chess
         private new void DragLeave(object sender, DragEventArgs e)
         {
             var button = sender as TableButton;
-            if(dragButton != button)
+            if(button != dragButton && button != coloredOldBut && button != coloredNewBut)
             {
                 button.Background = Brushes.Transparent;
                 button.Opacity = 0.95;
@@ -151,7 +154,7 @@ namespace Chess
         private new void DragOver(object sender, DragEventArgs e)
         {
             var button = sender as TableButton;
-            if(dragButton != button)
+            if(button != dragButton && button != coloredOldBut && button != coloredNewBut)
             {
                 button.Background = Brushes.Yellow;
                 button.Opacity = 0.6;
@@ -162,10 +165,10 @@ namespace Chess
         {
             var button = sender as TableButton;
             // First we will check if the button has figure and then remember and allow drag
-            if (board.Figures[button.PosVertical, button.PosHorizontal] != null)
+            if (board.Figures[button.PosVertical, button.PosHorizontal] != null && !board.IsKingAttacked(buttons[button.PosVertical, button.PosHorizontal]))
             {
                 button.Background = Brushes.Yellow;
-
+                userDragedFigureOutOfTable = false;
                 // Remembering button/position/figure that has been draged
                 dragButton = button;
 
@@ -184,36 +187,36 @@ namespace Chess
         private void DropFigure(object sender, DragEventArgs e)
         {
             var newbutton = sender as TableButton;
-            newbutton.Opacity = 0.95;
 
-            if(userDragedFigureOutOfTable)
+            newbutton.Opacity = 0.95;
+            newbutton.Background = Brushes.Transparent;
+
+            if (userDragedFigureOutOfTable)
             {
                 newbutton.Background = Brushes.Transparent;
                 userDragedFigureOutOfTable = false;
                 return;
             }
+            else dragButton.Background = Brushes.Transparent;
 
+            // Here we check if user has dropped figure to the same position
             if (!(dragButton.PosVertical == newbutton.PosVertical && dragButton.PosHorizontal == newbutton.PosHorizontal))
             {
-                DropFigureToNewPosition(newbutton);
+                // Checking if it's valid move
+                if(board.IsValidOperation(board.Figures[dragButton.PosVertical, dragButton.PosHorizontal],
+                                          new short[] { dragButton.PosVertical, dragButton.PosHorizontal },
+                                          new short[] { newbutton.PosVertical, newbutton.PosHorizontal }))
+                    DropFigureToNewPosition(dragButton, newbutton);
+                else
+                {
+                    dragButton.Image = board.Figures[dragButton.PosVertical, dragButton.PosHorizontal].Image;
+                }
             }
             else
             {
                 // Setting image back on button if user dropped figure on same position
                 newbutton.Image = board.Figures[newbutton.PosVertical, newbutton.PosHorizontal].Image;
             }
-
-            // Coloring last move
-            if (coloredOldBut != null)
-                coloredOldBut.Background = Brushes.Transparent;
-            if (coloredNewBut != null)
-                coloredNewBut.Background = Brushes.Transparent;
-
-            newbutton.Background = Brushes.Yellow;
-            dragButton.Background = Brushes.Yellow;
-
-            coloredOldBut = dragButton;
-            coloredNewBut = newbutton;
 
             dragButton = null;
             dragImage.Source = null;
@@ -227,18 +230,21 @@ namespace Chess
 
             var tablePos = e.GetPosition(this.table);
 
+            // Adding small margin
             if ((tablePos.X < 10 || tablePos.X + 10 > table.ActualWidth|| tablePos.Y < 10 || tablePos.Y + 10> table.ActualHeight) && dragButton != null)
             {
                 dragButton.Image = board.Figures[dragButton.PosVertical, dragButton.PosHorizontal].Image;
 
                 userDragedFigureOutOfTable = true;
+
+                dragButton.Background = Brushes.Transparent;
                 
                 dragButton = null;
                 dragImage.Source = null;
             }
         }
 
-        private void DropFigureToNewPosition(TableButton newbutton)
+        private void DropFigureToNewPosition(TableButton dragButton, TableButton newbutton)
         {
             // Copying to the new position
             board.Figures[newbutton.PosVertical, newbutton.PosHorizontal] = board.Figures[dragButton.PosVertical, dragButton.PosHorizontal];
@@ -247,6 +253,18 @@ namespace Chess
             // Clearing old position
             board.Figures[dragButton.PosVertical, dragButton.PosHorizontal] = null;
             buttons[dragButton.PosVertical, dragButton.PosHorizontal].Image = null;
+
+            // Coloring last move
+            if (coloredOldBut != null)
+                coloredOldBut.Background = Brushes.Transparent;
+            if (coloredNewBut != null)
+                coloredNewBut.Background = Brushes.Transparent;
+
+            dragButton.Background = Brushes.Yellow;
+            newbutton.Background = Brushes.Yellow;
+
+            coloredOldBut = dragButton;
+            coloredNewBut = newbutton;
         }
 
         private void ChangeTableColorButton_MouseDown(object sender, MouseButtonEventArgs e)
