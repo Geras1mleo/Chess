@@ -11,7 +11,7 @@ namespace Chess
     public partial class CustomChessTable : Window
     {
         // Hardcoded player color
-        private readonly FigureColor playerColor = FigureColor.Black;
+        private readonly FigureColor playerColor = FigureColor.White;
 
         private TableButton[,] buttons;
         private Board board;
@@ -165,7 +165,7 @@ namespace Chess
         {
             var button = sender as TableButton;
             // First we will check if the button has figure and then remember and allow drag
-            if (board.Figures[button.PosVertical, button.PosHorizontal] != null && !board.IsKingAttacked(buttons[button.PosVertical, button.PosHorizontal]))
+            if (board.Figures[button.PosVertical, button.PosHorizontal] != null)
             {
                 button.Background = Brushes.Yellow;
                 userDragedFigureOutOfTable = false;

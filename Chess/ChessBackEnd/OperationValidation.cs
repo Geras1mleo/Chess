@@ -28,17 +28,17 @@ namespace Chess.ChessBackEnd
                     isValid = RookValidation(figure, oldPos, newPos);
                     break;
                 case FigureType.Knight:
-                    // TODO
+                    isValid = KnightValidation(figure, oldPos, newPos);
                     break;
                 case FigureType.Bishop:
                     isValid = BishopValidation(figure, oldPos, newPos);
                     break;
                 case FigureType.Queen:
-                    // For queen just using validation of bishop or rook
+                    // For queen just using validation of bishop OR rook
                     isValid = BishopValidation(figure, oldPos, newPos) || RookValidation(figure, oldPos, newPos);
                     break;
                 case FigureType.King:
-                    //TODO
+                    isValid = KingValidation(figure, oldPos, newPos);
                     break;
             }
             if (isValid)
@@ -49,7 +49,7 @@ namespace Chess.ChessBackEnd
             else return false;
         }
 
-        public bool IsKingAttacked(TableButton button)
+        private bool IsKingAttacked()
         {
             //TODO
             return false;
@@ -146,6 +146,25 @@ namespace Chess.ChessBackEnd
             else return false;
         }
 
+        private bool KnightValidation(Figure figure, short[] oldPos, short[] newPos)
+        {
+            if(// Moving forewards
+               (newPos[0] - oldPos[0] == 2 && newPos[1] - oldPos[1] == 1) ||
+               (newPos[0] - oldPos[0] == 1 && newPos[1] - oldPos[1] == 2) ||
+               (newPos[0] - oldPos[0] == 2 && newPos[1] - oldPos[1] == -1) ||
+               (newPos[0] - oldPos[0] == 1 && newPos[1] - oldPos[1] == -2) ||
+               // Moving backwards
+               (newPos[0] - oldPos[0] == -2 && newPos[1] - oldPos[1] == 1) ||
+               (newPos[0] - oldPos[0] == -1 && newPos[1] - oldPos[1] == 2) ||
+               (newPos[0] - oldPos[0] == -2 && newPos[1] - oldPos[1] == -1) ||
+               (newPos[0] - oldPos[0] == -1 && newPos[1] - oldPos[1] == -2))
+            {
+                if (Figures[newPos[0], newPos[1]] != null && Figures[newPos[0], newPos[1]].Color == figure.Color) return false;
+                else return true;
+            }
+            return false;
+        }
+
         private bool BishopValidation(Figure figure, short[] oldPos, short[] newPos)
         {
             // If new position is on same vertical or horizontal just go back bc its impossible for bishop
@@ -178,6 +197,16 @@ namespace Chess.ChessBackEnd
                     }
                     else return true;
                 }
+            }
+            return false;
+        }
+
+        private bool KingValidation(Figure figure, short[] oldPos, short[] newPos)
+        {
+            if((newPos[0] - oldPos[0] == 0 || newPos[0] - oldPos[0] == 1 || newPos[0] - oldPos[0] == -1) && (newPos[1] - oldPos[1] == 0 || newPos[1] - oldPos[1] == 1 || newPos[1] - oldPos[1] == -1))
+            {
+                if (Figures[newPos[0], newPos[1]] != null && Figures[newPos[0], newPos[1]].Color == figure.Color) return false;
+                else return true;
             }
             return false;
         }
