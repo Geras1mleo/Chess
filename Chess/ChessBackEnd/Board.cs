@@ -7,8 +7,15 @@
         //We need this buttons only for En Passant to clear image from button
         private TableButton[,] buttons;
 
-        public Board(TableButton[,] buttons)
+        public Board(TableButton[,] buttons, Board board = null)
         {
+            if (board != null)
+            {
+                Figures = board.Figures;
+                this.buttons = board.buttons;
+                return;
+            }
+
             this.buttons = buttons;
             Figures = new Figure[8, 8];
             

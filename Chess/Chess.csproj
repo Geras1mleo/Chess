@@ -56,6 +56,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Tables\NewGamePage.xaml.cs">
+      <DependentUpon>NewGamePage.xaml</DependentUpon>
+    </Compile>
     <Page Include="Tables\CustomChessTable.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -68,6 +71,7 @@
     <Compile Include="ChessBackEnd\OperationValidation.cs" />
     <Compile Include="ChessBackEnd\Enums.cs" />
     <Compile Include="ChessBackEnd\Figure.cs" />
+    <Compile Include="ChessBackEnd\Server.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -77,6 +81,10 @@
       <DependentUpon>CustomChessTable.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Tables\NewGamePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -101,50 +109,53 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Images\bb.png">
+    <Resource Include="Images\bb.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\bk.png">
+    </Resource>
+    <Resource Include="Images\bk.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </Resource>
     <Resource Include="Images\table_blue.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Content Include="Images\bn.png">
+    <Resource Include="Images\bn.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\bp.png">
+    </Resource>
+    <Resource Include="Images\bp.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\bq.png">
+    </Resource>
+    <Resource Include="Images\bq.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\br.png">
+    </Resource>
+    <Resource Include="Images\br.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\wb.png">
+    </Resource>
+    <Resource Include="Images\wb.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\wk.png">
+    </Resource>
+    <Resource Include="Images\wk.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\wn.png">
+    </Resource>
+    <Resource Include="Images\wn.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\wp.png">
+    </Resource>
+    <Resource Include="Images\wp.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\wq.png">
+    </Resource>
+    <Resource Include="Images\wq.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Images\wr.png">
+    </Resource>
+    <Resource Include="Images\wr.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\table_green.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\user.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

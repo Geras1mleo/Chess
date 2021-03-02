@@ -8,17 +8,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/bb.png")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/bk.png")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/bn.png")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/bp.png")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/bq.png")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/br.png")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/wb.png")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/wk.png")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/wn.png")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/wp.png")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/wq.png")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/wr.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/user.png")]
 
 

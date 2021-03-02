@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-C:\Users\geras\source\repos\Chess\Chess\obj\Debug\
+D:\Projects\Chess\Chess\obj\Debug\
 Chess
 none
 false
 DEBUG;TRACE
-C:\Users\geras\source\repos\Chess\Chess\App.xaml
-11579543063
-12319736872
-1096435966
-141183416626
-Tables\CustomChessTable.xaml;
+D:\Projects\Chess\Chess\App.xaml
+21896922427
 
-False
+1227112553
+141183416626
+Tables\CustomChessTable.xaml;Tables\NewGamePage.xaml;
+
+True
 

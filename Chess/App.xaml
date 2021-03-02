@@ -45,6 +45,18 @@
                 <Setter Property="FontWeight" Value="Medium" />
                 <Setter Property="Foreground" Value="White" />
             </Style>
+            <Style x:Key="RoundButton" TargetType="Button">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border CornerRadius="20" Background="{TemplateBinding Background}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="Background" Value="#49c849"/>
+            </Style>
             <SolidColorBrush x:Key="GreenTable">#769656</SolidColorBrush>
             <SolidColorBrush x:Key="BlueTable">#566996</SolidColorBrush>
         </ResourceDictionary>

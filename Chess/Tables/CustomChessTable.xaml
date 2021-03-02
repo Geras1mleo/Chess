@@ -6,9 +6,10 @@
         xmlns:local="clr-namespace:Chess"
         mc:Ignorable="d"
         Name="window"
-        Title="Chess" Height="700" Width="700" Background="#FF1A1A1A" Foreground="#FF343434">
-    <Canvas x:Name="canvas" DragOver="Canvas_DragOver">
-        <Grid x:Name="table" Margin="100" AllowDrop="True">
+        Title="Chess" Height="630" Width="726.4" Background="#FF343434" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize">
+
+    <Canvas x:Name="canvas" DragOver="Canvas_DragOver" >
+        <Grid x:Name="table" AllowDrop="True" Canvas.Left="30" Canvas.Top="60" Height="480" Width="480">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="60"/>
@@ -112,10 +113,51 @@
                    HorizontalAlignment="Right"
                    VerticalAlignment="Bottom"/>
         </Grid>
-        <Button x:Name="ChangeTableColorButton"
+
+        <Button x:Name="ChangeTableColorButton" 
                 Content="Change Board Color"
-                Canvas.Left="458" Canvas.Top="73"
-                Width="122" Height="27"
-                PreviewMouseDown="ChangeTableColorButton_MouseDown"/>
+                Canvas.Left="520" Canvas.Top="517"
+                Width="106" Height="23" BorderThickness="0"
+                PreviewMouseDown="ChangeTableColorButton_MouseDown"
+                FontSize="10" FontFamily="Century Gothic"/>
+        <Button x:Name="PlayWithFriendButton"
+                Content="Play New Game"
+                Style="{StaticResource RoundButton}"
+                Canvas.Left="535" Canvas.Top="60"
+                Width="166" Height="50"
+                PreviewMouseDown="PlayWithFriendButton_PreviewMouseDown" 
+                FontSize="15" FontFamily="Century Gothic"/>
+        <Button x:Name="LeaveLobbyButton"
+                Content="Leave Lobby"
+                Canvas.Left="645" Canvas.Top="60"
+                Width="65" Height="24"
+                PreviewMouseDown="PlayWithFriendButton_PreviewMouseDown" 
+                FontSize="10" BorderThickness="0"
+                Background="Red"
+                Visibility="Hidden" FontFamily="Century Gothic"/>
+
+        <Image Height="38" Canvas.Left="30" Canvas.Top="17" Width="38" Source="/Chess;component/Images/user.png" Stretch="Fill" />
+        <Image Height="38" Canvas.Left="30" Canvas.Top="545" Width="38" Source="/Chess;component/Images/user.png" Stretch="Fill" />
+        <TextBox x:Name="OpponentNick"
+                 Height="23" 
+                 Canvas.Left="74" 
+                 Canvas.Top="17"
+                 TextWrapping="Wrap"
+                 Width="120" 
+                 Background="Transparent"
+                 Text="Your opponent"
+                 BorderThickness="0"
+                 FontSize="15" FontFamily="Century Gothic"/>
+        <TextBox x:Name="PlayerNick"
+                Height="23" 
+                Canvas.Left="78" 
+                Canvas.Top="545"
+                TextWrapping="Wrap"
+                Width="120" 
+                Background="Transparent"
+                Text="You"
+                BorderThickness="0"
+                FontSize="15" FontFamily="Century Gothic"/>
+        
     </Canvas>
 </Window>

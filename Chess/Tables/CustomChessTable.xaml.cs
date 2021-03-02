@@ -5,26 +5,30 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Chess.ChessBackEnd;
+using Chess.Tables;
 
 namespace Chess
 {
     public partial class CustomChessTable : Window
     {
-        // Hardcoded player color
-        private readonly FigureColor playerColor = FigureColor.White;
+        private FigureColor playerColor;
 
         private TableButton[,] buttons;
         private Board board;
+        private readonly Server server;
 
         private TableButton dragButton;
         private TableButton coloredOldBut, coloredNewBut;
         private Image dragImage;
 
         private Label[] letterLables, numberLables;
-        private TableColor currentTableColor;
 
         private bool userDragedFigureOutOfTable;
 
+        // Reminds whitch player now can move figures
+        public static FigureColor PlayerMove { get; set; } = FigureColor.White;
+
+        private TableColor currentTableColor;
         public TableColor TableColor
         {
             get { return currentTableColor; }
@@ -70,20 +74,20 @@ namespace Chess
             }
         }
 
-        // Reminds whitch player now can move figures
-        public static FigureColor PlayerMove { get; set; } = FigureColor.White;
-
         public CustomChessTable()
         {
             InitializeComponent();
-            InitializeBoard(playerColor, TableColor.Blue);
+            InitializeBoard(FigureColor.White, TableColor.Blue);
+            server = new Server(DataReceived);
         }
         
-        private void InitializeBoard(FigureColor playerColor, TableColor tableColor)
+        private void InitializeBoard(FigureColor playerColor, TableColor tableColor, Board currBoard = null)
         {
+            this.playerColor = playerColor;
             TableColor = tableColor;
+            
             buttons = new TableButton[8, 8];
-            board = new Board(buttons);
+            board = new Board(buttons, currBoard);
 
             // Creating and setting buttons on right position here
             for (int i = 0, j = table.RowDefinitions.Count - 1; i < table.RowDefinitions.Count; i++, j--)
@@ -132,6 +136,7 @@ namespace Chess
                 letterLables[i].Content = playerColor == FigureColor.White ? lettets[i] : lettets[j];
             }
 
+            canvas.Children.Remove(dragImage);
             dragImage = new Image()
             {
                 IsHitTestVisible = false,
@@ -174,7 +179,7 @@ namespace Chess
 
                 // Start animation of draging figure
                 dragButton.Image = null;
-                dragImage.Source = new BitmapImage(new Uri(board.Figures[dragButton.PosVertical, dragButton.PosHorizontal].Image, UriKind.Relative));
+                dragImage.Source = new BitmapImage(new Uri(board.Figures[dragButton.PosVertical, dragButton.PosHorizontal].Image, UriKind.RelativeOrAbsolute));
 
                 // DO NOT DELETE THIS!!! we wont use it later but otherwise drag & drop doesn't work
                 var data = new DataObject();
@@ -199,7 +204,7 @@ namespace Chess
             }
             else dragButton.Background = Brushes.Transparent;
 
-            // Here we check if user has dropped figure to the same position
+            // Here we check if user has not dropped figure to the same position
             if (!(dragButton.PosVertical == newbutton.PosVertical && dragButton.PosHorizontal == newbutton.PosHorizontal))
             {
                 // Checking if it's valid move
@@ -207,10 +212,8 @@ namespace Chess
                                           new short[] { dragButton.PosVertical, dragButton.PosHorizontal },
                                           new short[] { newbutton.PosVertical, newbutton.PosHorizontal }))
                     DropFigureToNewPosition(dragButton, newbutton);
-                else
-                {
-                    dragButton.Image = board.Figures[dragButton.PosVertical, dragButton.PosHorizontal].Image;
-                }
+
+                else dragButton.Image = board.Figures[dragButton.PosVertical, dragButton.PosHorizontal].Image;
             }
             else
             {
@@ -244,8 +247,17 @@ namespace Chess
             }
         }
 
+        private void PlayWithFriendButton_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var newGame = new NewGamePage(server.GetCreateLobbyAction());
+            newGame.ShowDialog();
+            //RotateBoard();
+        }
+
         private void DropFigureToNewPosition(TableButton dragButton, TableButton newbutton)
         {
+            PlayerMove = PlayerMove == FigureColor.White ? FigureColor.Black : FigureColor.White;
+
             // Copying to the new position
             board.Figures[newbutton.PosVertical, newbutton.PosHorizontal] = board.Figures[dragButton.PosVertical, dragButton.PosHorizontal];
             newbutton.Image = board.Figures[newbutton.PosVertical, newbutton.PosHorizontal].Image;
@@ -280,6 +292,19 @@ namespace Chess
                     ChangeTableColorButton.Background = (SolidColorBrush)Application.Current.Resources["BlueTable"];
                     break;
             }
+        }
+        
+        private void RotateBoard()
+        {
+            foreach (var item in buttons)
+                table.Children.Remove(item);
+
+            InitializeBoard(playerColor == FigureColor.White ? FigureColor.Black : FigureColor.White, currentTableColor, board);
+        }
+
+        private void DataReceived(string move)
+        {
+
         }
     }
 }

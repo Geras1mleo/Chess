@@ -59,7 +59,7 @@ namespace Chess.ChessBackEnd
                 }
 
                 
-                return $@"/Chess;component/Images/{colorLetter}{typeLetter}.png";
+                return $@"pack://application:,,,/Chess;component/Images/{colorLetter}{typeLetter}.png";
             }
         }
     }

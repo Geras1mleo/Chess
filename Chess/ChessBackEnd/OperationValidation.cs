@@ -41,18 +41,93 @@ namespace Chess.ChessBackEnd
                     isValid = KingValidation(figure, oldPos, newPos);
                     break;
             }
-            if (isValid)
-            {
-                CustomChessTable.PlayerMove = figure.Color == FigureColor.White ? FigureColor.Black : FigureColor.White;
-                return true;
-            }
+            if (isValid && !IsKingAttacked(figure, oldPos, newPos)) return true;
             else return false;
         }
 
-        private bool IsKingAttacked()
+        private bool IsKingAttacked(Figure figure, short[] oldPos, short[] newPos)
         {
-            //TODO
-            return false;
+            // Remember begin situation of figures
+            var beginSituation = (Figure[,])Figures.Clone();
+
+            Figures[newPos[0], newPos[1]] = Figures[oldPos[0], oldPos[1]];
+            Figures[oldPos[0], oldPos[1]] = null;
+
+            // Here comes each figure that must be checked and current position of it
+            object[,] figures = new object[16, 2];
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    if (Figures[i,j] != null && Figures[i,j].Color != figure.Color)
+                    {
+                        for (int k = 0; k < figures.GetLength(0); k++)
+                        {
+                            if (figures[k, 0] == null)
+                            {
+                                figures[k, 0] = Figures[i, j];
+                                figures[k, 1] = new short[] { (short)i, (short)j };
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Searching for king position
+            var kingPos = new short[2];
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    if(Figures[i,j] != null && Figures[i,j].Color == figure.Color && Figures[i,j].Type == FigureType.King)
+                    {
+                        kingPos[0] = (short)i;
+                        kingPos[1] = (short)j;
+                        goto FoundKing;
+                    }
+                }
+            }
+            // Going out from 2 loops
+            FoundKing:
+
+            bool isAttacked = false;
+
+            for (int i = 0; i < figures.GetLength(0); i++)
+            {
+                var fig = (Figure)figures[i, 0];
+                if (fig == null) break;
+
+                switch (fig.Type)
+                {
+                    case FigureType.Pawn:
+                        isAttacked = PawnValidation(fig, (short[])figures[i, 1], kingPos);
+                        break;
+                    case FigureType.Rook:
+                        isAttacked = RookValidation(fig, (short[])figures[i, 1], kingPos);
+                        break;
+                    case FigureType.Knight:
+                        isAttacked = KnightValidation(fig, (short[])figures[i, 1], kingPos);
+                        break;
+                    case FigureType.Bishop:
+                        isAttacked = BishopValidation(fig, (short[])figures[i, 1], kingPos);
+                        break;
+                    case FigureType.Queen:
+                        // For queen just using validation of bishop OR rook
+                        isAttacked = BishopValidation(fig, (short[])figures[i, 1], kingPos) || RookValidation(fig, (short[])figures[i, 1], kingPos);
+                        break;
+                    case FigureType.King:
+                        isAttacked = KingValidation(fig, (short[])figures[i, 1], kingPos);
+                        break;
+                }
+
+                if (isAttacked) break;
+            }
+
+            Figures = beginSituation;
+
+            if (isAttacked) return true;
+            else return false;
         }
 
         private bool ValidPlayerMove(Figure figure)
