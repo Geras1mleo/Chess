@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -212,7 +213,9 @@ namespace Chess
                                           new short[] { dragButton.PosVertical, dragButton.PosHorizontal },
                                           new short[] { newbutton.PosVertical, newbutton.PosHorizontal }))
                 {
+                    
                     server.SendMove(LobbyID.Text, $"{dragButton.PosVertical},{dragButton.PosHorizontal};{newbutton.PosVertical},{newbutton.PosHorizontal}");
+                    
                     DropFigureToNewPosition(dragButton, newbutton);
                 }
 

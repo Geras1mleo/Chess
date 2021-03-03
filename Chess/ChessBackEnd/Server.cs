@@ -53,25 +53,28 @@ namespace Chess.ChessBackEnd
         /// <returns>New lobby id</returns>
         public string CreateNewLobby(string nickname)
         {
-            try
+            return Task.Factory.StartNew(() =>
             {
-                sw.Write($"NewLobby/{nickname}");
-                
-                var data = sr.ReadToEnd();
-
-                if (data.Contains("NewLobby/"))
+                try
                 {
-                    var lobbyID = data.Replace("NewLobby/", "");
-                    ConnectToLobby(lobbyID);
+                    sw.Write($"NewLobby/{nickname}");
 
-                    return lobbyID;
+                    var data = sr.ReadToEnd();
+
+                    if (data.Contains("NewLobby/"))
+                    {
+                        var lobbyID = data.Replace("NewLobby/", "");
+                        ConnectToLobby(lobbyID);
+
+                        return lobbyID;
+                    }
+                    else return "Error: Invalid data received from server";
                 }
-                else return "Error: Invalid data received from server";
-            }
-            catch (Exception e)
-            {
-                return $"Error: {e.Message}";
-            }
+                catch (Exception e)
+                {
+                    return $"Error: {e.Message}";
+                }
+            }).Result;
         }
 
         private void Listening()
@@ -99,25 +102,28 @@ namespace Chess.ChessBackEnd
 
         public void SendMove(string lobbyID, string move)
         {
-            try
+            Task.Factory.StartNew(() =>
             {
-                sw.Write($"Move/{lobbyID}/{move}");
-
-                var data = sr.ReadToEnd();
-
-                if (data.Contains("ConfirmMove/"))
+                try
                 {
-                    MessageBox.Show("Data send succesfully: " + data);
+                    sw.Write($"Move/{lobbyID}/{move}");
+
+                    var data = sr.ReadToEnd();
+
+                    if (data.Contains("ConfirmMove/"))
+                    {
+                        MessageBox.Show("Data send succesfully: " + data);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Invalid data received when sending move to server: " + data);
+                    }
                 }
-                else
+                catch (Exception e)
                 {
-                    MessageBox.Show("Invalid data received when sending move to server: " + data);
+                    MessageBox.Show("Error: " + e.Message);
                 }
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("Error: " + e.Message);
-            }
+            });
         }
     }
 }
