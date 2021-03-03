@@ -68,15 +68,15 @@ namespace ChessServer
 
                     // For each client new thread that will be listening to incoming data
                     if(client.Connected)
-                        new Thread(() => ListenToClient(client)).Start();
+                        new Thread(() => ListenToClient(client)) { IsBackground = true}.Start();
                 }
             });
         }
 
         static void ListenToClient(Client client)
         {
-            var sr = new StreamReader(client.GetStream());
             Console.WriteLine("New client added\t Socket connected to: " + client.Client.RemoteEndPoint.ToString());
+            var sr = new StreamReader(client.GetStream());
 
             while (client.Connected)
             {
