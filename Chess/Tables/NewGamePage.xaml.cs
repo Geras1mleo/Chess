@@ -43,12 +43,17 @@ namespace Chess.Tables
                 ErrorNick.Foreground = new SolidColorBrush(Colors.Red);
                 return;
             }
+
             var id = CreateLobby(Nickname.Text);
-            if (id.Equals("error"))
+
+            if (id.Contains("Error"))
             {
-                MessageBox.Show("Can't connect to server", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Can't connect to server\n{id}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            Close();
+            else
+            {
+                Close();
+            }
         }
 
         private void Confirm_Click(object sender, RoutedEventArgs e)

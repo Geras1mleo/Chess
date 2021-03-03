@@ -65,7 +65,7 @@ namespace Chess
                     // Setting Style from resources depending on label position => Dark, light, dark, light, dark
                     numberLables[i].Style = style;
                     letterLables[i].Style = style;
-                    if(i % 2 != 0)
+                    if (i % 2 != 0)
                     {
                         numberLables[i].Foreground = color;
                         letterLables[i].Foreground = color;
@@ -78,14 +78,14 @@ namespace Chess
         {
             InitializeComponent();
             InitializeBoard(FigureColor.White, TableColor.Blue);
-            server = new Server(DataReceived);
+            server = new Server(DataReceived, ConnectToLobby);
         }
-        
+
         private void InitializeBoard(FigureColor playerColor, TableColor tableColor, Board currBoard = null)
         {
             this.playerColor = playerColor;
             TableColor = tableColor;
-            
+
             buttons = new TableButton[8, 8];
             board = new Board(buttons, currBoard);
 
@@ -102,7 +102,7 @@ namespace Chess
                     button.Drop += DropFigure;
 
                     // We rotate table depending on Figure Color of player / board position
-                    if(playerColor == FigureColor.White)
+                    if (playerColor == FigureColor.White)
                     {
                         Grid.SetRow(button, j);
                         Grid.SetColumn(button, k);
@@ -127,12 +127,12 @@ namespace Chess
 
 
             // Setting right letter/number on right position on board
-            string[] lettets = {"a", "b", "c", "d", "e", "f", "g", "h"};
+            string[] lettets = { "a", "b", "c", "d", "e", "f", "g", "h" };
 
             for (int i = 0, j = letterLables.Length - 1; i < letterLables.Length; i++, j--)
             {
                 // Setting numbers/letters depending on player color => board rotation
-                numberLables[i].Content = playerColor == FigureColor.White ? i+1 : j+1;
+                numberLables[i].Content = playerColor == FigureColor.White ? i + 1 : j + 1;
                 letterLables[i].Content = playerColor == FigureColor.White ? lettets[i] : lettets[j];
             }
 
@@ -149,7 +149,7 @@ namespace Chess
         private new void DragLeave(object sender, DragEventArgs e)
         {
             var button = sender as TableButton;
-            if(button != dragButton && button != coloredOldBut && button != coloredNewBut)
+            if (button != dragButton && button != coloredOldBut && button != coloredNewBut)
             {
                 button.Background = Brushes.Transparent;
                 button.Opacity = 0.95;
@@ -159,7 +159,7 @@ namespace Chess
         private new void DragOver(object sender, DragEventArgs e)
         {
             var button = sender as TableButton;
-            if(button != dragButton && button != coloredOldBut && button != coloredNewBut)
+            if (button != dragButton && button != coloredOldBut && button != coloredNewBut)
             {
                 button.Background = Brushes.Yellow;
                 button.Opacity = 0.6;
@@ -208,10 +208,13 @@ namespace Chess
             if (!(dragButton.PosVertical == newbutton.PosVertical && dragButton.PosHorizontal == newbutton.PosHorizontal))
             {
                 // Checking if it's valid move
-                if(board.IsValidOperation(board.Figures[dragButton.PosVertical, dragButton.PosHorizontal],
+                if (board.IsValidOperation(board.Figures[dragButton.PosVertical, dragButton.PosHorizontal],
                                           new short[] { dragButton.PosVertical, dragButton.PosHorizontal },
                                           new short[] { newbutton.PosVertical, newbutton.PosHorizontal }))
+                {
+                    server.SendMove(LobbyID.Text, $"{dragButton.PosVertical},{dragButton.PosHorizontal};{newbutton.PosVertical},{newbutton.PosHorizontal}");
                     DropFigureToNewPosition(dragButton, newbutton);
+                }
 
                 else dragButton.Image = board.Figures[dragButton.PosVertical, dragButton.PosHorizontal].Image;
             }
@@ -234,14 +237,14 @@ namespace Chess
             var tablePos = e.GetPosition(this.table);
 
             // Adding small margin
-            if ((tablePos.X < 10 || tablePos.X + 10 > table.ActualWidth|| tablePos.Y < 10 || tablePos.Y + 10> table.ActualHeight) && dragButton != null)
+            if ((tablePos.X < 10 || tablePos.X + 10 > table.ActualWidth || tablePos.Y < 10 || tablePos.Y + 10 > table.ActualHeight) && dragButton != null)
             {
                 dragButton.Image = board.Figures[dragButton.PosVertical, dragButton.PosHorizontal].Image;
 
                 userDragedFigureOutOfTable = true;
 
                 dragButton.Background = Brushes.Transparent;
-                
+
                 dragButton = null;
                 dragImage.Source = null;
             }
@@ -249,7 +252,7 @@ namespace Chess
 
         private void PlayWithFriendButton_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            var newGame = new NewGamePage(server.GetCreateLobbyAction());
+            var newGame = new NewGamePage(server.CreateNewLobby);
             newGame.ShowDialog();
             //RotateBoard();
         }
@@ -293,7 +296,7 @@ namespace Chess
                     break;
             }
         }
-        
+
         private void RotateBoard()
         {
             foreach (var item in buttons)
@@ -304,7 +307,12 @@ namespace Chess
 
         private void DataReceived(string move)
         {
-
+            MessageBox.Show("Data received from server: " + move);
+        }
+        private void ConnectToLobby(string lobbyID)
+        {
+            LobbyID.Text = lobbyID;
+            MessageBox.Show("Connected to lobby: " + lobbyID);
         }
     }
 }

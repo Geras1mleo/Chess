@@ -158,6 +158,7 @@
                 Text="You"
                 BorderThickness="0"
                 FontSize="15" FontFamily="Century Gothic"/>
-        
+        <TextBlock x:Name="LobbyID" Canvas.Left="581" TextWrapping="Wrap" Canvas.Top="136" Height="32" Width="72"/>
+
     </Canvas>
 </Window>

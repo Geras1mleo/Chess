@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ChessServer
@@ -14,6 +15,8 @@ namespace ChessServer
         const short PORT = 5853;
 
         static TcpListener server;
+        static bool listen = true;
+
         static List<Lobby> lobbies = new List<Lobby>();
         static List<string> IDs = new List<string>();
 
@@ -21,6 +24,20 @@ namespace ChessServer
         {
             server = new TcpListener(new IPEndPoint(IPAddress.Any, PORT));
             StartServerAsync();
+            while (true)
+            {
+                var str = Console.ReadLine();
+                if(str == "stop")
+                {
+                    listen = false;
+                    server.Stop();
+                }
+                else if(str == "start" && !listen)
+                {
+                    listen = true;
+                    StartServerAsync();
+                }
+            }
         }
 
         /// <summary>
@@ -32,8 +49,13 @@ namespace ChessServer
 
             Task.Factory.StartNew(() =>
             {
-                while (true)
+                while (listen)
                 {
+                    if (!server.Pending())
+                    {
+                        Thread.Sleep(200);
+                        continue;
+                    }
                     // When new client connects to server we get new variable of TcpClient here
                     Client client = (Client)server.AcceptTcpClient();
 
@@ -50,9 +72,9 @@ namespace ChessServer
 
             while (client.Connected)
             {
-                var str = sr.ReadToEnd();
+                var data = sr.ReadToEnd();
 
-                ProcessCommand(client, str);
+                ProcessCommand(client, data);
             }
             // Player disconnected => notify opponent
             if (!client.Connected)
@@ -64,6 +86,7 @@ namespace ChessServer
                 }
             }
         }
+
         /// <summary>
         /// Make new lobby:
         /// NewLobby/*nickname*
@@ -99,17 +122,26 @@ namespace ChessServer
                     ConnectToLobby(client, parameters[1], parameters[2]);
                     break;
                 default:
-                    Console.WriteLine("Invalid message format received: " + command);
+                    Console.WriteLine("Invalid message format received: " + command + "\tFrom: " + client.Client.RemoteEndPoint.ToString());
                     break;
             }
         }
+
         static void AddNewLobby(Client client, string nickname)
         {
+            // Generating new id for lobby
             var id = new Random().Next(0, 10000).ToString();
+
             if (!IDs.Contains(id))
             {
                 IDs.Add(id);
                 lobbies.Add(new Lobby(id, client, nickname));
+
+                var sw = new StreamWriter(client.GetStream());
+                sw.AutoFlush = true;
+
+                sw.Write($"NewLobby/{id}");
+
                 Console.WriteLine("New Lobby created: " + id);
             }
             else
@@ -124,9 +156,8 @@ namespace ChessServer
             foreach (var item in lobbies)
             {
                 if(item.LobbyID == lobbyID)
-                {
                     item.NewMove(client, move);
-                }
+                
             }
         }
 

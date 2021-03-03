@@ -40,7 +40,6 @@ namespace ChessServer
                 BlackClient.Nickname = nickname;
                 Console.WriteLine("Black player connected to lobby: " + LobbyID);
             }
-            
         }
 
         public void UserLeftNotify(TcpClient client)
@@ -86,15 +85,23 @@ namespace ChessServer
 
             try
             {
-                var swb = new StreamWriter(BlackClient.GetStream());
-                swb.AutoFlush = true;
-
                 var sww = new StreamWriter(WhiteClient.GetStream());
                 sww.AutoFlush = true;
 
-                swb.Write($"ConfirmedMove/{LobbyID}/{move}");
-                sww.Write($"ConfirmedMove/{LobbyID}/{move}");
+                var swb = new StreamWriter(BlackClient.GetStream());
+                swb.AutoFlush = true;
 
+                // Confirm move to the same client
+                if (client == WhiteClient)
+                {
+                    swb.Write($"Move/{move}");
+                    sww.Write($"ConfirmMove/{move}");
+                }
+                else if (client == BlackClient)
+                {
+                    sww.Write($"Move/{move}");
+                    swb.Write($"ConfirmMove/{move}");
+                }
                 Moves.Add(move);
             }
             catch (Exception e)
