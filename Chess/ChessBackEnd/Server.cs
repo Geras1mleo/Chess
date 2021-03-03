@@ -13,10 +13,14 @@ namespace Chess.ChessBackEnd
 {
     class Server
     {
-        const short PORT = 5853;
+        const short PORT = 8080;
         const string IP = "93.188.166.178";
+
         private event Action<string> UpdateTable;
         private event Action<string> ConnectToLobby;
+
+        private StreamWriter sw;
+        private StreamReader sr;
 
         private TcpClient client;
 
@@ -29,6 +33,11 @@ namespace Chess.ChessBackEnd
                 var ipEP = new IPEndPoint(IPAddress.Parse(IP), PORT);
                 client = new TcpClient();
                 client.Connect(ipEP);
+
+                sw = new StreamWriter(client.GetStream());
+                sw.AutoFlush = true;
+                sr = new StreamReader(client.GetStream());
+
                 Listening();
             }
             catch (Exception e)
@@ -46,15 +55,7 @@ namespace Chess.ChessBackEnd
         {
             try
             {
-                var stream = client.GetStream();
-                stream.ReadTimeout = 1500;
-
-                var sw = new StreamWriter(stream);
-                sw.AutoFlush = true;
-
                 sw.Write($"NewLobby/{nickname}");
-
-                var sr = new StreamReader(stream);
                 
                 var data = sr.ReadToEnd();
 
@@ -65,7 +66,6 @@ namespace Chess.ChessBackEnd
 
                     return lobbyID;
                 }
-                
                 else return "Error: Invalid data received from server";
             }
             catch (Exception e)
@@ -82,7 +82,6 @@ namespace Chess.ChessBackEnd
                 {
                     try
                     {
-                        var sr = new StreamReader(client.GetStream());
                         var data = sr.ReadToEnd();
 
                         UpdateTable(data);
@@ -102,15 +101,8 @@ namespace Chess.ChessBackEnd
         {
             try
             {
-                var stream = client.GetStream();
-                //stream.ReadTimeout = 1500;
-
-                var sw = new StreamWriter(stream);
-                sw.AutoFlush = true;
-
                 sw.Write($"Move/{lobbyID}/{move}");
 
-                var sr = new StreamReader(stream);
                 var data = sr.ReadToEnd();
 
                 if (data.Contains("ConfirmMove/"))

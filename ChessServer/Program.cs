@@ -12,7 +12,7 @@ namespace ChessServer
 {
     class Program
     {
-        const short PORT = 5853;
+        const short PORT = 8080;
 
         static TcpListener server;
         static bool listen = true;
