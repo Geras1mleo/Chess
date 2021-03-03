@@ -77,6 +77,7 @@ namespace ChessServer
                 catch (Exception e)
                 {
                     Console.WriteLine("Exception while listening to connections\n" + e.Message);
+                    Console.ReadLine();
                 }
             });
         }
