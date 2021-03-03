@@ -84,8 +84,8 @@ namespace Chess.ChessBackEnd
                     try
                     {
                         var data = sr.ReadToEnd();
-
-                        UpdateTable(data);
+                        if(!string.IsNullOrEmpty(data))
+                            UpdateTable(data);
                     }
                     catch (Exception e)
                     {

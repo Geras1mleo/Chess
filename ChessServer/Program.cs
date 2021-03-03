@@ -56,20 +56,27 @@ namespace ChessServer
             Task.Factory.StartNew(() =>
             {
                 Console.WriteLine("Waiting for clients to join...");
-                while (listen)
+                try
                 {
-                    //if (!server.Pending())
-                    //{
-                    //    Thread.Sleep(50); 
-                    //    continue;
-                    //}
-                    // When new client connects to server we get new variable of TcpClient here
-                    var client = server.AcceptTcpClient();
+                    while (listen)
+                    {
+                        //if (!server.Pending())
+                        //{
+                        //    Thread.Sleep(50); 
+                        //    continue;
+                        //}
+                        // When new client connects to server we get new variable of TcpClient here
+                        var client = server.AcceptTcpClient();
 
-                    Console.WriteLine("New client");
-                    // For each client new thread that will be listening to incoming data
-                    //if(client.Connected)
-                        new Thread(() => ListenToClient((Client)client)) { IsBackground = true}.Start();
+                        Console.WriteLine("New client");
+                        // For each client new thread that will be listening to incoming data
+                        //if(client.Connected)
+                            new Thread(() => ListenToClient((Client)client)) { IsBackground = true}.Start();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception while listening to connections\n" + e.Message);
                 }
             });
         }
@@ -82,7 +89,7 @@ namespace ChessServer
             while (client.Connected)
             {
                 var data = sr.ReadToEnd();
-
+                Console.WriteLine("Data received: " + data);
                 ProcessCommand(client, data);
             }
             // Player disconnected => notify opponent
