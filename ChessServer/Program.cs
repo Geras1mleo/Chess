@@ -58,11 +58,11 @@ namespace ChessServer
                 Console.WriteLine("Waiting for clients to join...");
                 while (listen)
                 {
-                    if (!server.Pending())
-                    {
-                        Thread.Sleep(50); 
-                        continue;
-                    }
+                    //if (!server.Pending())
+                    //{
+                    //    Thread.Sleep(50); 
+                    //    continue;
+                    //}
                     // When new client connects to server we get new variable of TcpClient here
                     var client = (Client)server.AcceptTcpClient();
 
