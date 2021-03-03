@@ -31,11 +31,16 @@ namespace ChessServer
                 {
                     listen = false;
                     server.Stop();
+                    Console.WriteLine("Server Stopped");
                 }
                 else if(str == "start" && !listen)
                 {
                     listen = true;
                     StartServerAsync();
+                }
+                else if(str == "info")
+                {
+                    Console.WriteLine("Amount lobbies: " + lobbies.Count);
                 }
             }
         }
@@ -45,6 +50,7 @@ namespace ChessServer
         /// </summary>
         static void StartServerAsync()
         {
+            Console.WriteLine("Starting Server");
             server.Start();
 
             Task.Factory.StartNew(() =>
@@ -53,7 +59,7 @@ namespace ChessServer
                 {
                     if (!server.Pending())
                     {
-                        Thread.Sleep(200);
+                        Thread.Sleep(50);
                         continue;
                     }
                     // When new client connects to server we get new variable of TcpClient here

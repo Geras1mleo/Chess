@@ -14,7 +14,7 @@ namespace Chess.ChessBackEnd
     class Server
     {
         const short PORT = 5853;
-        const string IP = "";
+        const string IP = "93.188.166.178";
         private event Action<string> UpdateTable;
         private event Action<string> ConnectToLobby;
 
@@ -27,12 +27,13 @@ namespace Chess.ChessBackEnd
             try
             {
                 var ipEP = new IPEndPoint(IPAddress.Parse(IP), PORT);
-                client = new TcpClient(ipEP);
+                client = new TcpClient();
+                client.Connect(ipEP);
                 Listening();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                MessageBox.Show("Can't connect to server", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Can't connect to server: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         
@@ -102,7 +103,7 @@ namespace Chess.ChessBackEnd
             try
             {
                 var stream = client.GetStream();
-                stream.ReadTimeout = 1500;
+                //stream.ReadTimeout = 1500;
 
                 var sw = new StreamWriter(stream);
                 sw.AutoFlush = true;
