@@ -60,7 +60,7 @@ namespace ChessServer
                 {
                     if (!server.Pending())
                     {
-                        Thread.Sleep(50);
+                        Thread.Sleep(50); 
                         continue;
                     }
                     // When new client connects to server we get new variable of TcpClient here
