@@ -67,7 +67,7 @@ namespace ChessServer
                     var client = (Client)server.AcceptTcpClient();
 
                     // For each client new thread that will be listening to incoming data
-                    if(client.Connected)
+                    //if(client.Connected)
                         new Thread(() => ListenToClient(client)) { IsBackground = true}.Start();
                 }
             });
