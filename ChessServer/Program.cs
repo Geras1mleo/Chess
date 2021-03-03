@@ -57,6 +57,7 @@ namespace ChessServer
             {
                 while (listen)
                 {
+                    Console.WriteLine("Waiting for clients to join...");
                     //if (!server.Pending())
                     //{
                     //    Thread.Sleep(50);
@@ -64,7 +65,7 @@ namespace ChessServer
                     //}
                     // When new client connects to server we get new variable of TcpClient here
                     Client client = (Client)server.AcceptTcpClient();
-                    
+                    Console.WriteLine("New client");
                     // For each client new thread that will be listening to incoming data
                     if(client.Connected)
                         Task.Factory.StartNew(() => ListenToClient(client));

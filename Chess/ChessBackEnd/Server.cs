@@ -51,9 +51,9 @@ namespace Chess.ChessBackEnd
         /// </summary>
         /// <param name="nickName">Nickname is gonna be passed on serve</param>
         /// <returns>New lobby id</returns>
-        public string CreateNewLobby(string nickname)
+        public void CreateNewLobby(string nickname)
         {
-            return Task.Factory.StartNew(() =>
+            Task.Factory.StartNew(() =>
             {
                 try
                 {
@@ -65,16 +65,14 @@ namespace Chess.ChessBackEnd
                     {
                         var lobbyID = data.Replace("NewLobby/", "");
                         ConnectToLobby(lobbyID);
-
-                        return lobbyID;
                     }
-                    else return "Error: Invalid data received from server";
+                    else MessageBox.Show("Error: Invalid data received from server");
                 }
                 catch (Exception e)
                 {
-                    return $"Error: {e.Message}";
+                    MessageBox.Show( $"Error while creating lobby: {e.Message}");
                 }
-            }).Result;
+            });
         }
 
         private void Listening()

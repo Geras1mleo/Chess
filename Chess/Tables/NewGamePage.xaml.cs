@@ -17,9 +17,9 @@ namespace Chess.Tables
     public partial class NewGamePage : Window
     {
         // This event will call fucntion in Server.class and will give server id back
-        private event Func<string, string> CreateLobby;
+        private event Action<string> CreateLobby;
 
-        public NewGamePage(Func<string, string> createLobby)
+        public NewGamePage(Action<string> createLobby)
         {
             InitializeComponent();
             this.CreateLobby = createLobby;
@@ -44,16 +44,7 @@ namespace Chess.Tables
                 return;
             }
 
-            var id = CreateLobby(Nickname.Text);
-
-            if (id.Contains("Error"))
-            {
-                MessageBox.Show($"Can't connect to server\n{id}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            else
-            {
-                Close();
-            }
+            CreateLobby(Nickname.Text);
         }
 
         private void Confirm_Click(object sender, RoutedEventArgs e)
