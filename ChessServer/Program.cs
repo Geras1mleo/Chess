@@ -64,12 +64,12 @@ namespace ChessServer
                     //    continue;
                     //}
                     // When new client connects to server we get new variable of TcpClient here
-                    var client = (Client)server.AcceptTcpClient();
+                    var client = server.AcceptTcpClient();
 
                     Console.WriteLine("New client");
                     // For each client new thread that will be listening to incoming data
                     //if(client.Connected)
-                        new Thread(() => ListenToClient(client)) { IsBackground = true}.Start();
+                        new Thread(() => ListenToClient((Client)client)) { IsBackground = true}.Start();
                 }
             });
         }
