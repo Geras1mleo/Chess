@@ -55,9 +55,9 @@ namespace ChessServer
 
             Task.Factory.StartNew(() =>
             {
+                Console.WriteLine("Waiting for clients to join...");
                 while (listen)
                 {
-                    Console.WriteLine("Waiting for clients to join...");
                     if (!server.Pending())
                     {
                         Thread.Sleep(50);
