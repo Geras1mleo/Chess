@@ -104,7 +104,7 @@ namespace Chess.ChessBackEnd
         {
             try
             {
-                sw.Write($"Move/{lobbyID}/{move}");
+                sw.WriteLine($"Move/{lobbyID}/{move}");
                 sw.Flush();
 
                 // Waiting for response with confirmation of move

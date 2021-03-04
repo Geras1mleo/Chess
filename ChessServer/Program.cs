@@ -23,7 +23,6 @@ namespace ChessServer
         static void Main(string[] args)
         {
             server = new TcpListener(new IPEndPoint(IPAddress.Any, PORT));
-            StartServer();
             Task.Factory.StartNew(() =>
             {
                 while (true)
@@ -46,6 +45,7 @@ namespace ChessServer
                     }
                 }
             });
+            StartServer();
         }
 
         /// <summary>
@@ -86,11 +86,17 @@ namespace ChessServer
                 var sr = new StreamReader(client.GetStream());
                 var sw = new StreamWriter(client.GetStream());
 
-                while (client.GetStream().CanRead)
+                while (client.Connected)
                 {
                     Console.WriteLine("Waiting for incoming data...");
 
                     var data = sr.ReadToEnd();
+                    if(data is null)
+                    {
+                        client.Close();
+                        break;
+                    }
+                    
                     Console.WriteLine("Data received: " + data);
 
                     // Sending back confirmation
@@ -98,6 +104,7 @@ namespace ChessServer
 
                     ProcessCommand(client, data);
                 }
+                Console.WriteLine("Disconnected");
             }
             catch (Exception e)
             {
