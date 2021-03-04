@@ -23,7 +23,7 @@ namespace ChessServer
         static void Main(string[] args)
         {
             server = new TcpListener(new IPEndPoint(IPAddress.Any, PORT));
-            StartServerAsync();
+            StartServer();
             Task.Factory.StartNew(() =>
             {
                 while (true)
@@ -38,7 +38,7 @@ namespace ChessServer
                     else if (str == "start" && !listen)
                     {
                         listen = true;
-                        StartServerAsync();
+                        StartServer();
                     }
                     else if (str == "info")
                     {
@@ -52,7 +52,7 @@ namespace ChessServer
         /// Accepting new clients here
         /// IN MAIN THREAD
         /// </summary>
-        static void StartServerAsync()
+        static void StartServer()
         {
             Console.WriteLine("Starting Server");
             server.Start();
@@ -76,28 +76,31 @@ namespace ChessServer
                 //if(client.Connected)
                 try
                 {
-                    new Thread(() => ListenToClient((Client)client)).Start();
+                    new Thread(() => ListenToClient(client)).Start();
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine("Exception while listening to connections\n" + e.Message);
-                    Console.ReadLine();
                 }
             }
         }
 
-        static void ListenToClient(Client client)
+        static void ListenToClient(TcpClient client)
         {
             try
             {
                 Console.WriteLine("New client added\t Socket connected to: " + client.Client.RemoteEndPoint.ToString());
                 var sr = new StreamReader(client.GetStream());
 
+                var sw = new StreamWriter(client.GetStream());
+                sw.Write("U have been added to clients list");
+                sw.Flush();
+
                 while (client.Connected)
                 {
                     var data = sr.ReadToEnd();
                     Console.WriteLine("Data received: " + data);
-                    ProcessCommand(client, data);
+                    ProcessCommand((Client)client, data);
                 }
                 // Player disconnected => notify opponent
                 if (!client.Connected)
