@@ -84,17 +84,15 @@ namespace ChessServer
             {
                 Console.WriteLine("New client added \nSocket connected to: " + client.Client.RemoteEndPoint.ToString());
                 var sr = new StreamReader(client.GetStream());
-
+                
                 while (client.GetStream().CanRead)
                 {
-                    if (client.GetStream().DataAvailable)
-                    {
-                        var data = sr.ReadToEnd();
-                        
-                        Console.WriteLine("Data received: " + data);
-                        ProcessCommand(client, data);
-                    }
-                    else Thread.Sleep(50);
+                    Console.WriteLine("Waiting for data");
+
+                    var data = sr.ReadToEnd();
+                    Console.WriteLine("Data received: " + data);
+                    
+                    ProcessCommand(client, data);
                 }
                 // Player disconnected => notify opponent
                 Console.WriteLine("Disconnecting client...");
