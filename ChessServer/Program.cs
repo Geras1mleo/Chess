@@ -48,42 +48,45 @@ namespace ChessServer
         /// <summary>
         /// Accepting new clients here
         /// </summary>
-        static void StartServerAsync()
+        static async void StartServerAsync()
         {
             Console.WriteLine("Starting Server");
             server.Start();
 
-            try
+            var currThread = Thread.CurrentThread;
+
+            await Task.Factory.StartNew(() =>
             {
-                Task.Factory.StartNew(() =>
+                Console.WriteLine("Waiting for clients to join...");
+                while (listen)
                 {
-                    Console.WriteLine("Waiting for clients to join...");
-                    while (listen)
+                    //if (!server.Pending())
+                    //{
+                    //    Thread.Sleep(50); 
+                    //    continue;
+                    //}
+                    // When new client connects to server we get new variable of TcpClient here
+                    var client = server.AcceptTcpClient();
+
+                    var sw = new StreamWriter(client.GetStream());
+                    sw.Write("Connection made");
+                    sw.Flush();
+
+                    Console.WriteLine("New client");
+                    // For each client new thread that will be listening to incoming data
+                    //if(client.Connected)
+                    try
                     {
-                        //if (!server.Pending())
-                        //{
-                        //    Thread.Sleep(50); 
-                        //    continue;
-                        //}
-                        // When new client connects to server we get new variable of TcpClient here
-                        var client = server.AcceptTcpClient();
-
-                        var sw = new StreamWriter(client.GetStream());
-                        sw.Write("Connection made");
-                        sw.Flush();
-
-                        Console.WriteLine("New client");
-                        // For each client new thread that will be listening to incoming data
-                        //if(client.Connected)
-                            new Thread(() => ListenToClient((Client)client)) { IsBackground = true}.Start();
+                        Task.Run(() => ListenToClient((Client)client));
                     }
-                });
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Exception while listening to connections\n" + e.Message);
-                Console.ReadLine();
-            }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Exception while listening to connections\n" + e.Message);
+                        Console.ReadLine();
+                    }
+                }
+            });
+            
         }
 
         static void ListenToClient(Client client)
