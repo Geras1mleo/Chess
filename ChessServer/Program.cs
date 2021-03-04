@@ -90,7 +90,7 @@ namespace ChessServer
                 {
                     Console.WriteLine("Waiting for incoming data...");
 
-                    var data = sr.ReadToEnd();
+                    var data = sr.ReadLine();
                     if(data is null)
                     {
                         client.Close();

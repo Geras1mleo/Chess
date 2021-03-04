@@ -54,7 +54,7 @@ namespace Chess.ChessBackEnd
             {
                 try
                 {
-                    var data = sr.ReadToEnd();
+                    var data = sr.ReadLine();
 
                     MessageBox.Show(data);
                 }
@@ -108,9 +108,9 @@ namespace Chess.ChessBackEnd
                 sw.Flush();
 
                 // Waiting for response with confirmation of move
-                var data = sr.ReadToEnd();
+                //var data = sr.ReadToEnd();
 
-                MessageBox.Show(data);
+                //MessageBox.Show(data);
             }
             catch (Exception e)
             {
