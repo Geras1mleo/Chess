@@ -16,8 +16,8 @@ namespace Chess.ChessBackEnd
         const short PORT = 8080;
         const string IP = "93.188.166.178";
 
-        private event Action<string> UpdateTable;
-        private event Action<string> ConnectToLobby;
+        private event Action<string> TableMovesHandler;
+        private event Action<string> ConnectToLobbyHandler;
 
         private StreamWriter sw;
         private StreamReader sr;
@@ -26,11 +26,12 @@ namespace Chess.ChessBackEnd
 
         public Server(Action<string> updateTable, Action<string> connectToLobby)
         {
-            UpdateTable = updateTable;
-            ConnectToLobby = connectToLobby;
+            TableMovesHandler = updateTable;
+            ConnectToLobbyHandler = connectToLobby;
             try
             {
                 var ipEP = new IPEndPoint(IPAddress.Parse(IP), PORT);
+
                 client = new TcpClient();
                 client.Connect(ipEP);
 
@@ -38,7 +39,7 @@ namespace Chess.ChessBackEnd
                 sw.AutoFlush = true;
                 sr = new StreamReader(client.GetStream());
 
-                Listening();
+                ListenToServerAsync();
             }
             catch (Exception e)
             {
@@ -46,25 +47,48 @@ namespace Chess.ChessBackEnd
             }
         }
         
+        private void ListenToServerAsync() => new Task(ListenToServer).Start();
+        private void ListenToServer()
+        {
+            while (true)
+            {
+                try
+                {
+                    var data = sr.ReadToEnd();
+
+                    MessageBox.Show(data);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("Error while listening to server\n" + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    if (!client.Client.Connected)
+                        break;
+
+                }
+            }
+        }
+
         /// <summary>
         /// Creates new lobby on server if possible
         /// </summary>
         /// <param name="nickName">Nickname is gonna be passed on serve</param>
         /// <returns>New lobby id</returns>
-        public void CreateNewLobby(string nickname)
+        /*public void CreateNewLobby(string nickname)
         {
             Task.Factory.StartNew(() =>
             {
                 try
                 {
                     sw.Write($"NewLobby/{nickname}");
+
                     MessageBox.Show("Request sent");
+
                     var data = sr.ReadToEnd();
 
                     if (data.Contains("NewLobby/"))
                     {
                         var lobbyID = data.Replace("NewLobby/", "");
-                        ConnectToLobby(lobbyID);
+                        ConnectToLobbyHandler(lobbyID);
                     }
                     else MessageBox.Show("Error: Invalid data received from server");
                 }
@@ -73,55 +97,26 @@ namespace Chess.ChessBackEnd
                     MessageBox.Show( $"Error while creating lobby: {e.Message}");
                 }
             });
-        }
+        }*/
 
-        private void Listening()
+        public void SendMoveAsync(string lobbyID, string move) => new Task(()=> { SendMove(lobbyID, move); }).Start();
+        private void SendMove(string lobbyID, string move)
         {
-            new Thread(() =>
+            try
             {
-                while (true)
-                {
-                    try
-                    {
-                        var data = sr.ReadToEnd();
-                        if(!string.IsNullOrEmpty(data))
-                            UpdateTable(data);
-                    }
-                    catch (Exception e)
-                    {
-                        MessageBox.Show("Error while listening to server\n" + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                        if (!client.Client.Connected)
-                            break;
-                        
-                    }
-                }
-            }).Start();
-        }
+                sw.Write($"Move/{lobbyID}/{move}");
+                sw.Flush();
 
-        public void SendMove(string lobbyID, string move)
-        {
-            Task.Factory.StartNew(() =>
+                // Waiting for response with confirmation of move
+                var data = sr.ReadToEnd();
+
+                MessageBox.Show(data);
+            }
+            catch (Exception e)
             {
-                try
-                {
-                    sw.Write($"Move/{lobbyID}/{move}");
-
-                    var data = sr.ReadToEnd();
-
-                    if (data.Contains("ConfirmMove/"))
-                    {
-                        MessageBox.Show("Data send succesfully: " + data);
-                    }
-                    else
-                    {
-                        MessageBox.Show("Invalid data received when sending move to server: " + data);
-                    }
-                }
-                catch (Exception e)
-                {
-                    MessageBox.Show("Error: " + e.Message);
-                }
-            });
+                MessageBox.Show("Error: " + e.Message);
+            }
+            
         }
     }
 }

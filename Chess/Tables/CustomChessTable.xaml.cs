@@ -214,7 +214,7 @@ namespace Chess
                                           new short[] { newbutton.PosVertical, newbutton.PosHorizontal }))
                 {
                     
-                    server.SendMove(LobbyID.Text, $"{dragButton.PosVertical},{dragButton.PosHorizontal};{newbutton.PosVertical},{newbutton.PosHorizontal}");
+                    server.SendMoveAsync(LobbyID.Text, $"{dragButton.PosVertical},{dragButton.PosHorizontal};{newbutton.PosVertical},{newbutton.PosHorizontal}");
                     
                     DropFigureToNewPosition(dragButton, newbutton);
                 }
@@ -255,8 +255,8 @@ namespace Chess
 
         private void PlayWithFriendButton_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            var newGame = new NewGamePage(server.CreateNewLobby);
-            newGame.ShowDialog();
+            //var newGame = new NewGamePage(server.CreateNewLobby);
+            //newGame.ShowDialog();
             //RotateBoard();
         }
 

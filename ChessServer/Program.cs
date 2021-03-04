@@ -84,22 +84,19 @@ namespace ChessServer
             {
                 Console.WriteLine("New client added \nSocket connected to: " + client.Client.RemoteEndPoint.ToString());
                 var sr = new StreamReader(client.GetStream());
-                
+                var sw = new StreamWriter(client.GetStream());
+
                 while (client.GetStream().CanRead)
                 {
-                    Console.WriteLine("Waiting for data");
+                    Console.WriteLine("Waiting for incoming data...");
 
                     var data = sr.ReadToEnd();
                     Console.WriteLine("Data received: " + data);
-                    
+
+                    // Sending back confirmation
+                    sw.WriteLine("Confirmed/" + data);
+
                     ProcessCommand(client, data);
-                }
-                // Player disconnected => notify opponent
-                Console.WriteLine("Disconnecting client...");
-                foreach (var item in lobbies)
-                {
-                    if (item.White.ClientCon == client || item.Black.ClientCon == client)
-                        item.UserLeftNotify(client);
                 }
             }
             catch (Exception e)
