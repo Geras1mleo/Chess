@@ -53,11 +53,11 @@ namespace ChessServer
             Console.WriteLine("Starting Server");
             server.Start();
 
-            Task.Factory.StartNew(() =>
+            try
             {
-                Console.WriteLine("Waiting for clients to join...");
-                try
+                Task.Factory.StartNew(() =>
                 {
+                    Console.WriteLine("Waiting for clients to join...");
                     while (listen)
                     {
                         //if (!server.Pending())
@@ -68,39 +68,51 @@ namespace ChessServer
                         // When new client connects to server we get new variable of TcpClient here
                         var client = server.AcceptTcpClient();
 
+                        var sw = new StreamWriter(client.GetStream());
+                        sw.Write("Connection made");
+                        sw.Flush();
+
                         Console.WriteLine("New client");
                         // For each client new thread that will be listening to incoming data
                         //if(client.Connected)
                             new Thread(() => ListenToClient((Client)client)) { IsBackground = true}.Start();
                     }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Exception while listening to connections\n" + e.Message);
-                    Console.ReadLine();
-                }
-            });
+                });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception while listening to connections\n" + e.Message);
+                Console.ReadLine();
+            }
         }
 
         static void ListenToClient(Client client)
         {
-            Console.WriteLine("New client added\t Socket connected to: " + client.Client.RemoteEndPoint.ToString());
-            var sr = new StreamReader(client.GetStream());
+            try
+            {
+                Console.WriteLine("New client added\t Socket connected to: " + client.Client.RemoteEndPoint.ToString());
+                var sr = new StreamReader(client.GetStream());
 
-            while (client.Connected)
-            {
-                var data = sr.ReadToEnd();
-                Console.WriteLine("Data received: " + data);
-                ProcessCommand(client, data);
-            }
-            // Player disconnected => notify opponent
-            if (!client.Connected)
-            {
-                foreach (var item in lobbies)
+                while (client.Connected)
                 {
-                    if (item.WhiteClient == client || item.BlackClient == client)
-                        item.UserLeftNotify(client);
+                    var data = sr.ReadToEnd();
+                    Console.WriteLine("Data received: " + data);
+                    ProcessCommand(client, data);
                 }
+                // Player disconnected => notify opponent
+                if (!client.Connected)
+                {
+                    foreach (var item in lobbies)
+                    {
+                        if (item.WhiteClient == client || item.BlackClient == client)
+                            item.UserLeftNotify(client);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception while listening to connections\n" + e.Message);
+                Console.ReadLine();
             }
         }
 

@@ -4,3 +4,4 @@ D:\Projects\Chess\ChessServer\bin\Debug\ChessServer.pdb
 D:\Projects\Chess\ChessServer\obj\Debug\ChessServer.csproj.CoreCompileInputs.cache
 D:\Projects\Chess\ChessServer\obj\Debug\ChessServer.exe
 D:\Projects\Chess\ChessServer\obj\Debug\ChessServer.pdb
+D:\Projects\Chess\ChessServer\obj\Debug\ChessServer.csprojAssemblyReference.cache
