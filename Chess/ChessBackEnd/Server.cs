@@ -58,7 +58,7 @@ namespace Chess.ChessBackEnd
                 try
                 {
                     sw.Write($"NewLobby/{nickname}");
-
+                    MessageBox.Show("Request sent");
                     var data = sr.ReadToEnd();
 
                     if (data.Contains("NewLobby/"))
