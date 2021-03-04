@@ -80,6 +80,7 @@ namespace Chess
             InitializeComponent();
             InitializeBoard(FigureColor.White, TableColor.Blue);
             server = new Server(DataReceived, ConnectToLobby);
+            LobbyID.Text = "12345";
         }
 
         private void InitializeBoard(FigureColor playerColor, TableColor tableColor, Board currBoard = null)

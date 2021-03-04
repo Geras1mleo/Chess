@@ -108,9 +108,9 @@ namespace Chess.ChessBackEnd
                 sw.Flush();
 
                 // Waiting for response with confirmation of move
-                //var data = sr.ReadToEnd();
+                var data = sr.ReadLine();
 
-                //MessageBox.Show(data);
+                MessageBox.Show(data);
             }
             catch (Exception e)
             {

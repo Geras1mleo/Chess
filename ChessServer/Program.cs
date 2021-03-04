@@ -88,8 +88,6 @@ namespace ChessServer
 
                 while (client.Connected)
                 {
-                    Console.WriteLine("Waiting for incoming data...");
-
                     var data = sr.ReadLine();
                     if(data is null)
                     {
@@ -101,6 +99,7 @@ namespace ChessServer
 
                     // Sending back confirmation
                     sw.WriteLine("Confirmed/" + data);
+                    sw.Flush();
 
                     ProcessCommand(client, data);
                 }
@@ -181,8 +180,10 @@ namespace ChessServer
             foreach (var item in lobbies)
             {
                 if(item.LobbyID == lobbyID)
+                {
                     item.NewMove(client, move);
-                
+                    break;
+                }
             }
         }
 
