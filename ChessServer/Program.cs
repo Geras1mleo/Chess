@@ -24,69 +24,66 @@ namespace ChessServer
         {
             server = new TcpListener(new IPEndPoint(IPAddress.Any, PORT));
             StartServerAsync();
-            while (true)
+            Task.Factory.StartNew(() =>
             {
-                var str = Console.ReadLine();
-                if(str == "stop")
+                while (true)
                 {
-                    listen = false;
-                    server.Stop();
-                    Console.WriteLine("Server Stopped");
+                    var str = Console.ReadLine();
+                    if (str == "stop")
+                    {
+                        listen = false;
+                        server.Stop();
+                        Console.WriteLine("Server Stopped");
+                    }
+                    else if (str == "start" && !listen)
+                    {
+                        listen = true;
+                        StartServerAsync();
+                    }
+                    else if (str == "info")
+                    {
+                        Console.WriteLine("Amount lobbies: " + lobbies.Count);
+                    }
                 }
-                else if(str == "start" && !listen)
-                {
-                    listen = true;
-                    StartServerAsync();
-                }
-                else if(str == "info")
-                {
-                    Console.WriteLine("Amount lobbies: " + lobbies.Count);
-                }
-            }
+            });
         }
 
         /// <summary>
         /// Accepting new clients here
+        /// IN MAIN THREAD
         /// </summary>
-        static async void StartServerAsync()
+        static void StartServerAsync()
         {
             Console.WriteLine("Starting Server");
             server.Start();
-
-            var currThread = Thread.CurrentThread;
-
-            await Task.Factory.StartNew(() =>
-            {
-                Console.WriteLine("Waiting for clients to join...");
-                while (listen)
-                {
-                    //if (!server.Pending())
-                    //{
-                    //    Thread.Sleep(50); 
-                    //    continue;
-                    //}
-                    // When new client connects to server we get new variable of TcpClient here
-                    var client = server.AcceptTcpClient();
-
-                    var sw = new StreamWriter(client.GetStream());
-                    sw.Write("Connection made");
-                    sw.Flush();
-
-                    Console.WriteLine("New client");
-                    // For each client new thread that will be listening to incoming data
-                    //if(client.Connected)
-                    try
-                    {
-                        Task.Run(() => ListenToClient((Client)client));
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Exception while listening to connections\n" + e.Message);
-                        Console.ReadLine();
-                    }
-                }
-            });
             
+            Console.WriteLine("Waiting for clients to join...");
+            while (listen)
+            {
+                //if (!server.Pending())
+                //{
+                //    Thread.Sleep(50); 
+                //    continue;
+                //}
+                // When new client connects to server we get new variable of TcpClient here
+                var client = server.AcceptTcpClient();
+
+                var sw = new StreamWriter(client.GetStream());
+                sw.Write("Connection made");
+                sw.Flush();
+
+                // For each client new thread that will be listening to incoming data
+                //if(client.Connected)
+                try
+                {
+                    new Thread(() => ListenToClient((Client)client)).Start();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception while listening to connections\n" + e.Message);
+                    Console.ReadLine();
+                }
+            }
         }
 
         static void ListenToClient(Client client)
