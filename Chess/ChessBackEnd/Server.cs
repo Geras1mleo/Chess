@@ -77,7 +77,7 @@ namespace Chess.ChessBackEnd
 
         private void Listening()
         {
-            Task.Factory.StartNew(() =>
+            new Thread(() =>
             {
                 while (true)
                 {
@@ -95,7 +95,7 @@ namespace Chess.ChessBackEnd
                         
                     }
                 }
-            });
+            }).Start();
         }
 
         public void SendMove(string lobbyID, string move)

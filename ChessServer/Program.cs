@@ -60,11 +60,11 @@ namespace ChessServer
             Console.WriteLine("Waiting for clients to join...");
             while (listen)
             {
-                //if (!server.Pending())
-                //{
-                //    Thread.Sleep(50); 
-                //    continue;
-                //}
+                if (!server.Pending())
+                {
+                    Thread.Sleep(50);
+                    continue;
+                }
                 // When new client connects to server we get new variable of TcpClient here
                 var client = server.AcceptTcpClient();
 
@@ -73,15 +73,8 @@ namespace ChessServer
                 sw.Flush();
 
                 // For each client new thread that will be listening to incoming data
-                //if(client.Connected)
-                try
-                {
+                if(client.Connected)
                     new Thread(() => ListenToClient(client)).Start();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Exception while listening to connections\n" + e.Message);
-                }
             }
         }
 
@@ -89,25 +82,21 @@ namespace ChessServer
         {
             try
             {
-                Console.WriteLine("New client added\t Socket connected to: " + client.Client.RemoteEndPoint.ToString());
+                Console.WriteLine("New client added \nSocket connected to: " + client.Client.RemoteEndPoint.ToString());
                 var sr = new StreamReader(client.GetStream());
-
-                var sw = new StreamWriter(client.GetStream());
-                sw.Write("U have been added to clients list");
-                sw.Flush();
 
                 while (client.Connected)
                 {
                     var data = sr.ReadToEnd();
                     Console.WriteLine("Data received: " + data);
-                    ProcessCommand((Client)client, data);
+                    ProcessCommand(client, data);
                 }
                 // Player disconnected => notify opponent
                 if (!client.Connected)
                 {
                     foreach (var item in lobbies)
                     {
-                        if (item.WhiteClient == client || item.BlackClient == client)
+                        if (item.White.ClientCon == client || item.Black.ClientCon == client)
                             item.UserLeftNotify(client);
                     }
                 }
@@ -139,7 +128,7 @@ namespace ChessServer
         /// </summary>
         /// <param name="client"></param>
         /// <param name="command"></param>
-        static void ProcessCommand(Client client, string command)
+        static void ProcessCommand(TcpClient client, string command)
         {
             var parameters = command.Split('/');
             switch (parameters[0])
@@ -159,7 +148,7 @@ namespace ChessServer
             }
         }
 
-        static void AddNewLobby(Client client, string nickname)
+        static void AddNewLobby(TcpClient client, string nickname)
         {
             // Generating new id for lobby
             var id = new Random().Next(0, 10000).ToString();
@@ -183,7 +172,7 @@ namespace ChessServer
             }
         }
 
-        static void NewMove(Client client, string lobbyID, string move)
+        static void NewMove(TcpClient client, string lobbyID, string move)
         {
             foreach (var item in lobbies)
             {
@@ -193,7 +182,7 @@ namespace ChessServer
             }
         }
 
-        static void ConnectToLobby(Client client, string lobbyID, string nickname)
+        static void ConnectToLobby(TcpClient client, string lobbyID, string nickname)
         {
             foreach (var item in lobbies)
             {
