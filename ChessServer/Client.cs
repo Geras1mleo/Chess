@@ -14,7 +14,7 @@ namespace ChessServer
         public Client(TcpClient tcpCient, string nickname)
         {
             ClientCon = tcpCient;
-            SW = new StreamWriter(ClientCon.GetStream());
+            SW = new StreamWriter(ClientCon.GetStream()) { AutoFlush = true };
             SR = new StreamReader(ClientCon.GetStream());
             Nickname = nickname;
         }

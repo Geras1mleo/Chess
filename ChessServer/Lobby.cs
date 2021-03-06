@@ -31,14 +31,14 @@ namespace ChessServer
             {
                 White = new Client(client, nickname);
                 Console.WriteLine("White player connected to lobby: " + LobbyID);
-                White.SW.WriteLine($"Connected/{LobbyID}/White");
+                White.SW.WriteLine($"Connected/{LobbyID}/White/{Black?.Nickname}");
             }
 
             else if (Black is null)
             {
                 Black = new Client(client, nickname);
                 Console.WriteLine("Black player connected to lobby: " + LobbyID);
-                Black.SW.WriteLine($"Connected/{LobbyID}/Black");
+                Black.SW.WriteLine($"Connected/{LobbyID}/Black/{White?.Nickname}");
             }
         }
 
@@ -78,26 +78,23 @@ namespace ChessServer
         public void NewMove(TcpClient client, string move)
         {
             // If someone else is trying to make move in this lobby...
-            if (!(client == White.ClientCon|| client == Black.ClientCon)) return;
+            if (!(client == White.ClientCon || client == Black.ClientCon)) return;
 
             // If one of players is not connected...
-            //if (White is null || Black is null) return;
+            if (White is null || Black is null) return;
 
             try
             {
-                var sww = new StreamWriter(White.ClientCon.GetStream()) { AutoFlush = true };
-                var swb = new StreamWriter(Black.ClientCon.GetStream()) { AutoFlush = true };
-
                 // Confirm move to the same client
                 if (client == White.ClientCon)
                 {
-                    swb.WriteLine($"Move/{move}");
-                    sww.WriteLine($"ConfirmedMove/{move}");
+                    Black.SW.WriteLine($"NewMove/{move}");
+                    White.SW.WriteLine($"ConfirmedMove/{move}");
                 }
                 else if (client == Black.ClientCon)
                 {
-                    sww.WriteLine($"Move/{move}");
-                    swb.WriteLine($"ConfirmedMove/{move}");
+                    White.SW.WriteLine($"NewMove/{move}");
+                    Black.SW.WriteLine($"ConfirmedMove/{move}");
                 }
                 Moves.Add(move);
             }

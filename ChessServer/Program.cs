@@ -130,14 +130,14 @@ namespace ChessServer
             var parameters = command.Split('/');
             switch (parameters[0])
             {
-                case "NewLobby":
+                case "CreateLobby":
                     AddNewLobby(client, parameters[1]);
-                    break;
-                case "Move":
-                    NewMove(client, parameters[1], parameters[2]);
                     break;
                 case "Connect":
                     ConnectToLobby(client, parameters[1], parameters[2]);
+                    break;
+                case "Move":
+                    NewMove(client, parameters[1], parameters[2]);
                     break;
                 default:
                     Console.WriteLine("Invalid message format received: " + command + "\tFrom: " + client.Client.RemoteEndPoint.ToString());
@@ -155,17 +155,21 @@ namespace ChessServer
                 IDs.Add(id);
                 lobbies.Add(new Lobby(id, client, nickname));
 
-                var sw = new StreamWriter(client.GetStream());
-                sw.AutoFlush = true;
-
-                sw.WriteLine($"NewLobbyConfirmed/{id}");
-
                 Console.WriteLine("New Lobby created: " + id);
             }
             else
             {
                 AddNewLobby(client, nickname);
                 return;
+            }
+        }
+
+        static void ConnectToLobby(TcpClient client, string lobbyID, string nickname)
+        {
+            foreach (var item in lobbies)
+            {
+                if (item.LobbyID == lobbyID)
+                    item.AddClient(client, nickname);
             }
         }
 
@@ -178,15 +182,6 @@ namespace ChessServer
                     item.NewMove(client, move);
                     break;
                 }
-            }
-        }
-
-        static void ConnectToLobby(TcpClient client, string lobbyID, string nickname)
-        {
-            foreach (var item in lobbies)
-            {
-                if (item.LobbyID == lobbyID)
-                    item.AddClient(client, nickname);
             }
         }
     }

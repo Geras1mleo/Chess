@@ -17,14 +17,14 @@ namespace Chess.ChessBackEnd
         const string IP = "93.188.166.178";
 
         private event Action<string> TableMovesHandler;
-        private event Action<string> ConnectToLobbyHandler;
+        private event Action<string, string, string> ConnectToLobbyHandler;
 
         private StreamWriter sw;
         private StreamReader sr;
 
         private TcpClient client;
 
-        public Server(Action<string> updateTable, Action<string> connectToLobby)
+        public Server(Action<string> updateTable, Action<string, string, string> connectToLobby)
         {
             TableMovesHandler = updateTable;
             ConnectToLobbyHandler = connectToLobby;
@@ -76,11 +76,24 @@ namespace Chess.ChessBackEnd
         /// <param name="nickName">Nickname is gonna be passed on serve</param>
         /// <returns>New lobby id</returns>
         public void CreateNewLobbyAsync(string nickname) => new Task(()=>CreateNewLobby(nickname)).Start();
-        public void CreateNewLobby(string nickname)
+        private void CreateNewLobby(string nickname)
         {
             try
             {
-                sw.WriteLine($"NewLobby/{nickname}");
+                sw.WriteLine($"CreateLobby/{nickname}");
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Error while creating lobby: {e.Message}");
+            }
+        }
+
+        public void ConnectToLobbyAsync(string lobbyID, string nickname) => new Task(() => ConnectToLobby(lobbyID, nickname)).Start();
+        private void ConnectToLobby(string lobbyID, string nickname)
+        {
+            try
+            {
+                sw.WriteLine($"Connect/{lobbyID}/{nickname}");
             }
             catch (Exception e)
             {
@@ -107,19 +120,17 @@ namespace Chess.ChessBackEnd
             string[] parameters = command.Split('/');
             switch (parameters[0])
             {
-                case "NewLobbyConfirmed":
-                    ConnectToLobbyHandler(parameters[1]);
-                    break;
                 case "Connected":
+                    ConnectToLobbyHandler(parameters[1], parameters[2], parameters[3]);
                     break;
-                case "Move":
+                case "NewMove":
                     TableMovesHandler(parameters[1]);
                     break;
                 case "ConfirmedMove":
                     MessageBox.Show("Confirmed: " + parameters[1]);
                     break;
                 default:
-                    MessageBox.Show("Got non-valid data from server" + command);
+                    MessageBox.Show("Non-valid data from server received " + command);
                     break;
             }
         }

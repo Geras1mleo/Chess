@@ -255,7 +255,7 @@ namespace Chess
 
         private void PlayWithFriendButton_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            var newGame = new NewGamePage(server.CreateNewLobby);
+            var newGame = new NewGamePage(server.CreateNewLobbyAsync, server.ConnectToLobbyAsync);
             newGame.ShowDialog();
             //RotateBoard();
         }
@@ -312,9 +312,15 @@ namespace Chess
         {
             MessageBox.Show("Move received from opponent: " + move);
         }
-        private void ConnectToLobby(string lobbyID)
+        private void ConnectToLobby(string lobbyID, string side, string nickname)
         {
-            LobbyID.Text = lobbyID;
+            if (side != "White") RotateBoard();
+
+            this.Dispatcher.Invoke(() =>
+            {
+                LobbyID.Text = lobbyID;
+                OpponentNick.Text = nickname;
+            });
             MessageBox.Show("Connected to lobby: " + lobbyID);
         }
     }

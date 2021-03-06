@@ -16,13 +16,17 @@ namespace Chess.Tables
 {
     public partial class NewGamePage : Window
     {
-        // This event will call fucntion in Server.class and will give server id back
+        // This event will call fucntion in Server.cs that will make request for new lobby on server
         private event Action<string> CreateLobby;
 
-        public NewGamePage(Action<string> createLobby)
+        // This event will call fucntion in Server.cs that will make request to join the lobby
+        private event Action<string, string> ConnectToLobby;
+
+        public NewGamePage(Action<string> createLobby, Action<string, string> connectToLobby)
         {
             InitializeComponent();
-            this.CreateLobby = createLobby;
+            CreateLobby = createLobby;
+            ConnectToLobby = connectToLobby;
         }
 
         private void Cancel_MouseDown(object sender, RoutedEventArgs e)
@@ -60,6 +64,9 @@ namespace Chess.Tables
                 ErrorLobby.Foreground = new SolidColorBrush(Colors.Red);
                 return;
             }
+
+            ConnectToLobby(LobbyID.Text, Nickname.Text);
+            Close();
         }
     }
 }
