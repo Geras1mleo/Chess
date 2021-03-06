@@ -13,6 +13,7 @@ namespace Chess
     public partial class CustomChessTable : Window
     {
         private FigureColor playerColor;
+        private bool isConnectedToLobby = false;
 
         private TableButton[,] buttons;
         private Board board;
@@ -27,7 +28,7 @@ namespace Chess
         private bool userDragedFigureOutOfTable;
 
         // Reminds whitch player now can move figures
-        public static FigureColor PlayerMove { get; set; } = FigureColor.White;
+        public static FigureColor PlayerMove { get; set; }
 
         private TableColor currentTableColor;
         public TableColor TableColor
@@ -84,8 +85,8 @@ namespace Chess
 
         private void InitializeBoard(FigureColor playerColor, TableColor tableColor, Board currBoard = null)
         {
-            this.playerColor = playerColor;
             TableColor = tableColor;
+            PlayerMove = FigureColor.White;
 
             buttons = new TableButton[8, 8];
             board = new Board(buttons, currBoard);
@@ -205,28 +206,31 @@ namespace Chess
             }
             else dragButton.Background = Brushes.Transparent;
 
-            // Here we check if user has not dropped figure to the same position
+            // Here we check if user has not dropped figure to the same position AND if player moves his color
             if (!(dragButton.PosVertical == newbutton.PosVertical && dragButton.PosHorizontal == newbutton.PosHorizontal))
             {
+                // If player is connected to lobby and trying to move figures of opponent => decline
+                if (isConnectedToLobby && playerColor != board.Figures[dragButton.PosVertical, dragButton.PosHorizontal].Color)
+                    goto Decline;
+
                 // Checking if it's valid move
                 if (board.IsValidOperation(board.Figures[dragButton.PosVertical, dragButton.PosHorizontal],
-                                          new short[] { dragButton.PosVertical, dragButton.PosHorizontal },
-                                          new short[] { newbutton.PosVertical, newbutton.PosHorizontal }))
+                                            new short[] { dragButton.PosVertical, dragButton.PosHorizontal },
+                                            new short[] { newbutton.PosVertical, newbutton.PosHorizontal }))
                 {
-                    
                     server.SendMoveAsync(LobbyID.Text, $"{dragButton.PosVertical},{dragButton.PosHorizontal};{newbutton.PosVertical},{newbutton.PosHorizontal}");
-                    
+
                     DropFigureToNewPosition(dragButton, newbutton);
+                    goto Accept;
                 }
 
-                else dragButton.Image = board.Figures[dragButton.PosVertical, dragButton.PosHorizontal].Image;
-            }
-            else
-            {
-                // Setting image back on button if user dropped figure on same position
-                newbutton.Image = board.Figures[newbutton.PosVertical, newbutton.PosHorizontal].Image;
+                else goto Decline;
             }
 
+            Decline:
+            dragButton.Image = board.Figures[dragButton.PosVertical, dragButton.PosHorizontal].Image;
+
+            Accept:
             dragButton = null;
             dragImage.Source = null;
         }
@@ -300,42 +304,50 @@ namespace Chess
             }
         }
 
-        private void RotateBoard()
+        private void RotateBoard(FigureColor playerColor, Board posBoard = null)
         {
             foreach (var item in buttons)
                 table.Children.Remove(item);
 
-            InitializeBoard(playerColor == FigureColor.White ? FigureColor.Black : FigureColor.White, currentTableColor, board);
+            InitializeBoard(playerColor, currentTableColor, posBoard);
         }
 
         private void TableMovesHandler(string move)
         {
-            MessageBox.Show("Move received from opponent: " + move);
+            string[] oldNew = move.Split(';');
+            string oldPos = oldNew[0], newPos = oldNew[1];
+            this.Dispatcher.Invoke(() =>
+            {
+                DropFigureToNewPosition(buttons[int.Parse(oldPos.Split(',')[0]), int.Parse(oldPos.Split(',')[1])], buttons[int.Parse(newPos.Split(',')[0]), int.Parse(newPos.Split(',')[1])]);
+            });
         }
         private void ConnectToLobbyHandler(string lobbyID, string side, string nickname)
         {
-            if (side != "White")
+            Dispatcher.Invoke(() =>
             {
-                this.Dispatcher.Invoke(() =>
-                {
-                    RotateBoard();
-                });
-            }
+                if (side == "White")
+                    playerColor = FigureColor.White;
+                
+                else if (side == "Black")
+                    playerColor = FigureColor.Black;
 
-            this.Dispatcher.Invoke(() =>
-            {
+                isConnectedToLobby = true;
+
+                RotateBoard(playerColor);
                 LobbyID.Text = lobbyID;
                 OpponentNick.Text = string.IsNullOrEmpty(nickname)? "Your opponent has not joined yet" : nickname;
+                PlayWithFriendButton.IsEnabled = false;
             });
             MessageBox.Show("Connected to lobby: " + lobbyID);
         }
+
         private void OpponentJoinedHandler(string nickname)
         {
             this.Dispatcher.Invoke(() =>
             {
                 OpponentNick.Text = nickname;
             });
-            MessageBox.Show($"Your opponent:{nickname} joined lobby");
+            MessageBox.Show($"Your opponent: {nickname} joined lobby");
         }
     }
 }

@@ -131,7 +131,7 @@ namespace Chess.ChessBackEnd
                     TableMovesHandler(parameters[1]);
                     break;
                 case "ConfirmedMove":
-                    MessageBox.Show("Confirmed: " + parameters[1]);
+                    //MessageBox.Show("Confirmed: " + parameters[1]);
                     break;
                 default:
                     MessageBox.Show("Non-valid data from server received " + command);

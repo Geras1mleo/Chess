@@ -32,26 +32,25 @@ namespace ChessServer
                         case "stop":
                             listen = false;
                             server.Stop();
-                            Console.WriteLine("Server Stopped");
-                            break;
+                            continue;
                         case "start":
                             if (!listen)
                             {
                                 listen = true;
                                 StartServer();
                             }
-                            break;
+                            continue;
                         case "info":
                             Console.WriteLine("Amount lobbies: " + lobbies.Count);
-                            break;
+                            continue;
                         case "clear":
                             lobbies.Clear();
                             IDs.Clear();
                             Console.WriteLine("Lobbies has been deleted succesfully!");
-                            break;
+                            continue;
                         default:
                             Console.WriteLine("Unknown command");
-                            break;
+                            continue;
                     }
                 }
             });
@@ -82,6 +81,7 @@ namespace ChessServer
                 if(client.Connected)
                     new Thread(() => ListenToClient(client)).Start();
             }
+            Console.WriteLine("Server Stopped, type 'start' to start again");
         }
 
         static void ListenToClient(TcpClient client)

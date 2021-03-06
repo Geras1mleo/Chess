@@ -17,7 +17,7 @@ namespace Chess.ChessBackEnd
         {
             bool isValid = false;
 
-            if (!ValidPlayerMove(figure)) return false;
+            if (CustomChessTable.PlayerMove != figure.Color) return false;
 
             switch (figure.Type)
             {
@@ -126,15 +126,7 @@ namespace Chess.ChessBackEnd
 
             Figures = beginSituation;
 
-            if (isAttacked) return true;
-            else return false;
-        }
-
-        private bool ValidPlayerMove(Figure figure)
-        {
-            if (CustomChessTable.PlayerMove == figure.Color)
-                return true;
-            else return false;
+            return isAttacked;
         }
 
         private bool PawnValidation(Figure figure, short[] oldPos, short[] newPos)
@@ -179,7 +171,7 @@ namespace Chess.ChessBackEnd
             // If moving vertical...
             if (oldPos[1] == newPos[1])
             {
-                for (int i = oldPos[0]; (oldPos[0] < newPos[0] && i <=newPos[0]) || (oldPos[0] > newPos[0] && i >= newPos[0]); i = i + (oldPos[0] < newPos[0]? 1 : -1))
+                for (int i = oldPos[0]; (oldPos[0] < newPos[0] && i <=newPos[0]) || (oldPos[0] > newPos[0] && i >= newPos[0]); i += (oldPos[0] < newPos[0]? 1 : -1))
                 {
                     // First iteration skip bc this is old position of rook 
                     if (i == oldPos[0]) continue;
@@ -200,7 +192,7 @@ namespace Chess.ChessBackEnd
             // If moving horizontal
             else if (oldPos[0] == newPos[0])
             {
-                for (int i = oldPos[1]; (oldPos[1] < newPos[1] && i <= newPos[1]) || (oldPos[1] > newPos[1] && i >= newPos[1]) ; i = i + (oldPos[1] < newPos[1]? 1 : -1))
+                for (int i = oldPos[1]; (oldPos[1] < newPos[1] && i <= newPos[1]) || (oldPos[1] > newPos[1] && i >= newPos[1]) ; i += (oldPos[1] < newPos[1]? 1 : -1))
                 {
                     // First iteration skip bc this is old position of rook 
                     if (i == oldPos[1]) continue;
@@ -250,7 +242,7 @@ namespace Chess.ChessBackEnd
             (oldPos[0] > newPos[0] && oldPos[1] > newPos[1] && i >= newPos[0] && j >= newPos[1]) ||
             (oldPos[0] < newPos[0] && oldPos[1] > newPos[1] && i <= newPos[0] && j >= newPos[1]) ||
             (oldPos[0] > newPos[0] && oldPos[1] < newPos[1] && i >= newPos[0] && j <= newPos[1]) ; 
-            i = i + (oldPos[0] < newPos[0]? 1 : -1), j = j + (oldPos[1] < newPos[1] ? 1 : -1))
+            i += (oldPos[0] < newPos[0]? 1 : -1), j += (oldPos[1] < newPos[1] ? 1 : -1))
             {
                 // First iteration skip bc this is old position of bishop 
                 if (i == oldPos[0] && j == oldPos[1]) continue;

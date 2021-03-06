@@ -12,7 +12,7 @@ namespace ChessServer
         public Client White { get; set; }
         public Client Black { get; set; }
 
-        public List<string> Moves { get; set; }
+        public List<string> Moves { get; set; } = new List<string>();
 
         public Lobby(string lobbyID, TcpClient client, string nickname)
         {
@@ -27,6 +27,7 @@ namespace ChessServer
             {
                 White = new Client(client, nickname);
                 Console.WriteLine("White player connected to lobby: " + LobbyID);
+
                 White.SW.WriteLine($"Connected/{LobbyID}/White/{Black?.Nickname}");
                 Black?.SW.WriteLine($"OpponentJoined/{White.Nickname}");
             }
@@ -35,6 +36,7 @@ namespace ChessServer
             {
                 Black = new Client(client, nickname);
                 Console.WriteLine("Black player connected to lobby: " + LobbyID);
+
                 Black.SW.WriteLine($"Connected/{LobbyID}/Black/{White?.Nickname}");
                 White?.SW.WriteLine($"OpponentJoined/{Black.Nickname}");
             }
@@ -49,8 +51,7 @@ namespace ChessServer
                     White.ClientCon.Close();
                     White = null;
 
-                    var sw = new StreamWriter(Black.ClientCon.GetStream());
-                    sw.AutoFlush = true;
+                    var sw = new StreamWriter(Black.ClientCon.GetStream()) { AutoFlush = true };
 
                     //TODO
                     //sw.Write("");
@@ -60,8 +61,7 @@ namespace ChessServer
                     Black.ClientCon.Close();
                     Black = null;
 
-                    var sw = new StreamWriter(White.ClientCon.GetStream());
-                    sw.AutoFlush = true;
+                    var sw = new StreamWriter(White.ClientCon.GetStream()) { AutoFlush = true };
 
                     //TODO
                     //sw.Write("");

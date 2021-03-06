@@ -143,7 +143,7 @@
                  Canvas.Left="74" 
                  Canvas.Top="17"
                  TextWrapping="Wrap"
-                 Width="120" 
+                 Width="436" 
                  Background="Transparent"
                  Text="Your opponent"
                  FontSize="15" FontFamily="Century Gothic"/>
@@ -152,7 +152,7 @@
                 Canvas.Left="78" 
                 Canvas.Top="545"
                 TextWrapping="Wrap"
-                Width="120" 
+                Width="432" 
                 Background="Transparent"
                 Text="You"
                 FontSize="15" FontFamily="Century Gothic"/>

@@ -5,7 +5,7 @@
         public Figure[,] Figures { get; set; }
 
         //We need this buttons only for En Passant to clear image from button
-        private TableButton[,] buttons;
+        private readonly TableButton[,] buttons;
 
         public Board(TableButton[,] buttons, Board board = null)
         {
