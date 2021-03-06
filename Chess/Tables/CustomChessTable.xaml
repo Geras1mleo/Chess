@@ -138,7 +138,7 @@
 
         <Image Height="38" Canvas.Left="30" Canvas.Top="17" Width="38" Source="/Chess;component/Images/user.png" Stretch="Fill" />
         <Image Height="38" Canvas.Left="30" Canvas.Top="545" Width="38" Source="/Chess;component/Images/user.png" Stretch="Fill" />
-        <TextBox x:Name="OpponentNick"
+        <TextBlock x:Name="OpponentNick"
                  Height="23" 
                  Canvas.Left="74" 
                  Canvas.Top="17"
@@ -146,9 +146,8 @@
                  Width="120" 
                  Background="Transparent"
                  Text="Your opponent"
-                 BorderThickness="0"
                  FontSize="15" FontFamily="Century Gothic"/>
-        <TextBox x:Name="PlayerNick"
+        <TextBlock x:Name="PlayerNick"
                 Height="23" 
                 Canvas.Left="78" 
                 Canvas.Top="545"
@@ -156,7 +155,6 @@
                 Width="120" 
                 Background="Transparent"
                 Text="You"
-                BorderThickness="0"
                 FontSize="15" FontFamily="Century Gothic"/>
         <TextBlock x:Name="LobbyID" Canvas.Left="581" TextWrapping="Wrap" Canvas.Top="136" Height="32" Width="72"/>
 

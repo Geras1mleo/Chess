@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Net.Sockets;
-using System.Net;
 using System.IO;
 
 namespace ChessServer
@@ -32,6 +28,7 @@ namespace ChessServer
                 White = new Client(client, nickname);
                 Console.WriteLine("White player connected to lobby: " + LobbyID);
                 White.SW.WriteLine($"Connected/{LobbyID}/White/{Black?.Nickname}");
+                Black?.SW.WriteLine($"OpponentJoined/{White.Nickname}");
             }
 
             else if (Black is null)
@@ -39,6 +36,7 @@ namespace ChessServer
                 Black = new Client(client, nickname);
                 Console.WriteLine("Black player connected to lobby: " + LobbyID);
                 Black.SW.WriteLine($"Connected/{LobbyID}/Black/{White?.Nickname}");
+                White?.SW.WriteLine($"OpponentJoined/{Black.Nickname}");
             }
         }
 

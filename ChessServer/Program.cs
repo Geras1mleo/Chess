@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,10 +15,10 @@ namespace ChessServer
         static TcpListener server;
         static bool listen = true;
 
-        static List<Lobby> lobbies = new List<Lobby>();
-        static List<string> IDs = new List<string>();
+        static readonly List<Lobby> lobbies = new List<Lobby>();
+        static readonly List<string> IDs = new List<string>();
 
-        static void Main(string[] args)
+        static void Main()
         {
             server = new TcpListener(new IPEndPoint(IPAddress.Any, PORT));
             Task.Factory.StartNew(() =>
@@ -28,25 +26,32 @@ namespace ChessServer
                 while (true)
                 {
                     var str = Console.ReadLine();
-                    if (str == "stop")
+
+                    switch (str)
                     {
-                        listen = false;
-                        server.Stop();
-                        Console.WriteLine("Server Stopped");
-                    }
-                    else if (str == "start" && !listen)
-                    {
-                        listen = true;
-                        StartServer();
-                    }
-                    else if (str == "info")
-                    {
-                        Console.WriteLine("Amount lobbies: " + lobbies.Count);
-                    }
-                    else if(str == "clear")
-                    {
-                        lobbies.Clear();
-                        IDs.Clear();
+                        case "stop":
+                            listen = false;
+                            server.Stop();
+                            Console.WriteLine("Server Stopped");
+                            break;
+                        case "start":
+                            if (!listen)
+                            {
+                                listen = true;
+                                StartServer();
+                            }
+                            break;
+                        case "info":
+                            Console.WriteLine("Amount lobbies: " + lobbies.Count);
+                            break;
+                        case "clear":
+                            lobbies.Clear();
+                            IDs.Clear();
+                            Console.WriteLine("Lobbies has been deleted succesfully!");
+                            break;
+                        default:
+                            Console.WriteLine("Unknown command");
+                            break;
                     }
                 }
             });

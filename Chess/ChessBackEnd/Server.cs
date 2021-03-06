@@ -16,18 +16,20 @@ namespace Chess.ChessBackEnd
         const short PORT = 8080;
         const string IP = "93.188.166.178";
 
-        private event Action<string> TableMovesHandler;
         private event Action<string, string, string> ConnectToLobbyHandler;
+        private event Action<string> TableMovesHandler;
+        private event Action<string> OpponentJoinedHandler;
 
-        private StreamWriter sw;
-        private StreamReader sr;
+        private readonly StreamWriter sw;
+        private readonly StreamReader sr;
 
-        private TcpClient client;
+        private readonly TcpClient client;
 
-        public Server(Action<string> updateTable, Action<string, string, string> connectToLobby)
+        public Server(Action<string, string, string> connectToLobbyHandler, Action<string> opponentJoinedHandler, Action<string> tableMovesHandler)
         {
-            TableMovesHandler = updateTable;
-            ConnectToLobbyHandler = connectToLobby;
+            ConnectToLobbyHandler = connectToLobbyHandler;
+            OpponentJoinedHandler = opponentJoinedHandler;
+            TableMovesHandler = tableMovesHandler;
             try
             {
                 var ipEP = new IPEndPoint(IPAddress.Parse(IP), PORT);
@@ -35,8 +37,7 @@ namespace Chess.ChessBackEnd
                 client = new TcpClient();
                 client.Connect(ipEP);
 
-                sw = new StreamWriter(client.GetStream());
-                sw.AutoFlush = true;
+                sw = new StreamWriter(client.GetStream()) { AutoFlush = true };
                 sr = new StreamReader(client.GetStream());
 
                 ListenToServerAsync();
@@ -122,6 +123,9 @@ namespace Chess.ChessBackEnd
             {
                 case "Connected":
                     ConnectToLobbyHandler(parameters[1], parameters[2], parameters[3]);
+                    break;
+                case "OpponentJoined":
+                    OpponentJoinedHandler(parameters[1]);
                     break;
                 case "NewMove":
                     TableMovesHandler(parameters[1]);

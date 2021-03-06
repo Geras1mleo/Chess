@@ -79,7 +79,7 @@ namespace Chess
         {
             InitializeComponent();
             InitializeBoard(FigureColor.White, TableColor.Blue);
-            server = new Server(DataReceived, ConnectToLobby);
+            server = new Server(ConnectToLobbyHandler, OpponentJoinedHandler, TableMovesHandler);
         }
 
         private void InitializeBoard(FigureColor playerColor, TableColor tableColor, Board currBoard = null)
@@ -308,20 +308,28 @@ namespace Chess
             InitializeBoard(playerColor == FigureColor.White ? FigureColor.Black : FigureColor.White, currentTableColor, board);
         }
 
-        private void DataReceived(string move)
+        private void TableMovesHandler(string move)
         {
             MessageBox.Show("Move received from opponent: " + move);
         }
-        private void ConnectToLobby(string lobbyID, string side, string nickname)
+        private void ConnectToLobbyHandler(string lobbyID, string side, string nickname)
         {
             if (side != "White") RotateBoard();
 
             this.Dispatcher.Invoke(() =>
             {
                 LobbyID.Text = lobbyID;
-                OpponentNick.Text = nickname;
+                OpponentNick.Text = string.IsNullOrEmpty(nickname)? "Your opponent has not joined yet" : nickname;
             });
             MessageBox.Show("Connected to lobby: " + lobbyID);
+        }
+        private void OpponentJoinedHandler(string nickname)
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                OpponentNick.Text = nickname;
+            });
+            MessageBox.Show($"Your opponent:{nickname} joined lobby");
         }
     }
 }
