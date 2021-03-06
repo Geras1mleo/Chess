@@ -314,7 +314,13 @@ namespace Chess
         }
         private void ConnectToLobbyHandler(string lobbyID, string side, string nickname)
         {
-            if (side != "White") RotateBoard();
+            if (side != "White")
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    RotateBoard();
+                });
+            }
 
             this.Dispatcher.Invoke(() =>
             {
