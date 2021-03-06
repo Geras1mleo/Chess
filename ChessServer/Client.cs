@@ -1,15 +1,21 @@
-﻿using System.Net.Sockets;
+﻿using System.IO;
+using System.Net.Sockets;
 
 namespace ChessServer
 {
     class Client
     {
         public TcpClient ClientCon { get; set; }
+        public StreamWriter SW { get;}
+        public StreamReader SR { get; }
+
         public string Nickname { get; set; }
 
         public Client(TcpClient tcpCient, string nickname)
         {
             ClientCon = tcpCient;
+            SW = new StreamWriter(ClientCon.GetStream());
+            SR = new StreamReader(ClientCon.GetStream());
             Nickname = nickname;
         }
     }

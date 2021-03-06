@@ -31,12 +31,14 @@ namespace ChessServer
             {
                 White = new Client(client, nickname);
                 Console.WriteLine("White player connected to lobby: " + LobbyID);
+                White.SW.WriteLine($"Connected/{LobbyID}/White");
             }
 
             else if (Black is null)
             {
                 Black = new Client(client, nickname);
                 Console.WriteLine("Black player connected to lobby: " + LobbyID);
+                Black.SW.WriteLine($"Connected/{LobbyID}/Black");
             }
         }
 
@@ -90,12 +92,12 @@ namespace ChessServer
                 if (client == White.ClientCon)
                 {
                     swb.WriteLine($"Move/{move}");
-                    sww.WriteLine($"ConfirmMove/{move}");
+                    sww.WriteLine($"ConfirmedMove/{move}");
                 }
                 else if (client == Black.ClientCon)
                 {
                     sww.WriteLine($"Move/{move}");
-                    swb.WriteLine($"ConfirmMove/{move}");
+                    swb.WriteLine($"ConfirmedMove/{move}");
                 }
                 Moves.Add(move);
             }

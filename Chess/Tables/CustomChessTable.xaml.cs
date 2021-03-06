@@ -310,7 +310,7 @@ namespace Chess
 
         private void DataReceived(string move)
         {
-            MessageBox.Show("Data received from server: " + move);
+            MessageBox.Show("Move received from opponent: " + move);
         }
         private void ConnectToLobby(string lobbyID)
         {

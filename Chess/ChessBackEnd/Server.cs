@@ -58,7 +58,7 @@ namespace Chess.ChessBackEnd
                 try
                 {
                     var data = sr.ReadLine();
-                    MessageBox.Show(data);
+                    ProcessCommand(data);
                 }
                 catch (Exception e)
                 {
@@ -81,17 +81,6 @@ namespace Chess.ChessBackEnd
             try
             {
                 sw.WriteLine($"NewLobby/{nickname}");
-
-                MessageBox.Show("Request sent");
-
-                var data = sr.ReadLine();
-
-                if (data.Contains("NewLobby/"))
-                {
-                    var lobbyID = data.Replace("NewLobby/", "");
-                    ConnectToLobbyHandler(lobbyID);
-                }
-                else MessageBox.Show("Error: Invalid data received from server: " + data);
             }
             catch (Exception e)
             {
@@ -105,14 +94,34 @@ namespace Chess.ChessBackEnd
             try
             {
                 sw.WriteLine($"Move/{lobbyID}/{move}");
-                var data = sr.ReadLine();
-                MessageBox.Show(data);
             }
             catch (Exception e)
             {
                 MessageBox.Show("Error: " + e.Message);
             }
             
+        }
+
+        private void ProcessCommand(string command)
+        {
+            string[] parameters = command.Split('/');
+            switch (parameters[0])
+            {
+                case "NewLobbyConfirmed":
+                    ConnectToLobbyHandler(parameters[1]);
+                    break;
+                case "Connected":
+                    break;
+                case "Move":
+                    TableMovesHandler(parameters[1]);
+                    break;
+                case "ConfirmedMove":
+                    MessageBox.Show("Confirmed: " + parameters[1]);
+                    break;
+                default:
+                    MessageBox.Show("Got non-valid data from server" + command);
+                    break;
+            }
         }
     }
 }

@@ -73,13 +73,6 @@ namespace ChessServer
                 // When new client connects to server we get new variable of TcpClient here
                 var client = server.AcceptTcpClient();
 
-                var sw = new StreamWriter(client.GetStream());
-
-                Thread.Sleep(50);
-
-                sw.AutoFlush = true;
-                sw.WriteLine("Connection made");
-
                 // For each client new thread that will be listening to incoming data
                 if(client.Connected)
                     new Thread(() => ListenToClient(client)).Start();
@@ -101,12 +94,10 @@ namespace ChessServer
                         client.Close();
                         break;
                     }
-                    
-                    Console.WriteLine("Data received: " + data);
 
                     ProcessCommand(client, data);
                 }
-                Console.WriteLine("Disconnected");
+                Console.WriteLine("Disconnected: " + client.Client.RemoteEndPoint.ToString());
             }
             catch (Exception e)
             {
@@ -167,7 +158,7 @@ namespace ChessServer
                 var sw = new StreamWriter(client.GetStream());
                 sw.AutoFlush = true;
 
-                sw.WriteLine($"NewLobby/{id}");
+                sw.WriteLine($"NewLobbyConfirmed/{id}");
 
                 Console.WriteLine("New Lobby created: " + id);
             }
