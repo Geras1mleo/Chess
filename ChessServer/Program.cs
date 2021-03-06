@@ -43,6 +43,11 @@ namespace ChessServer
                     {
                         Console.WriteLine("Amount lobbies: " + lobbies.Count);
                     }
+                    else if(str == "clear")
+                    {
+                        lobbies.Clear();
+                        IDs.Clear();
+                    }
                 }
             });
             StartServer();
@@ -69,8 +74,11 @@ namespace ChessServer
                 var client = server.AcceptTcpClient();
 
                 var sw = new StreamWriter(client.GetStream());
-                sw.Write("Connection made");
-                sw.Flush();
+
+                Thread.Sleep(50);
+
+                sw.AutoFlush = true;
+                sw.WriteLine("Connection made");
 
                 // For each client new thread that will be listening to incoming data
                 if(client.Connected)
@@ -84,7 +92,6 @@ namespace ChessServer
             {
                 Console.WriteLine("New client added \nSocket connected to: " + client.Client.RemoteEndPoint.ToString());
                 var sr = new StreamReader(client.GetStream());
-                var sw = new StreamWriter(client.GetStream());
 
                 while (client.Connected)
                 {
@@ -96,10 +103,6 @@ namespace ChessServer
                     }
                     
                     Console.WriteLine("Data received: " + data);
-
-                    // Sending back confirmation
-                    sw.WriteLine("Confirmed/" + data);
-                    sw.Flush();
 
                     ProcessCommand(client, data);
                 }
@@ -164,7 +167,7 @@ namespace ChessServer
                 var sw = new StreamWriter(client.GetStream());
                 sw.AutoFlush = true;
 
-                sw.Write($"NewLobby/{id}");
+                sw.WriteLine($"NewLobby/{id}");
 
                 Console.WriteLine("New Lobby created: " + id);
             }

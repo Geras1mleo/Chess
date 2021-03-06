@@ -47,6 +47,9 @@ namespace Chess.ChessBackEnd
             }
         }
         
+        /// <summary>
+        /// Listens to incoming data from the server asyncronously
+        /// </summary>
         private void ListenToServerAsync() => new Task(ListenToServer).Start();
         private void ListenToServer()
         {
@@ -55,7 +58,6 @@ namespace Chess.ChessBackEnd
                 try
                 {
                     var data = sr.ReadLine();
-
                     MessageBox.Show(data);
                 }
                 catch (Exception e)
@@ -73,31 +75,29 @@ namespace Chess.ChessBackEnd
         /// </summary>
         /// <param name="nickName">Nickname is gonna be passed on serve</param>
         /// <returns>New lobby id</returns>
-        /*public void CreateNewLobby(string nickname)
+        public void CreateNewLobbyAsync(string nickname) => new Task(()=>CreateNewLobby(nickname)).Start();
+        public void CreateNewLobby(string nickname)
         {
-            Task.Factory.StartNew(() =>
+            try
             {
-                try
+                sw.WriteLine($"NewLobby/{nickname}");
+
+                MessageBox.Show("Request sent");
+
+                var data = sr.ReadLine();
+
+                if (data.Contains("NewLobby/"))
                 {
-                    sw.Write($"NewLobby/{nickname}");
-
-                    MessageBox.Show("Request sent");
-
-                    var data = sr.ReadToEnd();
-
-                    if (data.Contains("NewLobby/"))
-                    {
-                        var lobbyID = data.Replace("NewLobby/", "");
-                        ConnectToLobbyHandler(lobbyID);
-                    }
-                    else MessageBox.Show("Error: Invalid data received from server");
+                    var lobbyID = data.Replace("NewLobby/", "");
+                    ConnectToLobbyHandler(lobbyID);
                 }
-                catch (Exception e)
-                {
-                    MessageBox.Show( $"Error while creating lobby: {e.Message}");
-                }
-            });
-        }*/
+                else MessageBox.Show("Error: Invalid data received from server: " + data);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Error while creating lobby: {e.Message}");
+            }
+        }
 
         public void SendMoveAsync(string lobbyID, string move) => new Task(()=> { SendMove(lobbyID, move); }).Start();
         private void SendMove(string lobbyID, string move)
@@ -105,11 +105,7 @@ namespace Chess.ChessBackEnd
             try
             {
                 sw.WriteLine($"Move/{lobbyID}/{move}");
-                sw.Flush();
-
-                // Waiting for response with confirmation of move
                 var data = sr.ReadLine();
-
                 MessageBox.Show(data);
             }
             catch (Exception e)

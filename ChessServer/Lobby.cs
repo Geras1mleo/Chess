@@ -53,7 +53,7 @@ namespace ChessServer
                     sw.AutoFlush = true;
 
                     //TODO
-                    sw.Write("");
+                    //sw.Write("");
                 }
                 else if (client == Black.ClientCon)
                 {
@@ -64,7 +64,7 @@ namespace ChessServer
                     sw.AutoFlush = true;
 
                     //TODO
-                    sw.Write("");
+                    //sw.Write("");
                 }
             }
             catch (Exception e)
@@ -79,26 +79,23 @@ namespace ChessServer
             if (!(client == White.ClientCon|| client == Black.ClientCon)) return;
 
             // If one of players is not connected...
-            if (White is null || Black is null) return;
+            //if (White is null || Black is null) return;
 
             try
             {
-                var sww = new StreamWriter(White.ClientCon.GetStream());
-                sww.AutoFlush = true;
-
-                var swb = new StreamWriter(Black.ClientCon.GetStream());
-                swb.AutoFlush = true;
+                var sww = new StreamWriter(White.ClientCon.GetStream()) { AutoFlush = true };
+                var swb = new StreamWriter(Black.ClientCon.GetStream()) { AutoFlush = true };
 
                 // Confirm move to the same client
                 if (client == White.ClientCon)
                 {
-                    swb.Write($"Move/{move}");
-                    sww.Write($"ConfirmMove/{move}");
+                    swb.WriteLine($"Move/{move}");
+                    sww.WriteLine($"ConfirmMove/{move}");
                 }
                 else if (client == Black.ClientCon)
                 {
-                    sww.Write($"Move/{move}");
-                    swb.Write($"ConfirmMove/{move}");
+                    sww.WriteLine($"Move/{move}");
+                    swb.WriteLine($"ConfirmMove/{move}");
                 }
                 Moves.Add(move);
             }

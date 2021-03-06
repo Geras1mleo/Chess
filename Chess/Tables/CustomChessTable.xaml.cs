@@ -80,7 +80,6 @@ namespace Chess
             InitializeComponent();
             InitializeBoard(FigureColor.White, TableColor.Blue);
             server = new Server(DataReceived, ConnectToLobby);
-            LobbyID.Text = "12345";
         }
 
         private void InitializeBoard(FigureColor playerColor, TableColor tableColor, Board currBoard = null)
@@ -256,8 +255,8 @@ namespace Chess
 
         private void PlayWithFriendButton_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            //var newGame = new NewGamePage(server.CreateNewLobby);
-            //newGame.ShowDialog();
+            var newGame = new NewGamePage(server.CreateNewLobby);
+            newGame.ShowDialog();
             //RotateBoard();
         }
 

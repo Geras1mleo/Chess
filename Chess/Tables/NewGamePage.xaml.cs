@@ -45,6 +45,7 @@ namespace Chess.Tables
             }
 
             CreateLobby(Nickname.Text);
+            Close();
         }
 
         private void Confirm_Click(object sender, RoutedEventArgs e)
