@@ -304,6 +304,10 @@ namespace Chess
             {
                 server.LeaveLobbyAsync(LobbyID.Text);
 
+                OpponentNick.Text = "Opponent";
+                LobbyID.Text = "";
+                isConnectedToLobby = false;
+
                 PlayWithFriendButton.Visibility = Visibility.Visible;
                 LeaveLobbyButton.Visibility = Visibility.Hidden;
             }
@@ -370,9 +374,6 @@ namespace Chess
             {
                 MessageBox.Show($"Your opponent: {OpponentNick.Text} has left the lobby");
                 OpponentNick.Text = "Opponent";
-
-                PlayWithFriendButton.Visibility = Visibility.Visible;
-                LeaveLobbyButton.Visibility = Visibility.Hidden;
             });
         }
 

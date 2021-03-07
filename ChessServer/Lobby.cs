@@ -27,7 +27,7 @@ namespace ChessServer
             if (White is null)
             {
                 White = new Client(client, nickname);
-                Console.WriteLine("White player connected to lobby: " + LobbyID);
+                Console.WriteLine($"White player: {nickname} has connected to lobby: " + LobbyID);
 
                 White.SW.WriteLine($"Connected/{LobbyID}/White/{Black?.Nickname}");
                 Black?.SW.WriteLine($"OpponentJoined/{White.Nickname}");
@@ -36,7 +36,7 @@ namespace ChessServer
             else if (Black is null)
             {
                 Black = new Client(client, nickname);
-                Console.WriteLine("Black player connected to lobby: " + LobbyID);
+                Console.WriteLine($"Black player: {nickname} has connected to lobby: " + LobbyID);
 
                 Black.SW.WriteLine($"Connected/{LobbyID}/Black/{White?.Nickname}");
                 White?.SW.WriteLine($"OpponentJoined/{Black.Nickname}");
@@ -47,14 +47,14 @@ namespace ChessServer
         {
             try
             {
-                if(client == White.ClientCon)
+                if(client == White?.ClientCon)
                 {
                     White = null;
 
                     Black?.SW.WriteLine("OpponentLeft");
                     Moves.Clear();
                 }
-                else if (client == Black.ClientCon)
+                else if (client == Black?.ClientCon)
                 {
                     Black = null;
 
