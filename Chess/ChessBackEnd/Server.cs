@@ -19,17 +19,23 @@ namespace Chess.ChessBackEnd
         private event Action<string, string, string> ConnectToLobbyHandler;
         private event Action<string> TableMovesHandler;
         private event Action<string> OpponentJoinedHandler;
+        private event Action OpponentLeftHandler;
 
         private readonly StreamWriter sw;
         private readonly StreamReader sr;
 
         private readonly TcpClient client;
 
-        public Server(Action<string, string, string> connectToLobbyHandler, Action<string> opponentJoinedHandler, Action<string> tableMovesHandler)
+        public Server(Action<string, string, string> connectToLobbyHandler, 
+                    Action<string> opponentJoinedHandler, 
+                    Action<string> tableMovesHandler, 
+                    Action opponentLeftHandler)
         {
             ConnectToLobbyHandler = connectToLobbyHandler;
             OpponentJoinedHandler = opponentJoinedHandler;
             TableMovesHandler = tableMovesHandler;
+            OpponentLeftHandler = opponentLeftHandler;
+
             try
             {
                 var ipEP = new IPEndPoint(IPAddress.Parse(IP), PORT);
@@ -58,12 +64,12 @@ namespace Chess.ChessBackEnd
             {
                 try
                 {
-                    var data = sr.ReadLine();
+                    var data = sr?.ReadLine();
                     ProcessCommand(data);
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show("Error while listening to server\n" + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Error while listening to server: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     if (!client.Client.Connected)
                         break;
 
@@ -81,11 +87,11 @@ namespace Chess.ChessBackEnd
         {
             try
             {
-                sw.WriteLine($"CreateLobby/{nickname}");
+                sw?.WriteLine($"CreateLobby/{nickname}");
             }
             catch (Exception e)
             {
-                MessageBox.Show($"Error while creating lobby: {e.Message}");
+                MessageBox.Show("Error while creating lobby: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -98,7 +104,7 @@ namespace Chess.ChessBackEnd
             }
             catch (Exception e)
             {
-                MessageBox.Show($"Error while creating lobby: {e.Message}");
+                MessageBox.Show($"Error while connecting lobby: {e.Message}");
             }
         }
 
@@ -107,13 +113,25 @@ namespace Chess.ChessBackEnd
         {
             try
             {
-                sw.WriteLine($"Move/{lobbyID}/{move}");
+                sw?.WriteLine($"Move/{lobbyID}/{move}");
             }
             catch (Exception e)
             {
-                MessageBox.Show("Error: " + e.Message);
+                MessageBox.Show("Error while sending move: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            
+        }
+        
+        public void LeaveLobbyAsync(string lobbyID) => new Task(() => { LeaveLobby(lobbyID); }).Start();
+        private void LeaveLobby(string lobbyID)
+        {
+            try
+            {
+                sw?.WriteLine($"LeaveLobby/{lobbyID}");
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error while leaving lobby: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void ProcessCommand(string command)
@@ -132,6 +150,9 @@ namespace Chess.ChessBackEnd
                     break;
                 case "ConfirmedMove":
                     //MessageBox.Show("Confirmed: " + parameters[1]);
+                    break;
+                case "OpponentLeft":
+                    OpponentLeftHandler();
                     break;
                 default:
                     MessageBox.Show("Non-valid data from server received " + command);

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Chess"
         mc:Ignorable="d"
         Name="window"
-        Title="Chess" Height="630" Width="726.4" Background="#FF343434" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize">
+        Title="Chess" Height="630" Width="726.4" Background="#FF343434" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize" Closing="window_Closing">
 
     <Canvas x:Name="canvas" DragOver="Canvas_DragOver" >
         <Grid x:Name="table" AllowDrop="True" Canvas.Left="30" Canvas.Top="60" Height="480" Width="480">
@@ -114,27 +114,29 @@
                    VerticalAlignment="Bottom"/>
         </Grid>
 
-        <Button x:Name="ChangeTableColorButton" 
-                Content="Change Board Color"
-                Canvas.Left="520" Canvas.Top="517"
-                Width="106" Height="23" BorderThickness="0"
+        <Button x:Name="ChangeTableColorButton"
+                Canvas.Left="510" Canvas.Top="517"
+                Width="20" Height="23" BorderThickness="0"
                 PreviewMouseDown="ChangeTableColorButton_MouseDown"
                 FontSize="10" FontFamily="Century Gothic"/>
         <Button x:Name="PlayWithFriendButton"
                 Content="Play New Game"
                 Style="{StaticResource RoundButton}"
-                Canvas.Left="535" Canvas.Top="60"
+                Canvas.Left="531" Canvas.Top="17"
                 Width="166" Height="50"
-                PreviewMouseDown="PlayWithFriendButton_PreviewMouseDown" 
+                Click="PlayWithFriendButton_Click"
+                Background="#38d7d7"
                 FontSize="15" FontFamily="Century Gothic"/>
         <Button x:Name="LeaveLobbyButton"
                 Content="Leave Lobby"
-                Canvas.Left="645" Canvas.Top="60"
-                Width="65" Height="24"
-                PreviewMouseDown="PlayWithFriendButton_PreviewMouseDown" 
+                Style="{StaticResource RoundButton}"
+                Canvas.Left="581" Canvas.Top="33"
+                Width="92" Height="22"
+                Click="LeaveLobbyButton_Click"
                 FontSize="10" BorderThickness="0"
-                Background="Red"
-                Visibility="Hidden" FontFamily="Century Gothic"/>
+                Background="#d62121"
+                Visibility="Hidden"
+                FontFamily="Century Gothic"/>
 
         <Image Height="38" Canvas.Left="30" Canvas.Top="17" Width="38" Source="/Chess;component/Images/user.png" Stretch="Fill" />
         <Image Height="38" Canvas.Left="30" Canvas.Top="545" Width="38" Source="/Chess;component/Images/user.png" Stretch="Fill" />

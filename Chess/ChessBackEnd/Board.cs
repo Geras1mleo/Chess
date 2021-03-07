@@ -1,11 +1,13 @@
-﻿namespace Chess.ChessBackEnd
+﻿using System.Collections.Generic;
+
+namespace Chess.ChessBackEnd
 {
     public partial class Board
     {
         public Figure[,] Figures { get; set; }
 
-        //We need this buttons only for En Passant to clear image from button
-        private readonly TableButton[,] buttons;
+        public List<short[]> MovesFrom { get; } = new List<short[]>();
+        public List<short[]> MovesTo { get; } = new List<short[]>();
 
         public Board(TableButton[,] buttons, Board board = null)
         {

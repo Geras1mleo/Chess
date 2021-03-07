@@ -80,7 +80,7 @@ namespace Chess
         {
             InitializeComponent();
             InitializeBoard(FigureColor.White, TableColor.Blue);
-            server = new Server(ConnectToLobbyHandler, OpponentJoinedHandler, TableMovesHandler);
+            server = new Server(ConnectToLobbyHandler, OpponentJoinedHandler, TableMovesHandler, OpponentLeftHandler);
         }
 
         private void InitializeBoard(FigureColor playerColor, TableColor tableColor, Board currBoard = null)
@@ -257,13 +257,6 @@ namespace Chess
             }
         }
 
-        private void PlayWithFriendButton_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            var newGame = new NewGamePage(server.CreateNewLobbyAsync, server.ConnectToLobbyAsync);
-            newGame.ShowDialog();
-            //RotateBoard();
-        }
-
         private void DropFigureToNewPosition(TableButton dragButton, TableButton newbutton)
         {
             PlayerMove = PlayerMove == FigureColor.White ? FigureColor.Black : FigureColor.White;
@@ -304,6 +297,23 @@ namespace Chess
             }
         }
 
+        private void LeaveLobbyButton_Click(object sender, RoutedEventArgs e)
+        {
+            var result = MessageBox.Show("Are you sure want to leave lobby? ", "Leaving Lobby", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if(result == MessageBoxResult.Yes)
+            {
+                server.LeaveLobbyAsync(LobbyID.Text);
+                PlayWithFriendButton.Visibility = Visibility.Visible;
+                LeaveLobbyButton.Visibility = Visibility.Hidden;
+            }
+        }
+
+        private void PlayWithFriendButton_Click(object sender, RoutedEventArgs e)
+        {
+            var newGame = new NewGamePage(server.CreateNewLobbyAsync, server.ConnectToLobbyAsync);
+            newGame.ShowDialog();
+        }
+
         private void RotateBoard(FigureColor playerColor, Board posBoard = null)
         {
             foreach (var item in buttons)
@@ -321,6 +331,7 @@ namespace Chess
                 DropFigureToNewPosition(buttons[int.Parse(oldPos.Split(',')[0]), int.Parse(oldPos.Split(',')[1])], buttons[int.Parse(newPos.Split(',')[0]), int.Parse(newPos.Split(',')[1])]);
             });
         }
+
         private void ConnectToLobbyHandler(string lobbyID, string side, string nickname)
         {
             Dispatcher.Invoke(() =>
@@ -336,7 +347,8 @@ namespace Chess
                 RotateBoard(playerColor);
                 LobbyID.Text = lobbyID;
                 OpponentNick.Text = string.IsNullOrEmpty(nickname)? "Your opponent has not joined yet" : nickname;
-                PlayWithFriendButton.IsEnabled = false;
+                PlayWithFriendButton.Visibility = Visibility.Hidden;
+                LeaveLobbyButton.Visibility = Visibility.Visible;
             });
             MessageBox.Show("Connected to lobby: " + lobbyID);
         }
@@ -347,7 +359,33 @@ namespace Chess
             {
                 OpponentNick.Text = nickname;
             });
-            MessageBox.Show($"Your opponent: {nickname} joined lobby");
+            MessageBox.Show($"Your opponent: {nickname} joined to lobby");
+        }
+
+        private void OpponentLeftHandler()
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                MessageBox.Show($"Your opponent: {OpponentNick.Text} has left the lobby");
+                OpponentNick.Text = "Opponent";
+
+                PlayWithFriendButton.Visibility = Visibility.Visible;
+                LeaveLobbyButton.Visibility = Visibility.Hidden;
+            });
+        }
+
+        private void window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (isConnectedToLobby)
+            {
+                var result = MessageBox.Show("If you leave you wont be able to reconnect to lobby and play further\nAre you sure want to exit? ", "Leave Lobby", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (result == MessageBoxResult.Yes)
+                {
+                    server.LeaveLobbyAsync(LobbyID.Text);
+                    e.Cancel = false;
+                }
+                else e.Cancel = true;
+            }
         }
     }
 }

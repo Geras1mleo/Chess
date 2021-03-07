@@ -17,6 +17,7 @@ namespace ChessServer
         public Lobby(string lobbyID, TcpClient client, string nickname)
         {
             LobbyID = lobbyID;
+
             //User that has made the lobby plays white
             AddClient(client, nickname);
         }
@@ -42,7 +43,7 @@ namespace ChessServer
             }
         }
 
-        public void UserLeftNotify(TcpClient client)
+        public void UserLeft(TcpClient client)
         {
             try
             {
@@ -51,20 +52,16 @@ namespace ChessServer
                     White.ClientCon.Close();
                     White = null;
 
-                    var sw = new StreamWriter(Black.ClientCon.GetStream()) { AutoFlush = true };
-
-                    //TODO
-                    //sw.Write("");
+                    Black?.SW.WriteLine("OpponentLeft");
+                    Moves.Clear();
                 }
                 else if (client == Black.ClientCon)
                 {
                     Black.ClientCon.Close();
                     Black = null;
 
-                    var sw = new StreamWriter(White.ClientCon.GetStream()) { AutoFlush = true };
-
-                    //TODO
-                    //sw.Write("");
+                    White?.SW.WriteLine("OpponentLeft");
+                    Moves.Clear();
                 }
             }
             catch (Exception e)

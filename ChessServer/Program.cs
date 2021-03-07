@@ -144,6 +144,9 @@ namespace ChessServer
                 case "Move":
                     NewMove(client, parameters[1], parameters[2]);
                     break;
+                case "LeaveLobby":
+                    LeaveLobby(client, parameters[1]);
+                    break;
                 default:
                     Console.WriteLine("Invalid message format received: " + command + "\tFrom: " + client.Client.RemoteEndPoint.ToString());
                     break;
@@ -188,6 +191,14 @@ namespace ChessServer
                     break;
                 }
             }
+        }
+
+        static void LeaveLobby(TcpClient client, string lobbyID)
+        {
+            var id = IDs.IndexOf(lobbyID);
+
+            if(id > -1)
+                lobbies[id].UserLeft(client);
         }
     }
 }

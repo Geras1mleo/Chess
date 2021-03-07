@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Chess.ChessBackEnd
 {
     public partial class Board
     {
         private short[] enPassantPos = { 0,0};
+
+        //We need this buttons only for En Passant to clear image from button
+        private readonly TableButton[,] buttons;
 
         /// <summary>
         /// 
@@ -41,8 +45,8 @@ namespace Chess.ChessBackEnd
                     isValid = KingValidation(figure, oldPos, newPos);
                     break;
             }
-            if (isValid && !IsKingAttacked(figure, oldPos, newPos)) return true;
-            else return false;
+
+            return isValid && !IsKingAttacked(figure, oldPos, newPos);
         }
 
         private bool IsKingAttacked(Figure figure, short[] oldPos, short[] newPos)
@@ -148,7 +152,7 @@ namespace Chess.ChessBackEnd
                     Figures[oldPos[0], oldPos[1]].Type = FigureType.Queen;
 
                 // If there enpassant is possible => remember position
-                if (oldPos[0] + (bw * 2) == newPos[0])
+                if (oldPos[0] + (bw * 2) == newPos[0] && (newPos[1] + 1 < 8 && Figures[newPos[0], newPos[1] + 1] != null && Figures[newPos[0], newPos[1] + 1].Type == FigureType.Pawn && Figures[newPos[0], newPos[1] + 1].Color != figure.Color || newPos[1] - 1 > -1 && Figures[newPos[0], newPos[1] - 1] != null && Figures[newPos[0], newPos[1] - 1].Type == FigureType.Pawn && Figures[newPos[0], newPos[1] - 1].Color != figure.Color))
                     enPassantPos = newPos;
 
                 return true;
