@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 using System.Windows;
 using System.IO;
 
@@ -57,7 +53,7 @@ namespace Chess.ChessBackEnd
         /// <summary>
         /// Listens to incoming data from the server asyncronously
         /// </summary>
-        private void ListenToServerAsync() => new Task(ListenToServer).Start();
+        public void ListenToServerAsync() => new Task(ListenToServer).Start();
         private void ListenToServer()
         {
             while (true)
@@ -65,17 +61,17 @@ namespace Chess.ChessBackEnd
                 try
                 {
                     var data = sr?.ReadLine();
+                    if (data is null) break;
 
                     ProcessCommand(data);
                 }
                 catch (Exception e)
                 {
-                    if (!client.Client.Connected)
-                        break;
-                    MessageBox.Show("Error while listening to server: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-
+                    if(client.Client.Connected)
+                        MessageBox.Show("Error while listening to server: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
+            MessageBox.Show("Disconnected from server", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         /// <summary>
@@ -150,7 +146,7 @@ namespace Chess.ChessBackEnd
                     TableMovesHandler(parameters[1], parameters[2]);
                     break;
                 case "ConfirmedMove":
-                    //MessageBox.Show("Confirmed: " + parameters[1]);
+
                     break;
                 case "OpponentLeft":
                     OpponentLeftHandler();

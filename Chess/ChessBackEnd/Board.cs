@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Chess.ChessBackEnd
+﻿namespace Chess.ChessBackEnd
 {
     public partial class Board
     {

@@ -13,7 +13,6 @@ namespace ChessServer
         const short PORT = 8080;
 
         static TcpListener server;
-        static bool listen = true;
 
         static readonly List<Lobby> lobbies = new List<Lobby>();
         static readonly List<string> IDs = new List<string>();
@@ -29,17 +28,6 @@ namespace ChessServer
 
                     switch (str)
                     {
-                        case "stop":
-                            listen = false;
-                            server.Stop();
-                            continue;
-                        case "start":
-                            if (!listen)
-                            {
-                                listen = true;
-                                StartServer();
-                            }
-                            continue;
                         case "info":
                             Console.WriteLine("Amount lobbies: " + lobbies.Count);
                             continue;
@@ -67,7 +55,7 @@ namespace ChessServer
             server.Start();
             
             Console.WriteLine("Waiting for clients to join...");
-            while (listen)
+            while (true)
             {
                 if (!server.Pending())
                 {
@@ -81,7 +69,6 @@ namespace ChessServer
                 if(client.Connected)
                     new Thread(() => ListenToClient(client)).Start();
             }
-            Console.WriteLine("Server Stopped, type 'start' to start again");
         }
 
         static void ListenToClient(TcpClient client)
@@ -103,10 +90,8 @@ namespace ChessServer
                     ProcessCommand(client, data);
                 }
             }
-            catch (Exception)
-            {
-                Console.WriteLine(client.Client.RemoteEndPoint.ToString() + "has been disconnected");
-            }
+            catch (Exception) { }
+            Console.WriteLine(client.Client.RemoteEndPoint.ToString() + "has been disconnected");
         }
 
         /// <summary>

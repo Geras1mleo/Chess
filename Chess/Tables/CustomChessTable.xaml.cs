@@ -218,9 +218,11 @@ namespace Chess
                                             new short[] { dragButton.PosVertical, dragButton.PosHorizontal },
                                             new short[] { newbutton.PosVertical, newbutton.PosHorizontal }))
                 {
-                    server.SendMoveAsync(LobbyID.Text, $"{dragButton.PosVertical},{dragButton.PosHorizontal};{newbutton.PosVertical},{newbutton.PosHorizontal}", board.Parameters);
+                    if(isConnectedToLobby)
+                        server.SendMoveAsync(LobbyID.Text, $"{dragButton.PosVertical},{dragButton.PosHorizontal};{newbutton.PosVertical},{newbutton.PosHorizontal}", board.Parameters);
 
-                    DropFigureToNewPosition(dragButton, newbutton);
+                    DropFigureToNewPosition(dragButton, newbutton, board.Parameters);
+                    board.Parameters = "";
                     goto Accept;
                 }
                 else goto Decline;
@@ -256,7 +258,7 @@ namespace Chess
             }
         }
 
-        private void DropFigureToNewPosition(TableButton dragButton, TableButton newbutton)
+        private void DropFigureToNewPosition(TableButton dragButton, TableButton newbutton, string parameters)
         {
             PlayerMove = PlayerMove == FigureColor.White ? FigureColor.Black : FigureColor.White;
 
@@ -267,6 +269,25 @@ namespace Chess
             // Clearing old position
             board.Figures[dragButton.PosVertical, dragButton.PosHorizontal] = null;
             buttons[dragButton.PosVertical, dragButton.PosHorizontal].Image = null;
+
+            switch (parameters)
+            {
+                case "Queen":
+                    board.Figures[newbutton.PosVertical, newbutton.PosHorizontal].Type = FigureType.Queen;
+                    buttons[newbutton.PosVertical, newbutton.PosHorizontal].Image = board.Figures[newbutton.PosVertical, newbutton.PosHorizontal].Image;
+                    break;
+                case "EnpasPos":
+                    board.SetEnPassantPos($"{newbutton.PosVertical},{newbutton.PosHorizontal}");
+                    break;
+            }
+            if (parameters.Contains("EnpasMove:"))
+            {
+                var pawnPos = parameters.Replace("EnpasMove:", "");
+                string[] pos = pawnPos.Split(',');
+
+                board.Figures[int.Parse(pos[0]), int.Parse(pos[1])] = null;
+                buttons[int.Parse(pos[0]), int.Parse(pos[1])].Image = null;
+            }
 
             // Coloring last move
             if (coloredOldBut != null)
@@ -332,22 +353,10 @@ namespace Chess
             string[] oldNew = move.Split(';');
             string oldPos = oldNew[0], newPos = oldNew[1];
             
-            this.Dispatcher.Invoke(() =>
+            Dispatcher.Invoke(() =>
             {
-                DropFigureToNewPosition(buttons[int.Parse(oldPos.Split(',')[0]), int.Parse(oldPos.Split(',')[1])], buttons[int.Parse(newPos.Split(',')[0]), int.Parse(newPos.Split(',')[1])]);
+                DropFigureToNewPosition(buttons[int.Parse(oldPos.Split(',')[0]), int.Parse(oldPos.Split(',')[1])], buttons[int.Parse(newPos.Split(',')[0]), int.Parse(newPos.Split(',')[1])], parameters);
             });
-
-            board.Parameters = parameters;
-
-            switch (parameters)
-            {
-                case "Queen":
-                    board.Figures[int.Parse(newPos.Split(',')[0]), int.Parse(newPos.Split(',')[1])].Type = FigureType.Queen;
-                    break;
-                case "EnPas":
-                    board.SetEnPassantPos(newPos);
-                    break;
-            }
         }
 
         private void ConnectToLobbyHandler(string lobbyID, string side, string nickname)
@@ -374,8 +383,9 @@ namespace Chess
 
         private void OpponentJoinedHandler(string nickname)
         {
-            this.Dispatcher.Invoke(() =>
+            Dispatcher.Invoke(() =>
             {
+                RotateBoard(playerColor);
                 OpponentNick.Text = nickname;
             });
             MessageBox.Show($"Your opponent: {nickname} joined to lobby");
@@ -383,7 +393,7 @@ namespace Chess
 
         private void OpponentLeftHandler()
         {
-            this.Dispatcher.Invoke(() =>
+            Dispatcher.Invoke(() =>
             {
                 MessageBox.Show($"Your opponent: {OpponentNick.Text} has left the lobby");
                 OpponentNick.Text = "Opponent";

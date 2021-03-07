@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Chess.ChessBackEnd
+﻿namespace Chess.ChessBackEnd
 {
     public partial class Board
     {
@@ -16,7 +13,7 @@ namespace Chess.ChessBackEnd
         private readonly TableButton[,] buttons;
 
         /// <summary>
-        /// 
+        /// Returns bool => valid move or not
         /// </summary>
         /// <param name="figure">Draged Figure</param>
         /// <param name="oldPos">First value is vertical, second => horizontal</param>
@@ -25,7 +22,6 @@ namespace Chess.ChessBackEnd
         public bool IsValidOperation(Figure figure, short[] oldPos, short[] newPos)
         {
             bool isValid = false;
-            Parameters = "";
 
             if (CustomChessTable.PlayerMove != figure.Color) return false;
 
@@ -155,28 +151,25 @@ namespace Chess.ChessBackEnd
             {
                 // If pawn reached end it turns to Queen
                 if (newPos[0] == 7 || newPos[0] == 0)
-                {
-                    Figures[oldPos[0], oldPos[1]].Type = FigureType.Queen;
                     Parameters = "Queen";
-                }
+                
 
                 // If there enpassant is possible => remember position
                 if (oldPos[0] + (bw * 2) == newPos[0] && (newPos[1] + 1 < 8 && Figures[newPos[0], newPos[1] + 1] != null && Figures[newPos[0], newPos[1] + 1].Type == FigureType.Pawn && Figures[newPos[0], newPos[1] + 1].Color != figure.Color || newPos[1] - 1 > -1 && Figures[newPos[0], newPos[1] - 1] != null && Figures[newPos[0], newPos[1] - 1].Type == FigureType.Pawn && Figures[newPos[0], newPos[1] - 1].Color != figure.Color))
                 {
                     enPassantPos = newPos;
-                    Parameters = "EnPas";
+                    Parameters = "EnpasPos";
                 }
 
                 return true;
             }
-            // If En Passant => clear button and figure
+            // If En Passant => give it in parameters to replace later
             else if (enPassantPos[0] == oldPos[0] && (enPassantPos[1] == oldPos[1] + 1 || enPassantPos[1] == oldPos[1] - 1) &&
                 ((oldPos[0] == 3 && Figures[3, enPassantPos[1]] != null && Figures[3, enPassantPos[1]].Color == FigureColor.White && Figures[3, oldPos[1]].Color == FigureColor.Black) ||
                 (oldPos[0] == 4 && Figures[4, enPassantPos[1]] != null && Figures[4, enPassantPos[1]].Color == FigureColor.Black && Figures[4, oldPos[1]].Color == FigureColor.White)) &&
                 newPos[0] == enPassantPos[0] + bw && newPos[1] == enPassantPos[1])
             {
-                Figures[enPassantPos[0], enPassantPos[1]] = null;
-                buttons[enPassantPos[0], enPassantPos[1]].Image = null;
+                Parameters = "EnpasMove:" + enPassantPos[0] + "," + enPassantPos[1];
                 return true;
             }
             else return false;
