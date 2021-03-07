@@ -92,7 +92,7 @@ namespace ChessServer
             }
             catch (Exception)
             {
-                Console.WriteLine(client.Client.RemoteEndPoint.ToString() + "has been disconnected");
+                Console.WriteLine("Disconnected");
             }
         }
 
