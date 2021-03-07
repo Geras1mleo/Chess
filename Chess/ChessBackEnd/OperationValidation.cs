@@ -6,6 +6,11 @@ namespace Chess.ChessBackEnd
     public partial class Board
     {
         private short[] enPassantPos = { 0,0};
+        public void SetEnPassantPos(string newPos)
+        {
+            var pos = newPos.Split(',');
+            enPassantPos = new short[] { short.Parse(pos[0]), short.Parse(pos[1]) };
+        }
 
         //We need this buttons only for En Passant to clear image from button
         private readonly TableButton[,] buttons;
@@ -20,6 +25,7 @@ namespace Chess.ChessBackEnd
         public bool IsValidOperation(Figure figure, short[] oldPos, short[] newPos)
         {
             bool isValid = false;
+            Parameters = "";
 
             if (CustomChessTable.PlayerMove != figure.Color) return false;
 
@@ -149,11 +155,17 @@ namespace Chess.ChessBackEnd
             {
                 // If pawn reached end it turns to Queen
                 if (newPos[0] == 7 || newPos[0] == 0)
+                {
                     Figures[oldPos[0], oldPos[1]].Type = FigureType.Queen;
+                    Parameters = "Queen";
+                }
 
                 // If there enpassant is possible => remember position
                 if (oldPos[0] + (bw * 2) == newPos[0] && (newPos[1] + 1 < 8 && Figures[newPos[0], newPos[1] + 1] != null && Figures[newPos[0], newPos[1] + 1].Type == FigureType.Pawn && Figures[newPos[0], newPos[1] + 1].Color != figure.Color || newPos[1] - 1 > -1 && Figures[newPos[0], newPos[1] - 1] != null && Figures[newPos[0], newPos[1] - 1].Type == FigureType.Pawn && Figures[newPos[0], newPos[1] - 1].Color != figure.Color))
+                {
                     enPassantPos = newPos;
+                    Parameters = "EnPas";
+                }
 
                 return true;
             }

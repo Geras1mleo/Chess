@@ -17,7 +17,7 @@ namespace Chess.ChessBackEnd
         const string IP = "93.188.166.178";
 
         private event Action<string, string, string> ConnectToLobbyHandler;
-        private event Action<string> TableMovesHandler;
+        private event Action<string, string> TableMovesHandler;
         private event Action<string> OpponentJoinedHandler;
         private event Action OpponentLeftHandler;
 
@@ -28,7 +28,7 @@ namespace Chess.ChessBackEnd
 
         public Server(Action<string, string, string> connectToLobbyHandler, 
                     Action<string> opponentJoinedHandler, 
-                    Action<string> tableMovesHandler, 
+                    Action<string, string> tableMovesHandler, 
                     Action opponentLeftHandler)
         {
             ConnectToLobbyHandler = connectToLobbyHandler;
@@ -109,12 +109,12 @@ namespace Chess.ChessBackEnd
             }
         }
 
-        public void SendMoveAsync(string lobbyID, string move) => new Task(()=> { SendMove(lobbyID, move); }).Start();
-        private void SendMove(string lobbyID, string move)
+        public void SendMoveAsync(string lobbyID, string move, string parameters) => new Task(()=> { SendMove(lobbyID, move, parameters); }).Start();
+        private void SendMove(string lobbyID, string move, string parameters)
         {
             try
             {
-                sw?.WriteLine($"Move/{lobbyID}/{move}");
+                sw?.WriteLine($"Move/{lobbyID}/{move}/{parameters}");
             }
             catch (Exception e)
             {
@@ -147,7 +147,7 @@ namespace Chess.ChessBackEnd
                     OpponentJoinedHandler(parameters[1]);
                     break;
                 case "NewMove":
-                    TableMovesHandler(parameters[1]);
+                    TableMovesHandler(parameters[1], parameters[2]);
                     break;
                 case "ConfirmedMove":
                     //MessageBox.Show("Confirmed: " + parameters[1]);

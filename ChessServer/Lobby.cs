@@ -68,7 +68,7 @@ namespace ChessServer
             }
         }
 
-        public void NewMove(TcpClient client, string move)
+        public void NewMove(TcpClient client, string move, string parameters)
         {
             // If someone else is trying to make move in this lobby...
             if (!(client == White.ClientCon || client == Black.ClientCon)) return;
@@ -81,13 +81,13 @@ namespace ChessServer
                 // Confirm move to the same client
                 if (client == White.ClientCon)
                 {
-                    Black.SW.WriteLine($"NewMove/{move}");
-                    White.SW.WriteLine($"ConfirmedMove/{move}");
+                    Black.SW.WriteLine($"NewMove/{move}/{parameters}");
+                    White.SW.WriteLine($"ConfirmedMove/{move}/{parameters}");
                 }
                 else if (client == Black.ClientCon)
                 {
-                    White.SW.WriteLine($"NewMove/{move}");
-                    Black.SW.WriteLine($"ConfirmedMove/{move}");
+                    White.SW.WriteLine($"NewMove/{move}/{parameters}");
+                    Black.SW.WriteLine($"ConfirmedMove/{move}/{parameters}");
                 }
                 Moves.Add(move);
             }

@@ -102,11 +102,10 @@ namespace ChessServer
 
                     ProcessCommand(client, data);
                 }
-                Console.WriteLine("Disconnected: " + client.Client.RemoteEndPoint.ToString());
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine("Exception while listening to connections\n" + e.Message);
+                Console.WriteLine(client.Client.RemoteEndPoint.ToString() + "has been disconnected");
             }
         }
 
@@ -142,7 +141,7 @@ namespace ChessServer
                     ConnectToLobby(client, parameters[1], parameters[2]);
                     break;
                 case "Move":
-                    NewMove(client, parameters[1], parameters[2]);
+                    NewMove(client, parameters[1], parameters[2], parameters[3]);
                     break;
                 case "LeaveLobby":
                     LeaveLobby(client, parameters[1]);
@@ -181,13 +180,13 @@ namespace ChessServer
             }
         }
 
-        static void NewMove(TcpClient client, string lobbyID, string move)
+        static void NewMove(TcpClient client, string lobbyID, string move, string parameters)
         {
             foreach (var item in lobbies)
             {
                 if(item.LobbyID == lobbyID)
                 {
-                    item.NewMove(client, move);
+                    item.NewMove(client, move, parameters);
                     break;
                 }
             }

@@ -218,12 +218,11 @@ namespace Chess
                                             new short[] { dragButton.PosVertical, dragButton.PosHorizontal },
                                             new short[] { newbutton.PosVertical, newbutton.PosHorizontal }))
                 {
-                    server.SendMoveAsync(LobbyID.Text, $"{dragButton.PosVertical},{dragButton.PosHorizontal};{newbutton.PosVertical},{newbutton.PosHorizontal}");
+                    server.SendMoveAsync(LobbyID.Text, $"{dragButton.PosVertical},{dragButton.PosHorizontal};{newbutton.PosVertical},{newbutton.PosHorizontal}", board.Parameters);
 
                     DropFigureToNewPosition(dragButton, newbutton);
                     goto Accept;
                 }
-
                 else goto Decline;
             }
 
@@ -327,14 +326,28 @@ namespace Chess
             InitializeBoard(playerColor, currentTableColor, posBoard);
         }
 
-        private void TableMovesHandler(string move)
+        private void TableMovesHandler(string move, string parameters)
         {
+            // Example move 1,1;2,2
             string[] oldNew = move.Split(';');
             string oldPos = oldNew[0], newPos = oldNew[1];
+            
             this.Dispatcher.Invoke(() =>
             {
                 DropFigureToNewPosition(buttons[int.Parse(oldPos.Split(',')[0]), int.Parse(oldPos.Split(',')[1])], buttons[int.Parse(newPos.Split(',')[0]), int.Parse(newPos.Split(',')[1])]);
             });
+
+            board.Parameters = parameters;
+
+            switch (parameters)
+            {
+                case "Queen":
+                    board.Figures[int.Parse(newPos.Split(',')[0]), int.Parse(newPos.Split(',')[1])].Type = FigureType.Queen;
+                    break;
+                case "EnPas":
+                    board.SetEnPassantPos(newPos);
+                    break;
+            }
         }
 
         private void ConnectToLobbyHandler(string lobbyID, string side, string nickname)
