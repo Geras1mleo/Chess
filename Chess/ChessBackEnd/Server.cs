@@ -61,7 +61,7 @@ namespace Chess.ChessBackEnd
                 try
                 {
                     var data = sr?.ReadLine();
-                    if (data is null) break;
+                    if (data is null) continue;
 
                     ProcessCommand(data);
                 }
@@ -71,7 +71,7 @@ namespace Chess.ChessBackEnd
                         MessageBox.Show("Error while listening to server: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
-            MessageBox.Show("Disconnected from server", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            //MessageBox.Show("Disconnected from server", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         /// <summary>

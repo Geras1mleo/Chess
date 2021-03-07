@@ -81,7 +81,7 @@ namespace ChessServer
                 while (client.Connected)
                 {
                     var data = sr.ReadLine();
-                    if(data is null)
+                    if (data is null)
                     {
                         client.Close();
                         break;
@@ -90,8 +90,10 @@ namespace ChessServer
                     ProcessCommand(client, data);
                 }
             }
-            catch (Exception) { }
-            Console.WriteLine(client.Client.RemoteEndPoint.ToString() + "has been disconnected");
+            catch (Exception)
+            {
+                Console.WriteLine(client.Client.RemoteEndPoint.ToString() + "has been disconnected");
+            }
         }
 
         /// <summary>
