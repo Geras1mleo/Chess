@@ -65,13 +65,14 @@ namespace Chess.ChessBackEnd
                 try
                 {
                     var data = sr?.ReadLine();
+
                     ProcessCommand(data);
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show("Error while listening to server: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     if (!client.Client.Connected)
                         break;
+                    MessageBox.Show("Error while listening to server: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 
                 }
             }
@@ -159,5 +160,7 @@ namespace Chess.ChessBackEnd
                     break;
             }
         }
+
+        public void Disconnect() => client.Close();
     }
 }

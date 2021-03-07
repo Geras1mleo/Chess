@@ -161,9 +161,9 @@ namespace ChessServer
             if (!IDs.Contains(id))
             {
                 IDs.Add(id);
-                lobbies.Add(new Lobby(id, client, nickname));
-
                 Console.WriteLine("New Lobby created: " + id);
+
+                lobbies.Add(new Lobby(id, client, nickname));
             }
             else
             {

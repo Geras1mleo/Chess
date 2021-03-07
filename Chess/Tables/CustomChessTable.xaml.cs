@@ -303,6 +303,7 @@ namespace Chess
             if(result == MessageBoxResult.Yes)
             {
                 server.LeaveLobbyAsync(LobbyID.Text);
+
                 PlayWithFriendButton.Visibility = Visibility.Visible;
                 LeaveLobbyButton.Visibility = Visibility.Hidden;
             }
@@ -347,6 +348,7 @@ namespace Chess
                 RotateBoard(playerColor);
                 LobbyID.Text = lobbyID;
                 OpponentNick.Text = string.IsNullOrEmpty(nickname)? "Your opponent has not joined yet" : nickname;
+
                 PlayWithFriendButton.Visibility = Visibility.Hidden;
                 LeaveLobbyButton.Visibility = Visibility.Visible;
             });
@@ -382,6 +384,8 @@ namespace Chess
                 if (result == MessageBoxResult.Yes)
                 {
                     server.LeaveLobbyAsync(LobbyID.Text);
+                    server.Disconnect();
+
                     e.Cancel = false;
                 }
                 else e.Cancel = true;

@@ -49,7 +49,6 @@ namespace ChessServer
             {
                 if(client == White.ClientCon)
                 {
-                    White.ClientCon.Close();
                     White = null;
 
                     Black?.SW.WriteLine("OpponentLeft");
@@ -57,7 +56,6 @@ namespace ChessServer
                 }
                 else if (client == Black.ClientCon)
                 {
-                    Black.ClientCon.Close();
                     Black = null;
 
                     White?.SW.WriteLine("OpponentLeft");
