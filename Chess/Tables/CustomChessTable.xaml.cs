@@ -89,7 +89,7 @@ namespace Chess
             PlayerMove = FigureColor.White;
 
             buttons = new TableButton[8, 8];
-            board = new Board(buttons, currBoard);
+            board = new Board(currBoard);
 
             // Creating and setting buttons on right position here
             for (int i = 0, j = table.RowDefinitions.Count - 1; i < table.RowDefinitions.Count; i++, j--)
@@ -222,7 +222,6 @@ namespace Chess
                         server.SendMoveAsync(LobbyID.Text, $"{dragButton.PosVertical},{dragButton.PosHorizontal};{newbutton.PosVertical},{newbutton.PosHorizontal}", board.Parameters);
 
                     DropFigureToNewPosition(dragButton, newbutton, board.Parameters);
-                    board.Parameters = "";
                     goto Accept;
                 }
                 else goto Decline;
@@ -280,6 +279,7 @@ namespace Chess
                     board.SetEnPassantPos($"{newbutton.PosVertical},{newbutton.PosHorizontal}");
                     break;
             }
+            // We will give position of figure that has been taken by En Passant in paramerters bc its safer
             if (parameters.Contains("EnpasMove:"))
             {
                 var pawnPos = parameters.Replace("EnpasMove:", "");
@@ -287,6 +287,28 @@ namespace Chess
 
                 board.Figures[int.Parse(pos[0]), int.Parse(pos[1])] = null;
                 buttons[int.Parse(pos[0]), int.Parse(pos[1])].Image = null;
+            }
+            else if (parameters.Contains("CastlePerm:"))
+            {
+                var type = parameters.Replace("CastlePerm:", "");
+
+                if (type == "King")
+                    board.SetCastlePermitations(FigureType.King, new short[] { dragButton.PosVertical, dragButton.PosHorizontal });
+
+                else if (type == "Rook")
+                    board.SetCastlePermitations(FigureType.Rook, new short[] { dragButton.PosVertical, dragButton.PosHorizontal });
+            }
+            else if (parameters.Contains("Castle:"))
+            {
+                short pos = short.Parse(parameters.Replace("Castle:", ""));
+                
+                board.Figures[newbutton.PosVertical, pos] = new Figure(board.Figures[newbutton.PosVertical, newbutton.PosHorizontal].Color, FigureType.King);
+                board.Figures[newbutton.PosVertical, pos == 2? 3 : 5] = new Figure(board.Figures[newbutton.PosVertical, newbutton.PosHorizontal].Color, FigureType.Rook);
+                board.Figures[newbutton.PosVertical, newbutton.PosHorizontal] = null;
+
+                buttons[newbutton.PosVertical, pos].Image = board.Figures[newbutton.PosVertical, pos].Image;
+                buttons[newbutton.PosVertical, pos == 2 ? 3 : 5].Image = board.Figures[newbutton.PosVertical, pos == 2 ? 3 : 5].Image;
+                buttons[newbutton.PosVertical, newbutton.PosHorizontal].Image = null;
             }
 
             // Coloring last move

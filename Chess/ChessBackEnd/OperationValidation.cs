@@ -9,8 +9,35 @@
             enPassantPos = new short[] { short.Parse(pos[0]), short.Parse(pos[1]) };
         }
 
-        //We need this buttons only for En Passant to clear image from button
-        private readonly TableButton[,] buttons;
+        // These variables are needed to track if castle is still possible
+        private bool wKingMoved,
+                       wLeftRookMoved, wRightRookMoved,
+                       bKingMoved,
+                       bLeftRookMoved, bRightRookMoved;
+
+        public void SetCastlePermitations(FigureType type, short[] oldPos)
+        {
+            switch (type)
+            {
+                case FigureType.Rook:
+
+                    if (oldPos[0] == 0 && oldPos[1] == 0)
+                        wLeftRookMoved = true;
+                    else if (oldPos[0] == 0 && oldPos[1] == 7)
+                        wRightRookMoved = true;
+                     else if (oldPos[0] == 7 && oldPos[1] == 0)
+                        bLeftRookMoved = true;
+                    else if (oldPos[0] == 7 && oldPos[1] == 7)
+                        bRightRookMoved = true;
+                    break;
+                case FigureType.King:
+                    if (oldPos[0] == 0)
+                        wKingMoved = true;
+                    else if(oldPos[0] == 7) 
+                        bKingMoved = true;
+                    break;
+            }
+        }
 
         /// <summary>
         /// Returns bool => valid move or not
@@ -22,6 +49,7 @@
         public bool IsValidOperation(Figure figure, short[] oldPos, short[] newPos)
         {
             bool isValid = false;
+            Parameters = "";
 
             if (CustomChessTable.PlayerMove != figure.Color) return false;
 
@@ -51,10 +79,18 @@
             return isValid && !IsKingAttacked(figure, oldPos, newPos);
         }
 
+        /// <summary>
+        /// Basically checking if the next operation on position of king is valid for one of figures
+        /// </summary>
+        /// <param name="figure"></param>
+        /// <param name="oldPos"></param>
+        /// <param name="newPos"></param>
+        /// <returns></returns>
         private bool IsKingAttacked(Figure figure, short[] oldPos, short[] newPos)
         {
-            // Remember begin situation of figures
+            // Remember begin situation of figures and parameters
             var beginSituation = (Figure[,])Figures.Clone();
+            var beginParameters = Parameters;
 
             Figures[newPos[0], newPos[1]] = Figures[oldPos[0], oldPos[1]];
             Figures[oldPos[0], oldPos[1]] = null;
@@ -101,7 +137,7 @@
 
             for (int i = 0; i < figures.GetLength(0); i++)
             {
-                var fig = (Figure)figures[i, 0];
+                var fig = figures[i, 0] as Figure;
                 if (fig == null) break;
 
                 switch (fig.Type)
@@ -131,6 +167,7 @@
             }
 
             Figures = beginSituation;
+            Parameters = beginParameters;
 
             return isAttacked;
         }
@@ -180,6 +217,7 @@
             // If moving vertical...
             if (oldPos[1] == newPos[1])
             {
+                // Here searching for first figure on da way
                 for (int i = oldPos[0]; (oldPos[0] < newPos[0] && i <=newPos[0]) || (oldPos[0] > newPos[0] && i >= newPos[0]); i += (oldPos[0] < newPos[0]? 1 : -1))
                 {
                     // First iteration skip bc this is old position of rook 
@@ -192,15 +230,24 @@
                     {
                         if (firstFigure.Color == figure.Color || newPos[0] != i)
                             return false;
-
-                        else return true;
+                        // If taking this first figure return true and pass en parameters that castle is not more possible
+                        else
+                        {
+                            if((figure.Color == FigureColor.White && (!wLeftRookMoved || !wRightRookMoved)) || (figure.Color == FigureColor.Black && (!bLeftRookMoved || !bRightRookMoved)))
+                                Parameters = "CastlePerm:Rook";
+                            
+                            return true;
+                        }
                     }
                 }
+                if ((figure.Color == FigureColor.White && (!wLeftRookMoved || !wRightRookMoved)) || (figure.Color == FigureColor.Black && (!bLeftRookMoved || !bRightRookMoved)))
+                    Parameters = "CastlePerm:Rook";
                 return true;
             }
             // If moving horizontal
             else if (oldPos[0] == newPos[0])
             {
+                // Here searching for first figure on da way
                 for (int i = oldPos[1]; (oldPos[1] < newPos[1] && i <= newPos[1]) || (oldPos[1] > newPos[1] && i >= newPos[1]) ; i += (oldPos[1] < newPos[1]? 1 : -1))
                 {
                     // First iteration skip bc this is old position of rook 
@@ -214,9 +261,18 @@
                         if (firstFigure.Color == figure.Color || newPos[1] != i)
                             return false;
 
-                        else return true;
+                        else
+                        {
+                            if ((figure.Color == FigureColor.White && (!wLeftRookMoved || !wRightRookMoved)) || (figure.Color == FigureColor.Black && (!bLeftRookMoved || !bRightRookMoved)))
+                                Parameters = "CastlePerm:Rook";
+
+                            return true;
+                        }
                     }
                 }
+                if ((figure.Color == FigureColor.White && (!wLeftRookMoved || !wRightRookMoved)) || (figure.Color == FigureColor.Black && (!bLeftRookMoved || !bRightRookMoved)))
+                    Parameters = "CastlePerm:Rook";
+
                 return true;
             }
             else return false;
@@ -281,8 +337,83 @@
         {
             if((newPos[0] - oldPos[0] == 0 || newPos[0] - oldPos[0] == 1 || newPos[0] - oldPos[0] == -1) && (newPos[1] - oldPos[1] == 0 || newPos[1] - oldPos[1] == 1 || newPos[1] - oldPos[1] == -1))
             {
-                if (Figures[newPos[0], newPos[1]] != null && Figures[newPos[0], newPos[1]].Color == figure.Color) return false;
-                else return true;
+                if ((!bKingMoved && figure.Color == FigureColor.Black) || (!wKingMoved && figure.Color == FigureColor.White))
+                    Parameters = "CastlePerm:King";
+
+                return Figures[newPos[0], newPos[1]]?.Color != figure.Color;
+            }
+            // Castle
+            else if ((newPos[1] == 0 || newPos[1] == 7) && Figures[newPos[0], newPos[1]]?.Type == FigureType.Rook && Figures[newPos[0], newPos[1]]?.Color == figure.Color)
+            {
+                switch (figure.Color)
+                {
+                    case FigureColor.White:
+                        if (!wKingMoved && (!wLeftRookMoved || !wRightRookMoved))
+                        {
+                            // Left Castle
+                            if (newPos[1] == 0 && !wLeftRookMoved)
+                            {
+                                if(Figures[0,1] is null && Figures[0,2] is null && Figures[0,3] is null)
+                                {
+                                    for (short i = 4; i >= 1; i--)
+                                    {
+                                        if (IsKingAttacked(Figures[0, 4], new short[] { 0, 4 }, new short[] { 0, i }))
+                                            return false;   
+                                    }
+                                    Parameters = "Castle:2";
+                                    return true;
+                                }
+                            }
+                            // Right Castle
+                            else if (newPos[1] == 7 && !wRightRookMoved)
+                            {
+                                if (Figures[0, 5] is null && Figures[0, 6] is null)
+                                {
+                                    for (short i = 4; i <= 6; i++)
+                                    {
+                                        if (IsKingAttacked(Figures[0, 4], new short[] { 0, 4 }, new short[] { 0, i }))
+                                            return false;
+                                    }
+                                    Parameters = "Castle:6";
+                                    return true;
+                                }
+                            }
+                        }
+                        break;
+                    case FigureColor.Black:
+                        if (!bKingMoved && (!bLeftRookMoved || !bRightRookMoved))
+                        {
+                            // Left Castle
+                            if (newPos[1] == 0 && !bLeftRookMoved)
+                            {
+                                if (Figures[7, 1] is null && Figures[7, 2] is null && Figures[7, 3] is null)
+                                {
+                                    for (short i = 4; i >= 1; i--)
+                                    {
+                                        if (IsKingAttacked(Figures[7, 4], new short[] { 7, 4 }, new short[] { 7, i }))
+                                            return false;
+                                    }
+                                    Parameters = "Castle:2";
+                                    return true;
+                                }
+                            }
+                            // Right Castle
+                            else if (newPos[1] == 7 && !bRightRookMoved)
+                            {
+                                if (Figures[7, 5] is null && Figures[7, 6] is null)
+                                {
+                                    for (short i = 4; i <= 6; i++)
+                                    {
+                                        if (IsKingAttacked(Figures[7, 4], new short[] { 7, 4 }, new short[] { 7, i }))
+                                            return false;
+                                    }
+                                    Parameters = "Castle:6";
+                                    return true;
+                                }
+                            }
+                        }
+                        break;
+                }
             }
             return false;
         }
