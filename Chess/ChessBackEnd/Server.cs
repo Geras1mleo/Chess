@@ -146,7 +146,7 @@ namespace Chess.ChessBackEnd
                     TableMovesHandler(parameters[1], parameters[2]);
                     break;
                 case "ConfirmedMove":
-
+                    TableMovesHandler(parameters[1], parameters[2]);
                     break;
                 case "OpponentLeft":
                     OpponentLeftHandler();

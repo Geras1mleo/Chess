@@ -84,6 +84,7 @@ namespace ChessServer
                     if (data is null)
                     {
                         client.Close();
+                        Console.WriteLine("Disconnected client");
                         break;
                     }
 

@@ -13,7 +13,7 @@ namespace Chess
     public partial class CustomChessTable : Window
     {
         private FigureColor playerColor;
-        private bool isConnectedToLobby = false;
+        private bool isConnectedToLobby = false, isInGame = false;
 
         private TableButton[,] buttons;
         private Board board;
@@ -218,10 +218,11 @@ namespace Chess
                                             new short[] { dragButton.PosVertical, dragButton.PosHorizontal },
                                             new short[] { newbutton.PosVertical, newbutton.PosHorizontal }))
                 {
-                    if(isConnectedToLobby)
+                    if(isConnectedToLobby && isInGame)
                         server.SendMoveAsync(LobbyID.Text, $"{dragButton.PosVertical},{dragButton.PosHorizontal};{newbutton.PosVertical},{newbutton.PosHorizontal}", board.Parameters);
+                    else
+                        DropFigureToNewPosition(dragButton, newbutton, board.Parameters);
 
-                    DropFigureToNewPosition(dragButton, newbutton, board.Parameters);
                     goto Accept;
                 }
                 else goto Decline;
@@ -349,6 +350,7 @@ namespace Chess
                 OpponentNick.Text = "Opponent";
                 LobbyID.Text = "";
                 isConnectedToLobby = false;
+                isInGame = false;
 
                 PlayWithFriendButton.Visibility = Visibility.Visible;
                 LeaveLobbyButton.Visibility = Visibility.Hidden;
@@ -395,7 +397,16 @@ namespace Chess
 
                 RotateBoard(playerColor);
                 LobbyID.Text = lobbyID;
-                OpponentNick.Text = string.IsNullOrEmpty(nickname)? "Your opponent has not joined yet" : nickname;
+                if (string.IsNullOrEmpty(nickname))
+                {
+                    OpponentNick.Text = "Your opponent has not joined yet";
+                    isInGame = false;
+                }
+                else
+                {
+                    OpponentNick.Text = nickname;
+                    isInGame = true;
+                }
 
                 PlayWithFriendButton.Visibility = Visibility.Hidden;
                 LeaveLobbyButton.Visibility = Visibility.Visible;
@@ -409,6 +420,8 @@ namespace Chess
             {
                 RotateBoard(playerColor);
                 OpponentNick.Text = nickname;
+                isConnectedToLobby = true;
+                isInGame = true;
             });
             MessageBox.Show($"Your opponent: {nickname} joined to lobby");
         }
@@ -419,23 +432,24 @@ namespace Chess
             {
                 MessageBox.Show($"Your opponent: {OpponentNick.Text} has left the lobby");
                 OpponentNick.Text = "Opponent";
+                isInGame = false;
             });
         }
 
         private void window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (isConnectedToLobby)
+            if (isConnectedToLobby && isInGame)
             {
                 var result = MessageBox.Show("If you leave you wont be able to reconnect to lobby and play further\nAre you sure want to exit? ", "Leave Lobby", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                 if (result == MessageBoxResult.Yes)
                 {
                     server.LeaveLobbyAsync(LobbyID.Text);
-                    server.Disconnect();
 
                     e.Cancel = false;
                 }
                 else e.Cancel = true;
             }
+            server.Disconnect();
         }
     }
 }
