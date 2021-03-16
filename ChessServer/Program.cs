@@ -77,6 +77,7 @@ namespace ChessServer
             catch (Exception)
             {
                 Console.WriteLine("Server stopped");
+                Environment.Exit(0);
             }
         }
 

@@ -4,12 +4,17 @@
 
 wine /root/Documents/Chess/ChessServer/bin/Debug/ChessServer.exe
 
-
 // Update ChessServer
 
 cd /root/Documents/Chess
-
 git pull https://github.com/Geras1mleo/Chess master
-
 geras1mleo
 <pass>
+
+// Commit Update
+
+cd D:\Projects\Chess\
+git add -A
+git commit -m "3.0"
+git push
+geras1mleo
