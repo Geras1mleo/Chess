@@ -37,7 +37,6 @@ namespace ChessServer
                             continue;
                         case "stop":
                             server.Stop();
-                            Console.WriteLine("Server stopped");
                             break;
                         default:
                             Console.WriteLine("Unknown command");
@@ -58,19 +57,26 @@ namespace ChessServer
             server.Start();
             
             Console.WriteLine("Waiting for clients to join...");
-            while (true)
+            try
             {
-                if (!server.Pending())
+                while (true)
                 {
-                    Thread.Sleep(50);
-                    continue;
-                }
-                // When new client connects to server we get new variable of TcpClient here
-                var client = server.AcceptTcpClient();
+                    if (!server.Pending())
+                    {
+                        Thread.Sleep(50);
+                        continue;
+                    }
+                    // When new client connects to server we get new variable of TcpClient here
+                    var client = server.AcceptTcpClient();
 
-                // For each client new thread that will be listening to incoming data
-                if(client.Connected)
-                    new Thread(() => ListenToClient(client)).Start();
+                    // For each client new thread that will be listening to incoming data
+                    if(client.Connected)
+                        new Thread(() => ListenToClient(client)).Start();
+                }
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Server stopped");
             }
         }
 

@@ -407,7 +407,7 @@ namespace Chess
                 PlayerNick.Text = playerNick;
                 if (string.IsNullOrEmpty(opponentNick))
                 {
-                    OpponentNick.Text = "Your opponent has not joined yet, send your lobby id to someone";
+                    OpponentNick.Text = "No one here yet, send your lobby id to someone";
                     isInGame = false;
                 }
                 else
@@ -439,7 +439,7 @@ namespace Chess
             Dispatcher.Invoke(() =>
             {
                 MessageBox.Show($"Your opponent: {OpponentNick.Text} has left the lobby");
-                OpponentNick.Text = "Your opponent has not joined yet, send your lobby id to someone";
+                OpponentNick.Text = "No one here yet, send your lobby id to someone";
                 isInGame = false;
             });
         }

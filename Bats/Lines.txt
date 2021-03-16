@@ -1,17 +1,15 @@
 <pass>
 
-
 // Start
 
 wine /root/Documents/Chess/ChessServer/bin/Debug/ChessServer.exe
 
 
-// Update
+// Update ChessServer
 
 cd /root/Documents/Chess
 
 git pull https://github.com/Geras1mleo/Chess master
 
 geras1mleo
-
 <pass>
