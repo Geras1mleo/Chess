@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Chess"
         mc:Ignorable="d"
         Name="window"
-        Title="Chess" Height="630" Width="726.4" Background="#FF343434" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize" Closing="window_Closing">
+        Title="Chess" Height="630" Width="726.4" Background="#FF343434" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize" Closing="Window_Closing">
 
     <Canvas x:Name="canvas" DragOver="Canvas_DragOver" >
         <Grid x:Name="table" AllowDrop="True" Canvas.Left="30" Canvas.Top="60" Height="480" Width="480">

@@ -12,7 +12,7 @@ namespace Chess.ChessBackEnd
         const short PORT = 8080;
         const string IP = "93.188.166.178";
 
-        private event Action<string, string, string> ConnectToLobbyHandler;
+        private event Action<string, string, string, string> ConnectToLobbyHandler;
         private event Action<string, string> TableMovesHandler;
         private event Action<string> OpponentJoinedHandler;
         private event Action OpponentLeftHandler;
@@ -22,7 +22,7 @@ namespace Chess.ChessBackEnd
 
         private readonly TcpClient client;
 
-        public Server(Action<string, string, string> connectToLobbyHandler, 
+        public Server(Action<string, string, string, string> connectToLobbyHandler, 
                     Action<string> opponentJoinedHandler, 
                     Action<string, string> tableMovesHandler, 
                     Action opponentLeftHandler)
@@ -137,7 +137,7 @@ namespace Chess.ChessBackEnd
             switch (parameters[0])
             {
                 case "Connected":
-                    ConnectToLobbyHandler(parameters[1], parameters[2], parameters[3]);
+                    ConnectToLobbyHandler(parameters[1], parameters[2], parameters[3], parameters[4]);
                     break;
                 case "OpponentJoined":
                     OpponentJoinedHandler(parameters[1]);

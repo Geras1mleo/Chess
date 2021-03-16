@@ -35,6 +35,10 @@ namespace ChessServer
                             IDs.Clear();
                             Console.WriteLine("Lobbies has been deleted succesfully!");
                             continue;
+                        case "stop":
+                            server.Stop();
+                            Console.WriteLine("Server stopped");
+                            break;
                         default:
                             Console.WriteLine("Unknown command");
                             continue;

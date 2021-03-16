@@ -27,7 +27,7 @@ namespace ChessServer
             {
                 White = new Client(client, nickname);
 
-                White.SW.WriteLine($"Connected/{LobbyID}/White/{Black?.Nickname}");
+                White.SW.WriteLine($"Connected/{LobbyID}/White/{nickname}/{Black?.Nickname}");
                 Black?.SW.WriteLine($"OpponentJoined/{White.Nickname}");
 
                 Console.WriteLine($"White player: {nickname} has connected to lobby: " + LobbyID);
@@ -36,7 +36,7 @@ namespace ChessServer
             {
                 Black = new Client(client, nickname);
 
-                Black.SW.WriteLine($"Connected/{LobbyID}/Black/{White?.Nickname}");
+                Black.SW.WriteLine($"Connected/{LobbyID}/Black/{nickname}/{White?.Nickname}");
                 White?.SW.WriteLine($"OpponentJoined/{Black.Nickname}");
 
                 Console.WriteLine($"Black player: {nickname} has connected to lobby: " + LobbyID);

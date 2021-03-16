@@ -92,8 +92,11 @@
             var beginSituation = (Figure[,])Figures.Clone();
             var beginParameters = Parameters;
 
-            Figures[newPos[0], newPos[1]] = Figures[oldPos[0], oldPos[1]];
-            Figures[oldPos[0], oldPos[1]] = null;
+            if(!(oldPos[0] == newPos[0] && oldPos[1] == newPos[1]))
+            {
+                Figures[newPos[0], newPos[1]] = Figures[oldPos[0], oldPos[1]];
+                Figures[oldPos[0], oldPos[1]] = null;
+            }
 
             // Here comes each figure that must be checked and current position of it
             object[,] figures = new object[16, 2];

@@ -79,7 +79,7 @@ namespace Chess
         public CustomChessTable()
         {
             InitializeComponent();
-            InitializeBoard(FigureColor.White, TableColor.Blue);
+            InitializeBoard(FigureColor.Black, TableColor.Blue);
             server = new Server(ConnectToLobbyHandler, OpponentJoinedHandler, TableMovesHandler, OpponentLeftHandler);
         }
 
@@ -153,8 +153,7 @@ namespace Chess
             var button = sender as TableButton;
             if (button != dragButton && button != coloredOldBut && button != coloredNewBut)
             {
-                button.Background = Brushes.Transparent;
-                button.Opacity = 0.95;
+                button.Background = new SolidColorBrush(Colors.Transparent) { Opacity = 0.95 };
             }
         }
 
@@ -163,8 +162,7 @@ namespace Chess
             var button = sender as TableButton;
             if (button != dragButton && button != coloredOldBut && button != coloredNewBut)
             {
-                button.Background = Brushes.Yellow;
-                button.Opacity = 0.6;
+                button.Background = new SolidColorBrush(Colors.Yellow) { Opacity = 0.6 };
             }
         }
 
@@ -174,7 +172,7 @@ namespace Chess
             // First we will check if the button has figure and then remember and allow drag
             if (board.Figures[button.PosVertical, button.PosHorizontal] != null)
             {
-                button.Background = Brushes.Yellow;
+                button.Background = new SolidColorBrush(Colors.Yellow) { Opacity = 0.6 };
                 userDragedFigureOutOfTable = false;
                 // Remembering button/position/figure that has been draged
                 dragButton = button;
@@ -195,16 +193,18 @@ namespace Chess
         {
             var newbutton = sender as TableButton;
 
-            newbutton.Opacity = 0.95;
-            newbutton.Background = Brushes.Transparent;
+            newbutton.Background = new SolidColorBrush(Colors.Transparent) { Opacity = 0.95 };
 
             if (userDragedFigureOutOfTable)
             {
-                newbutton.Background = Brushes.Transparent;
+                newbutton.Background = new SolidColorBrush(Colors.Transparent) { Opacity = 0.95 };
                 userDragedFigureOutOfTable = false;
                 return;
             }
-            else dragButton.Background = Brushes.Transparent;
+            else
+            {
+                dragButton.Background = new SolidColorBrush(Colors.Transparent) { Opacity = 0.95 };
+            }
 
             // Here we check if user has not dropped figure to the same position AND if player moves his color
             if (!(dragButton.PosVertical == newbutton.PosVertical && dragButton.PosHorizontal == newbutton.PosHorizontal))
@@ -228,6 +228,7 @@ namespace Chess
                 else goto Decline;
             }
 
+            // Set figure back here
             Decline:
             dragButton.Image = board.Figures[dragButton.PosVertical, dragButton.PosHorizontal].Image;
 
@@ -251,7 +252,7 @@ namespace Chess
 
                 userDragedFigureOutOfTable = true;
 
-                dragButton.Background = Brushes.Transparent;
+                dragButton.Background = new SolidColorBrush(Colors.Transparent) { Opacity = 0.95 };
 
                 dragButton = null;
                 dragImage.Source = null;
@@ -314,12 +315,12 @@ namespace Chess
 
             // Coloring last move
             if (coloredOldBut != null)
-                coloredOldBut.Background = Brushes.Transparent;
+                coloredOldBut.Background = new SolidColorBrush(Colors.Transparent) { Opacity = 0.95 };
             if (coloredNewBut != null)
-                coloredNewBut.Background = Brushes.Transparent;
+                coloredNewBut.Background = new SolidColorBrush(Colors.Transparent) { Opacity = 0.95 };
 
-            dragButton.Background = Brushes.Yellow;
-            newbutton.Background = Brushes.Yellow;
+            dragButton.Background = new SolidColorBrush(Colors.Yellow) { Opacity = 0.6 };
+            newbutton.Background = new SolidColorBrush(Colors.Yellow) { Opacity = 0.6 };
 
             coloredOldBut = dragButton;
             coloredNewBut = newbutton;
@@ -363,6 +364,11 @@ namespace Chess
             newGame.ShowDialog();
         }
 
+        /// <summary>
+        /// Rotates (and clears) the board
+        /// </summary>
+        /// <param name="playerColor"></param>
+        /// <param name="posBoard">Let it null if u want to clear the board too</param>
         private void RotateBoard(FigureColor playerColor, Board posBoard = null)
         {
             foreach (var item in buttons)
@@ -383,7 +389,7 @@ namespace Chess
             });
         }
 
-        private void ConnectToLobbyHandler(string lobbyID, string side, string nickname)
+        private void ConnectToLobbyHandler(string lobbyID, string side, string playerNick, string opponentNick)
         {
             Dispatcher.Invoke(() =>
             {
@@ -397,14 +403,16 @@ namespace Chess
 
                 RotateBoard(playerColor);
                 LobbyID.Text = lobbyID;
-                if (string.IsNullOrEmpty(nickname))
+
+                PlayerNick.Text = playerNick;
+                if (string.IsNullOrEmpty(opponentNick))
                 {
-                    OpponentNick.Text = "Your opponent has not joined yet";
+                    OpponentNick.Text = "Your opponent has not joined yet, send your lobby id to someone";
                     isInGame = false;
                 }
                 else
                 {
-                    OpponentNick.Text = nickname;
+                    OpponentNick.Text = opponentNick;
                     isInGame = true;
                 }
 
@@ -431,12 +439,12 @@ namespace Chess
             Dispatcher.Invoke(() =>
             {
                 MessageBox.Show($"Your opponent: {OpponentNick.Text} has left the lobby");
-                OpponentNick.Text = "Opponent";
+                OpponentNick.Text = "Your opponent has not joined yet, send your lobby id to someone";
                 isInGame = false;
             });
         }
 
-        private void window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (isConnectedToLobby && isInGame)
             {
