@@ -12,14 +12,13 @@ namespace ChessServer
     {
         const short PORT = 8080;
 
-        static TcpListener server;
+        static readonly TcpListener server = new TcpListener(new IPEndPoint(IPAddress.Any, PORT));
 
         static readonly List<Lobby> lobbies = new List<Lobby>();
         static readonly List<string> IDs = new List<string>();
 
         static void Main()
         {
-            server = new TcpListener(new IPEndPoint(IPAddress.Any, PORT));
             Task.Factory.StartNew(() =>
             {
                 while (true)
@@ -135,7 +134,9 @@ namespace ChessServer
                     LeaveLobby(client, parameters[1]);
                     break;
                 default:
-                    Console.WriteLine("Invalid message format received: " + command + "\tFrom: " + client.Client.RemoteEndPoint.ToString());
+                    Console.WriteLine("Invalid message format received: " + command + "\nFrom: " + client.Client.RemoteEndPoint.ToString());
+                    client.Close();
+                    Console.WriteLine("Connection has been forced closed");
                     break;
             }
         }
@@ -164,8 +165,12 @@ namespace ChessServer
             foreach (var item in lobbies)
             {
                 if (item.LobbyID == lobbyID)
+                {
                     item.AddClient(client, nickname);
+                    return;
+                }
             }
+            RepportError(client, $"Lobby {lobbyID} does not exist, please try again");
         }
 
         static void NewMove(TcpClient client, string lobbyID, string move, string parameters)
@@ -175,7 +180,7 @@ namespace ChessServer
                 if(item.LobbyID == lobbyID)
                 {
                     item.NewMove(client, move, parameters);
-                    break;
+                    return;
                 }
             }
         }
@@ -185,7 +190,22 @@ namespace ChessServer
             var id = IDs.IndexOf(lobbyID);
 
             if(id > -1)
+            {
                 lobbies[id].UserLeft(client);
+
+                if (lobbies[id].Black is null && lobbies[id].White is null)
+                {
+                    lobbies.Remove(lobbies[id]);
+                    IDs.Remove(lobbyID);
+                    Console.WriteLine("Lobby: " + lobbyID + " has been deleted");
+                }
+            }
+        }
+
+        public static void RepportError(TcpClient client, string message)
+        {
+            var sw = new StreamWriter(client.GetStream()) { AutoFlush = true };
+            sw.WriteLine("Error/" + message);
         }
     }
 }

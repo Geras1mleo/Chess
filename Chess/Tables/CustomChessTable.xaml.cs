@@ -220,8 +220,8 @@ namespace Chess
                 {
                     if(isConnectedToLobby && isInGame)
                         server.SendMoveAsync(LobbyID.Text, $"{dragButton.PosVertical},{dragButton.PosHorizontal};{newbutton.PosVertical},{newbutton.PosHorizontal}", board.Parameters);
-                    else
-                        DropFigureToNewPosition(dragButton, newbutton, board.Parameters);
+                    
+                    DropFigureToNewPosition(dragButton, newbutton, board.Parameters);
 
                     goto Accept;
                 }

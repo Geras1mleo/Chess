@@ -4,9 +4,6 @@
     {
         public Figure[,] Figures { get; set; }
 
-        //public List<short[]> MovesFrom { get; } = new List<short[]>();
-        //public List<short[]> MovesTo { get; } = new List<short[]>();
-
         public string Parameters { get; set; } = "";
 
         public Board(Board board = null)

@@ -146,13 +146,13 @@ namespace Chess.ChessBackEnd
                     TableMovesHandler(parameters[1], parameters[2]);
                     break;
                 case "ConfirmedMove":
-                    TableMovesHandler(parameters[1], parameters[2]);
+                    //TableMovesHandler(parameters[1], parameters[2]);
                     break;
                 case "OpponentLeft":
                     OpponentLeftHandler();
                     break;
-                default:
-                    MessageBox.Show("Non-valid data from server received " + command);
+                case "Error":
+                    MessageBox.Show(parameters[1], "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
             }
         }

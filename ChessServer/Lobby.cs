@@ -26,19 +26,24 @@ namespace ChessServer
             if (White is null)
             {
                 White = new Client(client, nickname);
-                Console.WriteLine($"White player: {nickname} has connected to lobby: " + LobbyID);
 
                 White.SW.WriteLine($"Connected/{LobbyID}/White/{Black?.Nickname}");
                 Black?.SW.WriteLine($"OpponentJoined/{White.Nickname}");
-            }
 
+                Console.WriteLine($"White player: {nickname} has connected to lobby: " + LobbyID);
+            }
             else if (Black is null)
             {
                 Black = new Client(client, nickname);
-                Console.WriteLine($"Black player: {nickname} has connected to lobby: " + LobbyID);
 
                 Black.SW.WriteLine($"Connected/{LobbyID}/Black/{White?.Nickname}");
                 White?.SW.WriteLine($"OpponentJoined/{Black.Nickname}");
+
+                Console.WriteLine($"Black player: {nickname} has connected to lobby: " + LobbyID);
+            }
+            else
+            {
+                Program.RepportError(client, "This lobby is not aviable");
             }
         }
 
@@ -52,6 +57,7 @@ namespace ChessServer
 
                     Black?.SW.WriteLine("OpponentLeft");
                     Moves.Clear();
+                    Console.WriteLine("White player left lobby: " + LobbyID);
                 }
                 else if (client == Black?.ClientCon)
                 {
@@ -59,11 +65,12 @@ namespace ChessServer
 
                     White?.SW.WriteLine("OpponentLeft");
                     Moves.Clear();
+                    Console.WriteLine("Black player left lobby: " + LobbyID);
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error while notifying opponent that user left lobby: " + LobbyID + "\t Error message: " + e.Message);
+                Console.WriteLine("Error while notifying opponent that user left lobby: " + LobbyID + "\nError message: " + e.Message);
             }
         }
 
