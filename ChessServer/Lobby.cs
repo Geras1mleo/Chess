@@ -13,6 +13,8 @@ namespace ChessServer
 
         public List<string> Moves { get; set; } = new List<string>();
 
+        private bool whiteRematch, blackRematch;
+
         public Lobby(string lobbyID, TcpClient client, string nickname)
         {
             LobbyID = lobbyID;
@@ -43,7 +45,7 @@ namespace ChessServer
             }
             else
             {
-                Program.RepportError(client, "This lobby is not aviable");
+                Program.ReportError(client, "This lobby is not aviable");
             }
         }
 
@@ -76,30 +78,71 @@ namespace ChessServer
 
         public void NewMove(TcpClient client, string move, string parameters)
         {
-            // If someone else is trying to make move in this lobby...
-            if (!(client == White.ClientCon || client == Black.ClientCon)) return;
-
-            // If one of players is not connected...
-            if (White is null || Black is null) return;
-
             try
             {
                 // Confirm move to the same client
-                if (client == White.ClientCon)
+                if (client == White?.ClientCon)
                 {
-                    Black.SW.WriteLine($"NewMove/{move}/{parameters}");
-                    White.SW.WriteLine($"ConfirmedMove/{move}/{parameters}");
+                    Black?.SW.WriteLine($"NewMove/{move}/{parameters}");
+                    White?.SW.WriteLine($"ConfirmedMove/{move}/{parameters}");
+                    Moves.Add(move);
                 }
-                else if (client == Black.ClientCon)
+                else if (client == Black?.ClientCon)
                 {
-                    White.SW.WriteLine($"NewMove/{move}/{parameters}");
-                    Black.SW.WriteLine($"ConfirmedMove/{move}/{parameters}");
+                    White?.SW.WriteLine($"NewMove/{move}/{parameters}");
+                    Black?.SW.WriteLine($"ConfirmedMove/{move}/{parameters}");
+                    Moves.Add(move);
                 }
-                Moves.Add(move);
             }
             catch (Exception e)
             {
                 Console.WriteLine("Error while writing new move in lobby: " + LobbyID + "\nError message: " + e.Message);
+            }
+        }
+
+        public void RematchRequest(TcpClient client)
+        {
+            if(White is null || Black is null)
+            {
+                Program.ReportError(client, "Your opponent has already left the lobby");
+                blackRematch = false; whiteRematch = false;
+                return;
+            }
+
+            try
+            {
+                if (client == White.ClientCon)
+                {
+                    whiteRematch = true;
+
+                    if(!blackRematch)
+                        Black.SW.WriteLine("RematchRequest");
+                }
+                else if (client == Black.ClientCon)
+                {
+                    blackRematch = true;
+
+                    if(!whiteRematch)
+                        White.SW.WriteLine("RematchRequest");
+                }
+            }
+            catch (Exception) { }
+
+            if(blackRematch && whiteRematch)    
+                SendRematch();
+        }
+
+        public void SendRematch()
+        {
+            try
+            {
+                White.SW.WriteLine("RematchConfirmed");
+                Black.SW.WriteLine("RematchConfirmed");
+                Moves.Clear();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error while sending rematch confirmation\nError message: " + e.Message);
             }
         }
     }

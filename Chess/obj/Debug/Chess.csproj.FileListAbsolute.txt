@@ -59,6 +59,8 @@ D:\Projects\Chess\Chess\obj\Debug\Chess.csproj.GenerateResource.cache
 D:\Projects\Chess\Chess\obj\Debug\Chess.csproj.CoreCompileInputs.cache
 D:\Projects\Chess\Chess\obj\Debug\Chess.exe
 D:\Projects\Chess\Chess\obj\Debug\Chess.pdb
-D:\Projects\Chess\Chess\obj\Debug\Tables\NewGamePage.g.cs
-D:\Projects\Chess\Chess\obj\Debug\Tables\NewGamePage.baml
 D:\Projects\Chess\Chess\obj\Debug\Chess.csprojAssemblyReference.cache
+D:\Projects\Chess\Chess\obj\Debug\Tables\EndGameWindow.g.cs
+D:\Projects\Chess\Chess\obj\Debug\Tables\NewGameWindow.g.cs
+D:\Projects\Chess\Chess\obj\Debug\Tables\EndGameWindow.baml
+D:\Projects\Chess\Chess\obj\Debug\Tables\NewGameWindow.baml

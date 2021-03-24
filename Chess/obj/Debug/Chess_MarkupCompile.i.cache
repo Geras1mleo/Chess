@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 D:\Projects\Chess\Chess\App.xaml
-21896922427
+31435009862
 
-1227112553
+13-1677958634
 141183416626
-Tables\CustomChessTable.xaml;Tables\NewGamePage.xaml;
+Tables\CustomChessTable.xaml;Tables\EndGameWindow.xaml;Tables\NewGameWindow.xaml;
 
 True
 

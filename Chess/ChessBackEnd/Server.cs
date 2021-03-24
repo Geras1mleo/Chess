@@ -17,10 +17,10 @@ namespace Chess.ChessBackEnd
         private event Action<string> OpponentJoinedHandler;
         private event Action OpponentLeftHandler;
 
-        private readonly StreamWriter sw;
-        private readonly StreamReader sr;
+        private TcpClient client;
 
-        private readonly TcpClient client;
+        private StreamWriter sw;
+        private StreamReader sr;
 
         public Server(Action<string, string, string, string> connectToLobbyHandler, 
                     Action<string> opponentJoinedHandler, 
@@ -32,46 +32,58 @@ namespace Chess.ChessBackEnd
             TableMovesHandler = tableMovesHandler;
             OpponentLeftHandler = opponentLeftHandler;
 
-            try
+            ConnectToServerAsync();
+        }
+
+        /// <summary>
+        /// Connects and listens to incoming data from the server asyncronously
+        /// </summary>
+        public void ConnectToServerAsync() => new Task(ConnectToServer).Start();
+        public void ConnectToServer()
+        {
+            if (!(client?.Connected == true))
             {
-                var ipEP = new IPEndPoint(IPAddress.Parse(IP), PORT);
+                try
+                {
+                    var ipEP = new IPEndPoint(IPAddress.Parse(IP), PORT);
 
-                client = new TcpClient();
-                client.Connect(ipEP);
+                    client = new TcpClient();
+                    client.Connect(ipEP);
 
-                sw = new StreamWriter(client.GetStream()) { AutoFlush = true };
-                sr = new StreamReader(client.GetStream());
+                    sw = new StreamWriter(client.GetStream()) { AutoFlush = true };
+                    sr = new StreamReader(client.GetStream());
 
-                ListenToServerAsync();
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("Can't connect to server: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ListenToServer();
+                }
+                catch (Exception e)
+                {
+                    if(client != null)
+                        MessageBox.Show("Cannot connect to server: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    client = null;
+                    sw = null;
+                    sr = null;
+                }
             }
         }
         
-        /// <summary>
-        /// Listens to incoming data from the server asyncronously
-        /// </summary>
-        public void ListenToServerAsync() => new Task(ListenToServer).Start();
         private void ListenToServer()
         {
-            while (true)
+            try
             {
-                try
+                while (true)
                 {
                     var data = sr?.ReadLine();
                     if (data is null) continue;
 
                     ProcessCommand(data);
                 }
-                catch (Exception e)
-                {
-                    if(client.Client.Connected)
-                        MessageBox.Show("Error while listening to server: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
             }
-            //MessageBox.Show("Disconnected from server", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            catch (Exception e)
+            {
+                if(client is null)
+                    throw e;
+                else MessageBox.Show("Error while listening to server: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         /// <summary>
@@ -97,7 +109,7 @@ namespace Chess.ChessBackEnd
         {
             try
             {
-                sw.WriteLine($"Connect/{lobbyID}/{nickname}");
+                sw?.WriteLine($"Connect/{lobbyID}/{nickname}");
             }
             catch (Exception e)
             {
@@ -131,6 +143,19 @@ namespace Chess.ChessBackEnd
             }
         }
 
+        public void RematchRequestAsync(string lobbyID) => new Task(() => RematchRequest(lobbyID)).Start();
+        private void RematchRequest(string lobbyID)
+        {
+            try
+            {
+                sw?.WriteLine($"RematchRequest/{lobbyID}");
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error while sending rematch request: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private void ProcessCommand(string command)
         {
             string[] parameters = command.Split('/');
@@ -157,6 +182,10 @@ namespace Chess.ChessBackEnd
             }
         }
 
-        public void Disconnect() => client.Close();
+        public void Disconnect()
+        {
+            client?.Close();
+            client = null;
+        }
     }
 }

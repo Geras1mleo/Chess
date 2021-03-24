@@ -79,7 +79,7 @@ namespace Chess
         public CustomChessTable()
         {
             InitializeComponent();
-            InitializeBoard(FigureColor.Black, TableColor.Blue);
+            InitializeBoard(FigureColor.White, TableColor.Blue);
             server = new Server(ConnectToLobbyHandler, OpponentJoinedHandler, TableMovesHandler, OpponentLeftHandler);
         }
 
@@ -313,6 +313,8 @@ namespace Chess
                 buttons[newbutton.PosVertical, newbutton.PosHorizontal].Image = null;
             }
 
+            HandleEndGameAsync();
+
             // Coloring last move
             if (coloredOldBut != null)
                 coloredOldBut.Background = new SolidColorBrush(Colors.Transparent) { Opacity = 0.95 };
@@ -360,7 +362,7 @@ namespace Chess
 
         private void PlayWithFriendButton_Click(object sender, RoutedEventArgs e)
         {
-            var newGame = new NewGamePage(server.CreateNewLobbyAsync, server.ConnectToLobbyAsync);
+            var newGame = new NewGameWindow(server.CreateNewLobbyAsync, server.ConnectToLobbyAsync);
             newGame.ShowDialog();
         }
 
@@ -458,6 +460,19 @@ namespace Chess
                 else e.Cancel = true;
             }
             server.Disconnect();
+        }
+
+        private void HandleEndGameAsync() => new Task(() => { HandleEndGame(); }).Start();
+        private void HandleEndGame()
+        {
+            if (board.IsCheckmate(PlayerMove))
+            {
+                MessageBox.Show("Checkmate");
+            }
+            else if (board.IsStalemate(PlayerMove))
+            {
+                MessageBox.Show("Stalemate");
+            }
         }
     }
 }

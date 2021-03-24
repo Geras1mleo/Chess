@@ -5,7 +5,7 @@ using System.Windows.Media;
 
 namespace Chess.Tables
 {
-    public partial class NewGamePage : Window
+    public partial class NewGameWindow : Window
     {
         // This event will call fucntion in Server.cs that will make request for new lobby on server
         private event Action<string> CreateLobby;
@@ -13,7 +13,7 @@ namespace Chess.Tables
         // This event will call fucntion in Server.cs that will make request to join the lobby
         private event Action<string, string> ConnectToLobby;
 
-        public NewGamePage(Action<string> createLobby, Action<string, string> connectToLobby)
+        public NewGameWindow(Action<string> createLobby, Action<string, string> connectToLobby)
         {
             InitializeComponent();
             CreateLobby = createLobby;

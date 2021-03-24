@@ -29,6 +29,8 @@ namespace ChessServer
                     {
                         case "info":
                             Console.WriteLine("Amount lobbies: " + lobbies.Count);
+                            foreach (var item in IDs)
+                                Console.Write(item + "\t");
                             continue;
                         case "clear":
                             lobbies.Clear();
@@ -37,6 +39,19 @@ namespace ChessServer
                             continue;
                         case "stop":
                             server.Stop();
+                            break;
+                        case "moves":
+                            Console.Write("Enter lobby id: ");
+                            string id = Console.ReadLine();
+                            foreach (var item in lobbies)
+                            {
+                                if (item.LobbyID == id)
+                                {
+                                    foreach (var move in item.Moves)
+                                        Console.WriteLine(move);
+                                    break;
+                                }
+                            }
                             break;
                         default:
                             Console.WriteLine("Unknown command");
@@ -144,6 +159,9 @@ namespace ChessServer
                 case "LeaveLobby":
                     LeaveLobby(client, parameters[1]);
                     break;
+                case "RematchRequest":
+                    RematchRequest(client, parameters[1]);
+                    break;
                 default:
                     Console.WriteLine("Invalid message format received: " + command + "\nFrom: " + client.Client.RemoteEndPoint.ToString());
                     client.Close();
@@ -181,7 +199,7 @@ namespace ChessServer
                     return;
                 }
             }
-            RepportError(client, $"Lobby {lobbyID} does not exist, please try again");
+            ReportError(client, $"Lobby {lobbyID} does not exist, please try again");
         }
 
         static void NewMove(TcpClient client, string lobbyID, string move, string parameters)
@@ -213,10 +231,28 @@ namespace ChessServer
             }
         }
 
-        public static void RepportError(TcpClient client, string message)
+        static void RematchRequest(TcpClient client, string lobbyID)
         {
-            var sw = new StreamWriter(client.GetStream()) { AutoFlush = true };
-            sw.WriteLine("Error/" + message);
+            var id = IDs.IndexOf(lobbyID);
+
+            if (id > -1)
+            {
+                lobbies[id].RematchRequest(client);
+            }
+        }
+
+        public static void ReportError(TcpClient client, string message)
+        {
+            try
+            {
+                var sw = new StreamWriter(client.GetStream()) { AutoFlush = true };
+                sw.WriteLine("Error/" + message);
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error while reporting error\n" + e.Message);
+            }
         }
     }
 }

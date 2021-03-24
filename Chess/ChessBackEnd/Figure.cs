@@ -83,8 +83,9 @@ namespace Chess.ChessBackEnd
                         Width = 56,
                         Height = 56,
                         Source = new BitmapImage(new Uri(value, UriKind.RelativeOrAbsolute)),
-                        VerticalAlignment = VerticalAlignment.Center,
-                        Stretch = Stretch.Uniform
+                        VerticalAlignment = VerticalAlignment.Stretch,
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        Stretch = Stretch.Fill
                     };
                     Content = image;
                 }
@@ -96,6 +97,10 @@ namespace Chess.ChessBackEnd
         {
             PosVertical = posVertical;
             PosHorizontal = posHorizontal;
+            // TODO Stretch icons
+            HorizontalContentAlignment = HorizontalAlignment.Stretch;
+            VerticalContentAlignment = VerticalAlignment.Stretch;
+            
             Style = (Style)FindResource("TableButtonStyle");
         }
     }

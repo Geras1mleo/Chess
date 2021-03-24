@@ -56,8 +56,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Tables\NewGamePage.xaml.cs">
-      <DependentUpon>NewGamePage.xaml</DependentUpon>
+    <Compile Include="Tables\EndGameWindow.xaml.cs">
+      <DependentUpon>EndGameWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tables\NewGameWindow.xaml.cs">
+      <DependentUpon>NewGameWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="Tables\CustomChessTable.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -81,7 +84,11 @@
       <DependentUpon>CustomChessTable.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Tables\NewGamePage.xaml">
+    <Page Include="Tables\EndGameWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tables\NewGameWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

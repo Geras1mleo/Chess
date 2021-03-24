@@ -11,9 +11,9 @@
 
         // These variables are needed to track if castle is still possible
         private bool wKingMoved,
-                       wLeftRookMoved, wRightRookMoved,
-                       bKingMoved,
-                       bLeftRookMoved, bRightRookMoved;
+                     wLeftRookMoved, wRightRookMoved,
+                     bKingMoved,
+                     bLeftRookMoved, bRightRookMoved;
 
         public void SetCastlePermitations(FigureType type, short[] oldPos)
         {
@@ -76,17 +76,17 @@
                     break;
             }
 
-            return isValid && !IsKingAttacked(figure, oldPos, newPos);
+            return isValid && !IsKingChecked(figure, oldPos, newPos);
         }
 
         /// <summary>
-        /// Basically checking if the next operation on position of king is valid for one of figures
+        /// Basically checking if the next operation on position of king is valid for one of figures of opponent
         /// </summary>
         /// <param name="figure"></param>
         /// <param name="oldPos"></param>
         /// <param name="newPos"></param>
         /// <returns></returns>
-        private bool IsKingAttacked(Figure figure, short[] oldPos, short[] newPos)
+        private bool IsKingChecked(Figure figure, short[] oldPos, short[] newPos)
         {
             // Remember begin situation of figures and parameters
             var beginSituation = (Figure[,])Figures.Clone();
@@ -104,7 +104,7 @@
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    if (Figures[i,j] != null && Figures[i,j].Color != figure.Color)
+                    if (Figures[i,j]?.Color != figure.Color)
                     {
                         for (int k = 0; k < figures.GetLength(0); k++)
                         {
@@ -125,7 +125,7 @@
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    if(Figures[i,j] != null && Figures[i,j].Color == figure.Color && Figures[i,j].Type == FigureType.King)
+                    if(Figures[i,j]?.Color == figure.Color && Figures[i,j]?.Type == FigureType.King)
                     {
                         kingPos[0] = (short)i;
                         kingPos[1] = (short)j;
@@ -136,43 +136,132 @@
             // Going out from 2 loops
             FoundKing:
 
-            bool isAttacked = false;
+            bool isChecked = false;
 
             for (int i = 0; i < figures.GetLength(0); i++)
             {
-                var fig = figures[i, 0] as Figure;
+                Figure fig = figures[i, 0] as Figure;
                 if (fig == null) break;
 
                 switch (fig.Type)
                 {
                     case FigureType.Pawn:
-                        isAttacked = PawnValidation(fig, (short[])figures[i, 1], kingPos);
+                        isChecked = PawnValidation(fig, (short[])figures[i, 1], kingPos);
                         break;
                     case FigureType.Rook:
-                        isAttacked = RookValidation(fig, (short[])figures[i, 1], kingPos);
+                        isChecked = RookValidation(fig, (short[])figures[i, 1], kingPos);
                         break;
                     case FigureType.Knight:
-                        isAttacked = KnightValidation(fig, (short[])figures[i, 1], kingPos);
+                        isChecked = KnightValidation(fig, (short[])figures[i, 1], kingPos);
                         break;
                     case FigureType.Bishop:
-                        isAttacked = BishopValidation(fig, (short[])figures[i, 1], kingPos);
+                        isChecked = BishopValidation(fig, (short[])figures[i, 1], kingPos);
                         break;
                     case FigureType.Queen:
                         // For queen just using validation of bishop OR rook
-                        isAttacked = BishopValidation(fig, (short[])figures[i, 1], kingPos) || RookValidation(fig, (short[])figures[i, 1], kingPos);
+                        isChecked = BishopValidation(fig, (short[])figures[i, 1], kingPos) || RookValidation(fig, (short[])figures[i, 1], kingPos);
                         break;
                     case FigureType.King:
-                        isAttacked = KingValidation(fig, (short[])figures[i, 1], kingPos);
+                        isChecked = KingValidation(fig, (short[])figures[i, 1], kingPos);
                         break;
                 }
 
-                if (isAttacked) break;
+                if (isChecked) break;
             }
 
             Figures = beginSituation;
             Parameters = beginParameters;
 
-            return isAttacked;
+            return isChecked;
+        }
+
+        public bool IsCheckmate(FigureColor color)
+        {
+            // Searching for king position
+            var kingPos = new short[2];
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    if (Figures[i, j]?.Color == color && Figures[i, j]?.Type == FigureType.King)
+                    {
+                        kingPos[0] = (short)i;
+                        kingPos[1] = (short)j;
+                        goto FoundKing;
+                    }
+                }
+            }
+            // Going out from 2 loops
+            FoundKing:
+
+            return IsKingChecked(Figures[kingPos[0], kingPos[1]], kingPos, kingPos) && !PlayerHasMoves(color);
+        }
+
+        public bool IsStalemate(FigureColor color)
+        {
+            // Searching for king position
+            var kingPos = new short[2];
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    if (Figures[i, j]?.Color == color && Figures[i, j]?.Type == FigureType.King)
+                    {
+                        kingPos[0] = (short)i;
+                        kingPos[1] = (short)j;
+                        goto FoundKing;
+                    }
+                }
+            }
+            // Going out from 2 loops
+            FoundKing:
+
+            return !IsKingChecked(Figures[kingPos[0], kingPos[1]], kingPos, kingPos) && !PlayerHasMoves(color);
+        }
+
+        private bool PlayerHasMoves(FigureColor color)
+        {
+            // Here comes each figure that must be checked (if it can move) and current position of it
+            object[,] figures = new object[16, 2];
+
+            for (short i = 0; i < 8; i++)
+            {
+                for (short j = 0; j < 8; j++)
+                {
+                    if (Figures[i, j]?.Color == color)
+                    {
+                        for (int k = 0; k < figures.GetLength(0); k++)
+                        {
+                            if (figures[k, 0] is null)
+                            {
+                                figures[k, 0] = Figures[i, j];
+                                figures[k, 1] = new short[] { i, j };
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Checking if there is one single valid move => return true
+            for (short i = 0; i < figures.GetLength(0); i++)
+            {
+                if (!(figures[i, 0] is Figure fig)) return false;
+
+                if (!(figures[i, 1] is short[] oldPos)) return false;
+
+                for (short j = 0; j < 8; j++)
+                {
+                    for (short k = 0; k < 8; k++)
+                    {
+                        if (oldPos[0] == j && oldPos[1] == k) continue;
+
+                        if (IsValidOperation(fig, oldPos, new short[] { j, k })) return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         private bool PawnValidation(Figure figure, short[] oldPos, short[] newPos)
@@ -360,7 +449,7 @@
                                 {
                                     for (short i = 4; i >= 1; i--)
                                     {
-                                        if (IsKingAttacked(Figures[0, 4], new short[] { 0, 4 }, new short[] { 0, i }))
+                                        if (IsKingChecked(Figures[0, 4], new short[] { 0, 4 }, new short[] { 0, i }))
                                             return false;   
                                     }
                                     Parameters = "Castle:2";
@@ -374,7 +463,7 @@
                                 {
                                     for (short i = 4; i <= 6; i++)
                                     {
-                                        if (IsKingAttacked(Figures[0, 4], new short[] { 0, 4 }, new short[] { 0, i }))
+                                        if (IsKingChecked(Figures[0, 4], new short[] { 0, 4 }, new short[] { 0, i }))
                                             return false;
                                     }
                                     Parameters = "Castle:6";
@@ -393,7 +482,7 @@
                                 {
                                     for (short i = 4; i >= 1; i--)
                                     {
-                                        if (IsKingAttacked(Figures[7, 4], new short[] { 7, 4 }, new short[] { 7, i }))
+                                        if (IsKingChecked(Figures[7, 4], new short[] { 7, 4 }, new short[] { 7, i }))
                                             return false;
                                     }
                                     Parameters = "Castle:2";
@@ -407,7 +496,7 @@
                                 {
                                     for (short i = 4; i <= 6; i++)
                                     {
-                                        if (IsKingAttacked(Figures[7, 4], new short[] { 7, 4 }, new short[] { 7, i }))
+                                        if (IsKingChecked(Figures[7, 4], new short[] { 7, 4 }, new short[] { 7, i }))
                                             return false;
                                     }
                                     Parameters = "Castle:6";

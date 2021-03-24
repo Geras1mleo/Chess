@@ -6,30 +6,30 @@
         xmlns:local="clr-namespace:Chess"
         mc:Ignorable="d"
         Name="window"
-        Title="Chess" Height="630" Width="726.4" Background="#FF343434" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize" Closing="Window_Closing">
+        Title="Chess" Height="710.8" Width="877.6" Background="#FF343434" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize" Closing="Window_Closing">
 
     <Canvas x:Name="canvas" DragOver="Canvas_DragOver" >
-        <Grid x:Name="table" AllowDrop="True" Canvas.Left="30" Canvas.Top="60" Height="480" Width="480">
+        <Grid x:Name="table" AllowDrop="True" Canvas.Left="30" Canvas.Top="60">
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="60"/>
-                <RowDefinition Height="60"/>
-                <RowDefinition Height="60"/>
-                <RowDefinition Height="60"/>
-                <RowDefinition Height="60"/>
-                <RowDefinition Height="60"/>
-                <RowDefinition Height="60"/>
-                <RowDefinition Height="60"/>
+                <RowDefinition Height="70"/>
+                <RowDefinition Height="70"/>
+                <RowDefinition Height="70"/>
+                <RowDefinition Height="70"/>
+                <RowDefinition Height="70"/>
+                <RowDefinition Height="70"/>
+                <RowDefinition Height="70"/>
+                <RowDefinition Height="70"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="60"/>
-                <ColumnDefinition Width="60"/>
-                <ColumnDefinition Width="60"/>
-                <ColumnDefinition Width="60"/>
-                <ColumnDefinition Width="60"/>
-                <ColumnDefinition Width="60"/>
-                <ColumnDefinition Width="60"/>
-                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="70"/>
             </Grid.ColumnDefinitions>
             <Label Name="n8"
                    Grid.Row="0"
@@ -115,14 +115,14 @@
         </Grid>
 
         <Button x:Name="ChangeTableColorButton"
-                Canvas.Left="510" Canvas.Top="517"
-                Width="20" Height="23" BorderThickness="0"
+                Canvas.Left="590" Canvas.Top="595"
+                Width="25" Height="25" BorderThickness="0"
                 PreviewMouseDown="ChangeTableColorButton_MouseDown"
                 FontSize="10" FontFamily="Century Gothic"/>
         <Button x:Name="PlayWithFriendButton"
                 Content="Play New Game"
                 Style="{StaticResource RoundButton}"
-                Canvas.Left="531" Canvas.Top="17"
+                Canvas.Left="645" Canvas.Top="24"
                 Width="166" Height="50"
                 Click="PlayWithFriendButton_Click"
                 Background="#38d7d7"
@@ -130,7 +130,7 @@
         <Button x:Name="LeaveLobbyButton"
                 Content="Leave Lobby"
                 Style="{StaticResource RoundButton}"
-                Canvas.Left="581" Canvas.Top="33"
+                Canvas.Left="684" Canvas.Top="33"
                 Width="92" Height="22"
                 Click="LeaveLobbyButton_Click"
                 FontSize="10" BorderThickness="0"
@@ -139,7 +139,7 @@
                 FontFamily="Century Gothic"/>
 
         <Image Height="38" Canvas.Left="30" Canvas.Top="17" Width="38" Source="/Chess;component/Images/user.png" Stretch="Fill" />
-        <Image Height="38" Canvas.Left="30" Canvas.Top="545" Width="38" Source="/Chess;component/Images/user.png" Stretch="Fill" />
+        <Image Height="38" Canvas.Left="28" Canvas.Top="621" Width="38" Source="/Chess;component/Images/user.png" Stretch="Fill" />
         <TextBlock x:Name="OpponentNick"
                  Height="23" 
                  Canvas.Left="74" 
@@ -151,14 +151,14 @@
                  FontSize="15" FontFamily="Century Gothic"/>
         <TextBlock x:Name="PlayerNick"
                 Height="23" 
-                Canvas.Left="78" 
-                Canvas.Top="545"
+                Canvas.Left="74" 
+                Canvas.Top="621"
                 TextWrapping="Wrap"
                 Width="432" 
                 Background="Transparent"
                 Text="You"
                 FontSize="15" FontFamily="Century Gothic"/>
-        <TextBlock x:Name="LobbyID" Canvas.Left="581" TextWrapping="Wrap" Canvas.Top="136" Height="32" Width="72"/>
+        <TextBlock x:Name="LobbyID" Canvas.Left="694" TextWrapping="Wrap" Canvas.Top="128" Height="32" Width="72"/>
 
     </Canvas>
 </Window>

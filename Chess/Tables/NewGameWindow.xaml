@@ -1,0 +1,33 @@
+﻿<Window x:Class="Chess.Tables.NewGameWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Chess.Tables"
+        mc:Ignorable="d"
+        Title="NewGamePage" Width="475.799" Height="222.603" WindowStartupLocation="CenterScreen"  WindowStyle="None" ResizeMode="NoResize" Background="Transparent" AllowsTransparency="True" MouseDown="Window_MouseDown">
+
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Wheat">
+        <TextBlock Text="Play With Friends" HorizontalAlignment="Center" VerticalAlignment="Top" FontFamily="Century Gothic" FontSize="25" FontWeight="Bold" />
+
+        <StackPanel Margin="16,43,236,110.4" >
+            <TextBlock Text="Enter your nickname:" FontSize="20" HorizontalAlignment="Left" FontFamily="Century Gothic"/>
+            <TextBox x:Name="Nickname" Height="28" HorizontalAlignment="Left" Width="214" FontFamily="Century Gothic" FontSize="20"/>
+            <TextBlock x:Name="ErrorNick" Text="You have to enter your nickname" FontSize="9" HorizontalAlignment="Left" Foreground="Transparent" Width="180"/>
+        </StackPanel>
+
+        <StackPanel Margin="264,43,27,110.4">
+            <TextBlock Text="Enter Lobby ID:" FontSize="20" HorizontalAlignment="Left" FontFamily="Century Gothic"/>
+            <TextBox x:Name="LobbyID" Height="28" HorizontalAlignment="Left" Width="180" FontFamily="Century Gothic" FontSize="20"/>
+            <TextBlock x:Name="ErrorLobby" Text="You have to enter your nickname" FontSize="9" HorizontalAlignment="Left" Foreground="Transparent" Width="180"/>
+        </StackPanel>
+        
+        <TextBlock Text="OR" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Top" FontFamily="Century Gothic" Margin="13,144,0,0" RenderTransformOrigin="1.219,1.054"/>
+
+        <Button x:Name="NewLobby" Content="Create new Lobby" Width="160" Height="30" BorderThickness="0" Click="NewLobby_Click" FontSize="15" Margin="58,139,258,53.4"/>
+
+        <Button x:Name="Connect" Content="Connect" HorizontalAlignment="Left" Margin="352,112,0,80.4" Click="Confirm_Click" FontSize="15" BorderThickness="0" Width="92" Height="30"/>
+
+        <Button x:Name="Cancel" Content="Cancel" HorizontalAlignment="Left" Margin="352,165,0,27.4" Click="Cancel_MouseDown" FontSize="15" BorderThickness="0" Width="92" Height="30"/>
+    </Grid>
+</Window>
