@@ -123,7 +123,7 @@
                 Content="Play New Game"
                 Style="{StaticResource RoundButton}"
                 Canvas.Left="645" Canvas.Top="24"
-                Width="166" Height="50"
+                Width="166" Height="60"
                 Click="PlayWithFriendButton_Click"
                 Background="#38d7d7"
                 FontSize="15" FontFamily="Century Gothic"/>
@@ -158,7 +158,7 @@
                 Background="Transparent"
                 Text="You"
                 FontSize="15" FontFamily="Century Gothic"/>
-        <TextBlock x:Name="LobbyID" Canvas.Left="694" TextWrapping="Wrap" Canvas.Top="128" Height="32" Width="72"/>
+        <TextBlock x:Name="LobbyID" Canvas.Left="645" TextWrapping="Wrap" Canvas.Top="101" Height="32" Width="72"/>
 
     </Canvas>
 </Window>

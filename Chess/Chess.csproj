@@ -162,7 +162,26 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\user.png" />
+    <Resource Include="Images\user.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Sounds\move-opponent.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Sounds\move-self.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Sounds\capture.mp3" />
+    <Content Include="Sounds\castle.mp3" />
+    <Content Include="Sounds\game-end.mp3" />
+    <Content Include="Sounds\game-start.mp3" />
+    <Content Include="Sounds\illegal.mp3" />
+    <Content Include="Sounds\move-check.mp3" />
+    <Content Include="Sounds\promote.mp3" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -19,4 +19,16 @@
         Green,
         Blue
     }
+    public enum Sound : short
+    {
+        MoveSelf,
+        MoveOpponent,
+        MoveCheck,
+        Castle,
+        Capture,
+        Promote,
+        GameStart,
+        GameEnd,
+        IllegalMove
+    }
 }

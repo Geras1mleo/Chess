@@ -32,6 +32,7 @@ namespace Chess.ChessBackEnd
             TableMovesHandler = tableMovesHandler;
             OpponentLeftHandler = opponentLeftHandler;
 
+            //Uncomment to connect to server
             ConnectToServerAsync();
         }
 

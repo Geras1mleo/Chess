@@ -5,3 +5,10 @@ D:\Projects\Chess\ChessServer\obj\Debug\ChessServer.csproj.CoreCompileInputs.cac
 D:\Projects\Chess\ChessServer\obj\Debug\ChessServer.exe
 D:\Projects\Chess\ChessServer\obj\Debug\ChessServer.pdb
 D:\Projects\Chess\ChessServer\obj\Debug\ChessServer.csprojAssemblyReference.cache
+C:\Users\geras\source\repos\Projects\Chess\ChessServer\bin\Debug\ChessServer.exe.config
+C:\Users\geras\source\repos\Projects\Chess\ChessServer\bin\Debug\ChessServer.exe
+C:\Users\geras\source\repos\Projects\Chess\ChessServer\bin\Debug\ChessServer.pdb
+C:\Users\geras\source\repos\Projects\Chess\ChessServer\obj\Debug\ChessServer.csprojAssemblyReference.cache
+C:\Users\geras\source\repos\Projects\Chess\ChessServer\obj\Debug\ChessServer.csproj.CoreCompileInputs.cache
+C:\Users\geras\source\repos\Projects\Chess\ChessServer\obj\Debug\ChessServer.exe
+C:\Users\geras\source\repos\Projects\Chess\ChessServer\obj\Debug\ChessServer.pdb

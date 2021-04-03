@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Chess.Tables"
         mc:Ignorable="d"
-        Title="EndGameWindow" Height="450" Width="800">
-    <Grid>
+        Title="gij suckt" Height="420.067" Width="463.747" Cursor="Arrow">
+    <Canvas>
         
-    </Grid>
+    </Canvas>
 </Window>
