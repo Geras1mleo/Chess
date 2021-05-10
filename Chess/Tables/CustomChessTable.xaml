@@ -117,8 +117,12 @@
         <Button x:Name="ChangeTableColorButton"
                 Canvas.Left="590" Canvas.Top="595"
                 Width="25" Height="25" BorderThickness="0"
-                PreviewMouseDown="ChangeTableColorButton_MouseDown"
-                FontSize="10" FontFamily="Century Gothic"/>
+                PreviewMouseDown="ChangeTableColorButton_MouseDown"/>
+        <Button x:Name="RotateBoardbtn"
+                Canvas.Left="615" Canvas.Top="595"
+                Width="25" Height="25" BorderThickness="0"
+                PreviewMouseDown="RotateBoardbtn_PreviewMouseDown"/>
+        
         <Button x:Name="PlayWithFriendButton"
                 Content="Play New Game"
                 Style="{StaticResource RoundButton}"
@@ -158,7 +162,8 @@
                 Background="Transparent"
                 Text="You"
                 FontSize="15" FontFamily="Century Gothic"/>
-        <TextBlock x:Name="LobbyID" Canvas.Left="645" TextWrapping="Wrap" Canvas.Top="101" Height="32" Width="72"/>
-
+        <Label Name="lblLobby" Content="Lobby ID:" Canvas.Left="645" Canvas.Top="86" FontSize="20" Visibility="Hidden"/>
+        <TextBlock x:Name="LobbyID" Canvas.Left="738" TextWrapping="Wrap" Canvas.Top="86" Height="34" Width="57" FontSize="25"/>
+        
     </Canvas>
 </Window>

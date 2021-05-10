@@ -19,7 +19,7 @@
         Green,
         Blue
     }
-    public enum Sound : short
+    public enum SoundType : short
     {
         MoveSelf,
         MoveOpponent,

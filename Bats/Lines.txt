@@ -13,7 +13,7 @@ geras1mleo
 
 // Commit Update
 
-C:\Users\geras\source\repos\Projects\Chess\Chess.sln
+C:\Users\geras\source\repos\Projects\Chess
 git add -A
 git commit -m "3.0"
 git push

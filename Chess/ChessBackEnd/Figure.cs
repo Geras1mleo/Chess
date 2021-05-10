@@ -70,7 +70,7 @@ namespace Chess.ChessBackEnd
         public short PosHorizontal { get;}
         
         /// <summary>
-        /// Sets an icon to a button by given path
+        /// Sets an icon to a button by given path(value is path to icon)
         /// </summary>
         public string Image
         {

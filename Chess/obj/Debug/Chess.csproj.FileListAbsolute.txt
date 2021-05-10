@@ -71,7 +71,6 @@ C:\Users\geras\source\repos\Projects\Chess\Chess\obj\Debug\Tables\CustomChessTab
 C:\Users\geras\source\repos\Projects\Chess\Chess\obj\Debug\Tables\EndGameWindow.g.cs
 C:\Users\geras\source\repos\Projects\Chess\Chess\obj\Debug\Tables\NewGameWindow.g.cs
 C:\Users\geras\source\repos\Projects\Chess\Chess\obj\Debug\App.g.cs
-C:\Users\geras\source\repos\Projects\Chess\Chess\obj\Debug\Chess_Content.g.cs
 C:\Users\geras\source\repos\Projects\Chess\Chess\obj\Debug\GeneratedInternalTypeHelper.g.cs
 C:\Users\geras\source\repos\Projects\Chess\Chess\obj\Debug\Chess_MarkupCompile.cache
 C:\Users\geras\source\repos\Projects\Chess\Chess\obj\Debug\Chess_MarkupCompile.lref

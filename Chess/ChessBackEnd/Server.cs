@@ -10,7 +10,7 @@ namespace Chess.ChessBackEnd
     class Server
     {
         const short PORT = 8080;
-        const string IP = "93.188.166.178";
+        const string IP = "127.0.0.1";
 
         private event Action<string, string, string, string> ConnectToLobbyHandler;
         private event Action<string, string> TableMovesHandler;
@@ -23,9 +23,9 @@ namespace Chess.ChessBackEnd
         private StreamReader sr;
 
         public Server(Action<string, string, string, string> connectToLobbyHandler, 
-                    Action<string> opponentJoinedHandler, 
-                    Action<string, string> tableMovesHandler, 
-                    Action opponentLeftHandler)
+                      Action<string> opponentJoinedHandler, 
+                      Action<string, string> tableMovesHandler, 
+                      Action opponentLeftHandler)
         {
             ConnectToLobbyHandler = connectToLobbyHandler;
             OpponentJoinedHandler = opponentJoinedHandler;
@@ -58,8 +58,7 @@ namespace Chess.ChessBackEnd
                 }
                 catch (Exception e)
                 {
-                    if(client != null)
-                        MessageBox.Show("Cannot connect to server: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Cannot connect to server: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     client = null;
                     sw = null;
                     sr = null;
@@ -81,9 +80,8 @@ namespace Chess.ChessBackEnd
             }
             catch (Exception e)
             {
-                if(client is null)
-                    throw e;
-                else MessageBox.Show("Error while listening to server: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                if(client != null)
+                    MessageBox.Show("Error while listening to server: " + e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

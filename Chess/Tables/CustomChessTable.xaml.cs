@@ -17,21 +17,27 @@ namespace Chess
 
         private TableButton[,] buttons;
         private Board board;
-        private readonly Server server;
+        private Server server;
 
+        // Making image follow the cursor and color buttons below
         private TableButton dragButton;
         private TableButton coloredOldBut, coloredNewBut;
         private Image dragImage;
 
+        // Labels with a,b,c,d.. 1,2,3..
         private Label[] letterLables, numberLables;
 
         private bool userDragedFigureOutOfTable;
 
         // Reminds whitch player now can move figures
-        public static FigureColor PlayerMove { get; set; }
+        public static FigureColor PlayerMove { get; set; } = FigureColor.White;
 
         private TableColor currentTableColor;
-        public TableColor TableColor
+
+        /// <summary>
+        /// Changes background color of board
+        /// </summary>
+        private TableColor TableColor
         {
             get { return currentTableColor; }
             set
@@ -86,7 +92,6 @@ namespace Chess
         private void InitializeBoard(FigureColor playerColor, TableColor tableColor, Board currBoard = null)
         {
             TableColor = tableColor;
-            PlayerMove = FigureColor.White;
 
             buttons = new TableButton[8, 8];
             board = new Board(currBoard);
@@ -206,11 +211,11 @@ namespace Chess
                 dragButton.Background = new SolidColorBrush(Colors.Transparent) { Opacity = 0.95 };
             }
 
-            // Here we check if user has not dropped figure to the same position AND if player moves his color
+            // Here we check if user has not dropped figure to the same position
             if (!(dragButton.PosVertical == newbutton.PosVertical && dragButton.PosHorizontal == newbutton.PosHorizontal))
             {
-                // If player is connected to lobby and trying to move figures of opponent => decline
-                if (isConnectedToLobby && playerColor != board.Figures[dragButton.PosVertical, dragButton.PosHorizontal].Color)
+                // If player is in game and trying to move figures of opponent => decline
+                if (isInGame && playerColor != board.Figures[dragButton.PosVertical, dragButton.PosHorizontal].Color)
                     goto Decline;
 
                 // Checking if it's valid move
@@ -227,12 +232,11 @@ namespace Chess
                 }
                 else
                 {
-                    PlaySound(Sound.IllegalMove);
                     goto Decline;
                 }
             }
 
-            // Set figure back here
+            // Set figure back to it's position
             Decline:
             dragButton.Image = board.Figures[dragButton.PosVertical, dragButton.PosHorizontal].Image;
 
@@ -249,7 +253,8 @@ namespace Chess
 
             var tablePos = e.GetPosition(this.table);
 
-            // Adding small margin
+            // When user is trying to drag figure out of board...
+            // Adding small margin (10 is margin)
             if ((tablePos.X < 10 || tablePos.X + 10 > table.ActualWidth || tablePos.Y < 10 || tablePos.Y + 10 > table.ActualHeight) && dragButton != null)
             {
                 dragButton.Image = board.Figures[dragButton.PosVertical, dragButton.PosHorizontal].Image;
@@ -265,10 +270,6 @@ namespace Chess
 
         private void DropFigureToNewPosition(TableButton dragButton, TableButton newbutton, string parameters)
         {
-            var sound = board.Figures[dragButton.PosVertical, dragButton.PosHorizontal].Color == playerColor ? Sound.MoveSelf : Sound.MoveOpponent;
-            if (board.Figures[newbutton.PosVertical, newbutton.PosHorizontal] != null)
-                sound = Sound.Capture;
-
             PlayerMove = PlayerMove == FigureColor.White ? FigureColor.Black : FigureColor.White;
 
             // Copying to the new position
@@ -284,7 +285,6 @@ namespace Chess
                 case "Queen":
                     board.Figures[newbutton.PosVertical, newbutton.PosHorizontal].Type = FigureType.Queen;
                     buttons[newbutton.PosVertical, newbutton.PosHorizontal].Image = board.Figures[newbutton.PosVertical, newbutton.PosHorizontal].Image;
-                    sound = Sound.Promote;
                     break;
                 case "EnpasPos":
                     board.SetEnPassantPos($"{newbutton.PosVertical},{newbutton.PosHorizontal}");
@@ -298,7 +298,6 @@ namespace Chess
 
                 board.Figures[int.Parse(pos[0]), int.Parse(pos[1])] = null;
                 buttons[int.Parse(pos[0]), int.Parse(pos[1])].Image = null;
-                sound = Sound.Capture;
             }
             else if (parameters.Contains("CastlePerm:"))
             {
@@ -321,10 +320,7 @@ namespace Chess
                 buttons[newbutton.PosVertical, pos].Image = board.Figures[newbutton.PosVertical, pos].Image;
                 buttons[newbutton.PosVertical, pos == 2 ? 3 : 5].Image = board.Figures[newbutton.PosVertical, pos == 2 ? 3 : 5].Image;
                 buttons[newbutton.PosVertical, newbutton.PosHorizontal].Image = null;
-                sound = Sound.Castle;
             }
-
-            Task.Run(()=> { PlaySound(sound); });
 
             HandleEndGameAsync();
 
@@ -356,6 +352,11 @@ namespace Chess
             }
         }
 
+        private void RotateBoardbtn_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            RotateBoard(tableRotation == FigureColor.White? FigureColor.Black : FigureColor.White, board);
+        }
+
         private void LeaveLobbyButton_Click(object sender, RoutedEventArgs e)
         {
             var result = MessageBox.Show("Are you sure want to leave lobby? ", "Leaving Lobby", MessageBoxButton.YesNo, MessageBoxImage.Warning);
@@ -365,6 +366,7 @@ namespace Chess
 
                 OpponentNick.Text = "Opponent";
                 LobbyID.Text = "";
+                lblLobby.Visibility = Visibility.Hidden;
                 isConnectedToLobby = false;
                 isInGame = false;
 
@@ -379,13 +381,15 @@ namespace Chess
             newGame.ShowDialog();
         }
 
+        private FigureColor tableRotation = FigureColor.White;
         /// <summary>
-        /// Rotates (and clears) the board
+        /// Rotates (and clears if null) the board
         /// </summary>
         /// <param name="playerColor"></param>
         /// <param name="posBoard">Let it null if u want to clear the board too</param>
         private void RotateBoard(FigureColor playerColor, Board posBoard = null)
         {
+            tableRotation = playerColor;
             foreach (var item in buttons)
                 table.Children.Remove(item);
 
@@ -418,6 +422,7 @@ namespace Chess
 
                 RotateBoard(playerColor);
                 LobbyID.Text = lobbyID;
+                lblLobby.Visibility = Visibility.Visible;
 
                 PlayerNick.Text = playerNick;
                 if (string.IsNullOrEmpty(opponentNick))
@@ -429,7 +434,6 @@ namespace Chess
                 {
                     OpponentNick.Text = opponentNick;
                     isInGame = true;
-                    PlaySound(Sound.GameStart);
                 }
 
                 PlayWithFriendButton.Visibility = Visibility.Hidden;
@@ -447,7 +451,6 @@ namespace Chess
                 isConnectedToLobby = true;
                 isInGame = true;
             });
-            PlaySound(Sound.GameStart);
             MessageBox.Show($"Your opponent: {nickname} joined to lobby");
         }
 
@@ -477,61 +480,18 @@ namespace Chess
             server?.Disconnect();
         }
 
-        private MediaPlayer mediaPlayer = new MediaPlayer(); object lockObj = new object();
-        private void PlaySound(Sound sound)
-        {
-            lock (lockObj)
-            {
-                mediaPlayer.Dispatcher.Invoke(() =>
-                {
-                    switch (sound)
-                    {
-                        case Sound.MoveSelf:
-                            mediaPlayer.Open(new Uri("../../Sounds/move-self.mp3", UriKind.Relative));
-                            break;
-                        case Sound.MoveOpponent:
-                            mediaPlayer.Open(new Uri("../../Sounds/move-opponent.mp3", UriKind.Relative));
-                            break;
-                        case Sound.MoveCheck:
-                            mediaPlayer.Open(new Uri("../../Sounds/move-check.mp3", UriKind.Relative));
-                            break;
-                        case Sound.Castle:
-                            mediaPlayer.Open(new Uri("../../Sounds/castle.mp3", UriKind.Relative));
-                            break;
-                        case Sound.Capture:
-                            mediaPlayer.Open(new Uri("../../Sounds/capture.mp3", UriKind.Relative));
-                            break;
-                        case Sound.Promote:
-                            mediaPlayer.Open(new Uri("../../Sounds/promote.mp3", UriKind.Relative));
-                            break;
-                        case Sound.GameStart:
-                            mediaPlayer.Open(new Uri("../../Sounds/capture.mp3", UriKind.Relative));
-                            break;
-                        case Sound.GameEnd:
-                            mediaPlayer.Open(new Uri("../../Sounds/game-end.mp3", UriKind.Relative));
-                            break;
-                        case Sound.IllegalMove:
-                            mediaPlayer.Open(new Uri("../../Sounds/illegal.mp3", UriKind.Relative));
-                            break;
-                        default:
-                            break;
-                    }
-                    mediaPlayer.Play();
-                });
-            }
-        }
-
+        /// <summary>
+        /// Asynchronously checking if there is a checklame or stalemate
+        /// </summary>
         private void HandleEndGameAsync() => new Task(() => { HandleEndGame(); }).Start();
         private void HandleEndGame()
         {
             if (board.IsCheckmate(PlayerMove))
             {
-                PlaySound(Sound.GameEnd);
                 MessageBox.Show("Checkmate");
             }
             else if (board.IsStalemate(PlayerMove))
             {
-                PlaySound(Sound.GameEnd);
                 MessageBox.Show("Stalemate");
             }
         }
