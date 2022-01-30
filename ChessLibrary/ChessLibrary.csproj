@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Description>Chess game logic</Description>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\.editorconfig" Link=".editorconfig" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Ardalis.SmartEnum" Version="2.0.1" />
+	  <PackageReference Include="Ardalis.SmartEnum.JsonNet" Version="1.0.31" />
+	</ItemGroup>
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<DebugType>embedded</DebugType>
+		<OutputType>Library</OutputType>
+		<RootNamespace>Chess</RootNamespace>
+	</PropertyGroup>
+</Project>
