@@ -8,5 +8,4 @@
 	</p>
 </div>
 
-# Chess
 todo: Documentation
