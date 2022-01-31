@@ -15,7 +15,7 @@ public partial class ChessBoard
     /// </summary>
     public event ChessPromotionResultEventHandler OnPromotePawn = delegate { };
     /// <summary>
-    /// Invokes when it's end game
+    /// Invokes when it's end of game
     /// </summary>
     public event ChessEndGameEventHandler OnEndGame = delegate { };
     /// <summary>
@@ -56,11 +56,16 @@ public partial class ChessBoard
             OnEndGame(this, new EndgameEventArgs(this, EndGame));
     }
 
-    private void OnCapturedEvent(CaptureEventArgs e)
+    private async Task OnCapturedEventAsync(Piece piece)
     {
-        if (context != null)
-            context.Post(delegate { OnCaptured(this, e); }, null);
+        await Task.Run(() => OnCapturedEvent(piece, new ChessBoard(pieces, PerformedMoves)));
+    }
+
+    private static void OnCapturedEvent(Piece piece, ChessBoard board)
+    {
+        if (board.context != null)
+            board.context.Post(delegate { board.OnCaptured(board, new CaptureEventArgs(board, piece, board.WhiteCaptured, board.BlackCaptured)); }, null);
         else
-            OnCaptured(this, e);
+            board.OnCaptured(board, new CaptureEventArgs(board, piece, board.WhiteCaptured, board.BlackCaptured));
     }
 }

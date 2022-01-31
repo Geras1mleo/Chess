@@ -25,13 +25,13 @@ public class CaptureEventArgs : ChessEventArgs
     /// <summary>
     /// List of captured pieces where color == White
     /// </summary>
-    public List<Piece> WhiteCapturedPieces { get; set; }
+    public Piece[] WhiteCapturedPieces { get; set; }
     /// <summary>
     /// List of captured pieces where color == Black
     /// </summary>
-    public List<Piece> BlackCapturedPieces { get; set; }
+    public Piece[] BlackCapturedPieces { get; set; }
 
-    public CaptureEventArgs(ChessBoard chessBoard, Piece capturedPiece, List<Piece> whiteCapturedPieces, List<Piece> blackCapturedPieces) : base(chessBoard)
+    public CaptureEventArgs(ChessBoard chessBoard, Piece capturedPiece, Piece[] whiteCapturedPieces, Piece[] blackCapturedPieces) : base(chessBoard)
     {
         CapturedPiece = capturedPiece;
         WhiteCapturedPieces = whiteCapturedPieces;

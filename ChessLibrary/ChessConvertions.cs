@@ -53,7 +53,7 @@ public partial class ChessBoard
                             else if (group.Value == "O-O-O")
                                 moveOut.NewPosition = new("a8");
                         }
-                        if(!IsValidMove(new Move(originalPos, moveOut.NewPosition)))
+                        if (!IsValidMove(new Move(originalPos, moveOut.NewPosition)))
                             throw new ChessSanNotFoundException(this, move);
                     }
                     break;
@@ -100,39 +100,36 @@ public partial class ChessBoard
 
         if (!originalPos.HasValue)
         {
-            var amb = Moves(false).Where(m => m.NewPosition == moveOut.NewPosition && m.Piece.Type == moveOut.Piece.Type);
+            var amb = GetMovesOfPieceOnPosition(moveOut.Piece, moveOut.NewPosition, this).ToList();
 
             if (originalPos.HasValueX)
             {
-                amb = amb.Where(m => m.OriginalPosition.X == originalPos.X);
-                var count = amb.Count();
+                amb = amb.Where(m => m.OriginalPosition.X == originalPos.X).ToList();
 
-                if (count == 1)
+                if (amb.Count == 1)
                     originalPos.Y = amb.ElementAt(0).OriginalPosition.Y;
 
-                else ThrowException(count, amb);
+                else ThrowException(amb.Count, amb);
             }
             else if (originalPos.HasValueY)
             {
-                amb = amb.Where(m => m.OriginalPosition.Y == originalPos.Y);
-                var count = amb.Count();
+                amb = amb.Where(m => m.OriginalPosition.Y == originalPos.Y).ToList();
 
-                if (count == 1)
+                if (amb.Count == 1)
                     originalPos.X = amb.ElementAt(0).OriginalPosition.X;
 
-                else ThrowException(count, amb);
+                else ThrowException(amb.Count, amb);
             }
             else
             {
-                var count = amb.Count();
-                if (count == 1)
+                if (amb.Count == 1)
                 {
                     originalPos.X = amb.ElementAt(0).OriginalPosition.X;
                     originalPos.Y = amb.ElementAt(0).OriginalPosition.Y;
                 }
-                else ThrowException(count, amb);
+                else ThrowException(amb.Count, amb);
             }
-            void ThrowException(int count, IEnumerable<Move> moves)
+            void ThrowException(int count, List<Move> moves)
             {
                 if (count < 1)
                     throw new ChessSanNotFoundException(this, move);
@@ -167,7 +164,13 @@ public partial class ChessBoard
         }
 
         if (move.Piece.Type != PieceType.Pawn)
-            sMove += char.ToUpper(move.Piece.Type.AsChar) + HandleAmbiguousMoves(move);
+        {
+            sMove += char.ToUpper(move.Piece.Type.AsChar);
+
+            // Only rook, knight, bishop(second from promotion) and queen(second from promotion) can have ambiguous moves
+            if (move.Piece.Type != PieceType.King)
+                sMove += HandleAmbiguousMovesNotation(move, this);
+        }
 
         if (move.CapturedPiece != null)
         {
@@ -209,10 +212,12 @@ public partial class ChessBoard
     {
         Fen = new FenBoard(fen);
         pieces = Fen.Pieces;
-        PerformedMoves = new List<Move>();
-        moveIndex = -1; prevMoveIndex = -1;
+        PerformedMoves.Clear();
+        moveIndex = -1;
         endGame = null;
-        Fen.IsCheck = WhiteKingChecked || BlackKingChecked;
+
+        HandleKingChecked();
+        HandleEndGame();
     }
 
     /// <summary>
@@ -224,18 +229,57 @@ public partial class ChessBoard
         return new FenBoard(this).ToString();
     }
 
-    private string HandleAmbiguousMoves(Move move)
+    private static string HandleAmbiguousMovesNotation(Move move, ChessBoard board)
     {
-        var sOut = "";
-        var amb = Moves(false).Where(m => m.NewPosition == move.NewPosition && m.Piece.Type == move.Piece.Type && m.OriginalPosition != move.OriginalPosition).ToList();
+        var amb = GetMovesOfPieceOnPosition(move.Piece, move.NewPosition, board).Where(m => m.OriginalPosition != move.OriginalPosition).ToList();
+        var origPos = move.OriginalPosition.ToString();
 
-        if (amb.Count > 0)
-            if (amb.Any(m => m.OriginalPosition.X == move.OriginalPosition.X))
-                sOut += move.OriginalPosition.ToString()[1];
+        if (amb.Count == 0)
+            return "";
+        else if (amb.Count == 1)
+        {
+            if (amb[0].OriginalPosition.X == move.OriginalPosition.X)
+                return origPos[1].ToString();
             else
-                sOut += move.OriginalPosition.ToString()[0];
+                return origPos[0].ToString();
+        }
+        else
+        {
+            var sOut = "";
 
-        return sOut;
+            if (amb.Any(m => m.OriginalPosition.X == move.OriginalPosition.X))
+                sOut += origPos[1];
+
+            if (amb.Any(m => m.OriginalPosition.Y == move.OriginalPosition.Y))
+                sOut += origPos[0];
+
+            return sOut;
+        }
+    }
+
+    private static Move[] GetMovesOfPieceOnPosition(Piece piece, Position newPosition, ChessBoard board)
+    {
+        var moves = new List<Move>();
+        Move move;
+
+        for (short i = 0; i < 8; i++)
+        {
+            for (short j = 0; j < 8; j++)
+            {
+                if (board.pieces[i, j] != null && board.pieces[i, j].Color == piece.Color && board.pieces[i, j].Type == piece.Type)
+                {
+                    // if original pos == new pos
+                    if (newPosition.Y == i && newPosition.X == j) continue;
+
+                    move = new Move(new() { Y = i, X = j }, newPosition) { Piece = piece };
+
+                    if (IsValidMove(move, board) && !IsKingCheckedValidation(move, piece.Color, board))
+                        moves.Add(move);
+                }
+            }
+        }
+
+        return moves.ToArray();
     }
 
     private static int GetHalfMovesCount(ChessBoard board)
@@ -281,11 +325,6 @@ public partial class ChessBoard
         /// Black moves Count
         /// </summary>
         public int FullMoves { get; }
-
-        /// <summary>
-        /// Whether given pieces positions check one of kings
-        /// </summary>
-        public bool IsCheck { get; internal set; }
 
         public FenBoard(ChessBoard board)
         {
@@ -361,6 +400,7 @@ public partial class ChessBoard
                         break;
                 }
             }
+
         }
 
         public override string ToString()

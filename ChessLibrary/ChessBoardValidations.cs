@@ -34,18 +34,21 @@ public partial class ChessBoard
             throw new ChessPieceNotFoundException(this, new Move(position, position));
 
         var moves = new List<Move>();
+        Move move;
 
         for (short i = 0; i < 8; i++)
         {
             for (short j = 0; j < 8; j++)
             {
-                var move = new Move(position, new Position { Y = i, X = j });
+                // if original pos == new pos
+                if (position.Y == i && position.X == j) continue;
+
+                move = new Move(position, new Position { Y = i, X = j }) { Piece = pieces[position.Y, position.X] };
+
                 if (IsValidMove(move, this, false, true))
                 {
                     moves.Add(move);
-
-                    if (generateSan)
-                        San(move);
+                    if (generateSan) San(move);
                 }
             }
         }
@@ -66,9 +69,8 @@ public partial class ChessBoard
         {
             for (short j = 0; j < 8; j++)
             {
-                if (pieces[i, j] == null) continue;
-
-                moves.AddRange(Moves(new Position { Y = i, X = j }, generateSan));
+                if (pieces[i, j] != null)
+                    moves.AddRange(Moves(new Position { Y = i, X = j }, generateSan));
             }
         }
 
@@ -102,7 +104,7 @@ public partial class ChessBoard
         return kingPos;
     }
 
-    private static bool IsValidMove(Move move, ChessBoard board, bool invokeEvents, bool checkPlayerMove)
+    private static bool IsValidMove(Move move, ChessBoard board, bool invokeEvents, bool checkTurn)
     {
         if (move == null || !move.HasValue)
             throw new ArgumentNullException(nameof(move));
@@ -110,7 +112,7 @@ public partial class ChessBoard
         if (board.pieces[move.OriginalPosition.Y, move.OriginalPosition.X] == null)
             throw new ChessPieceNotFoundException(board, move);
 
-        if (checkPlayerMove && board.pieces[move.OriginalPosition.Y, move.OriginalPosition.X].Color != board.Turn) return false;
+        if (checkTurn && board.pieces[move.OriginalPosition.Y, move.OriginalPosition.X].Color != board.Turn) return false;
 
         if (move.OriginalPosition == move.NewPosition) return false;
 
@@ -206,7 +208,7 @@ public partial class ChessBoard
 
         // move in Validation => King is being captured!
         if (!kingPos.HasValue)
-            return true;
+            return false;
 
         for (short i = 0; i < 8; i++)
         {
