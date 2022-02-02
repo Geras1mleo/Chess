@@ -39,16 +39,19 @@ public partial class ChessBoard
     {
         get
         {
-            if (LoadedFromFEN)
-                return PerformedMoves.Count % 2 == 0 ? Fen.Turn : Fen.Turn.OppositeColor();
+            if (IsLastMoveDisplayed)
+                if (LoadedFromFEN)
+                    return PerformedMoves.Count % 2 == 0 ? Fen.Turn : Fen.Turn.OppositeColor();
+                else
+                    return PerformedMoves.Count % 2 == 0 ? PieceColor.White : PieceColor.Black;
             else
-                return PerformedMoves.Count % 2 == 0 ? PieceColor.White : PieceColor.Black;
+                return PerformedMoves[moveIndex].Piece.Color.OppositeColor();
         }
     }
 
     private bool whiteKingChecked = false;
     /// <summary>
-    /// Returns state of White king (Checked or not)
+    /// Returns the state of White king (Checked or not)
     /// </summary>
     public bool WhiteKingChecked
     {
@@ -58,14 +61,14 @@ public partial class ChessBoard
             if (value != whiteKingChecked)
             {
                 whiteKingChecked = value;
-                OnKingCheckedChangedEvent(new CheckEventArgs(this, WhiteKing, value));
+                OnWhiteKingCheckedChangedEvent(new CheckEventArgs(this, WhiteKing, value));
             }
         }
     }
 
     private bool blackKingChecked = false;
     /// <summary>
-    /// Returns state of Black king (Checked or not)
+    /// Returns the state of Black king (Checked or not)
     /// </summary>
     public bool BlackKingChecked
     {
@@ -75,7 +78,7 @@ public partial class ChessBoard
             if (value != blackKingChecked)
             {
                 blackKingChecked = value;
-                OnKingCheckedChangedEvent(new CheckEventArgs(this, BlackKing, value));
+                OnBlackKingCheckedChangedEvent(new CheckEventArgs(this, BlackKing, value));
             }
         }
     }
@@ -101,17 +104,8 @@ public partial class ChessBoard
             cap.AddRange(PerformedMoves.Where(m => m.CapturedPiece?.Color == PieceColor.White).Select(m => new Piece(m.CapturedPiece.Color, m.CapturedPiece.Type)));
 
             if (LoadedFromFEN)
-            {
-                var pieces = Fen.Pieces.Cast<Piece>().Where(p => p?.Color == PieceColor.White);
+                cap.AddRange(Fen.WhiteCaptured);
 
-                // Calculating missing pieces on fen begin situation
-                // Math.Clamp() for get max/min taken figures (2 queens possible)
-                cap.AddRange(Enumerable.Range(0, Math.Clamp(8 - pieces.Where(p => p.Type == PieceType.Pawn).Count(), 0, 8)).Select(p => new Piece(PieceColor.White, PieceType.Pawn)));
-                cap.AddRange(Enumerable.Range(0, Math.Clamp(2 - pieces.Where(p => p.Type == PieceType.Rook).Count(), 0, 2)).Select(p => new Piece(PieceColor.White, PieceType.Rook)));
-                cap.AddRange(Enumerable.Range(0, Math.Clamp(2 - pieces.Where(p => p.Type == PieceType.Bishop).Count(), 0, 2)).Select(p => new Piece(PieceColor.White, PieceType.Bishop)));
-                cap.AddRange(Enumerable.Range(0, Math.Clamp(2 - pieces.Where(p => p.Type == PieceType.Knight).Count(), 0, 2)).Select(p => new Piece(PieceColor.White, PieceType.Knight)));
-                cap.AddRange(Enumerable.Range(0, Math.Clamp(1 - pieces.Where(p => p.Type == PieceType.Queen).Count(), 0, 1)).Select(p => new Piece(PieceColor.White, PieceType.Queen)));
-            }
             return cap.ToArray();
         }
     }
@@ -128,15 +122,8 @@ public partial class ChessBoard
             cap.AddRange(PerformedMoves.Where(m => m.CapturedPiece?.Color == PieceColor.Black).Select(m => new Piece(m.CapturedPiece.Color, m.CapturedPiece.Type)));
 
             if (LoadedFromFEN)
-            {
-                var pieces = Fen.Pieces.Cast<Piece>().Where(p => p?.Color == PieceColor.Black);
+                cap.AddRange(Fen.BlackCaptured);
 
-                cap.AddRange(Enumerable.Range(0, Math.Clamp(8 - pieces.Where(p => p.Type == PieceType.Pawn).Count(), 0, 8)).Select(p => new Piece(PieceColor.Black, PieceType.Pawn)));
-                cap.AddRange(Enumerable.Range(0, Math.Clamp(2 - pieces.Where(p => p.Type == PieceType.Rook).Count(), 0, 2)).Select(p => new Piece(PieceColor.Black, PieceType.Rook)));
-                cap.AddRange(Enumerable.Range(0, Math.Clamp(2 - pieces.Where(p => p.Type == PieceType.Bishop).Count(), 0, 2)).Select(p => new Piece(PieceColor.Black, PieceType.Bishop)));
-                cap.AddRange(Enumerable.Range(0, Math.Clamp(2 - pieces.Where(p => p.Type == PieceType.Knight).Count(), 0, 2)).Select(p => new Piece(PieceColor.Black, PieceType.Knight)));
-                cap.AddRange(Enumerable.Range(0, Math.Clamp(1 - pieces.Where(p => p.Type == PieceType.Queen).Count(), 0, 1)).Select(p => new Piece(PieceColor.Black, PieceType.Queen)));
-            }
             return cap.ToArray();
         }
     }
@@ -184,7 +171,7 @@ public partial class ChessBoard
     /// <summary>
     /// Is last move displayed on this chess board, false after DisplayPrevious()
     /// </summary>
-    public bool IsLastMove => moveIndex == PerformedMoves.Count - 1;
+    public bool IsLastMoveDisplayed => moveIndex == PerformedMoves.Count - 1;
 
     /// <summary>
     /// Creates new chess board with default pieces positions
@@ -279,7 +266,7 @@ public partial class ChessBoard
         if (IsEndGame)
             throw new ChessGameEndedException(this, EndGame);
 
-        if (!IsLastMove)
+        if (!IsLastMoveDisplayed)
             throw new ChessInvalidMoveException(this, "Please use board.DisplayLastMove(); to be able to perform new moves in this chess game", move);
 
         if (IsValidMove(move, true, true))
@@ -303,7 +290,7 @@ public partial class ChessBoard
     private void DropPieceToNewPosition(Move move)
     {
         if (move.CapturedPiece != null)
-            OnCapturedEventAsync(move.CapturedPiece);
+            OnCapturedEvent(move.CapturedPiece);
 
         // Copying to the new position
         this[move.NewPosition] = this[move.OriginalPosition];
@@ -354,45 +341,34 @@ public partial class ChessBoard
     public void Put(Piece piece, Position position)
     {
         this[position] = piece;
+        HandleKingChecked();
     }
 
     /// <summary>
-    /// Removes a piece from position
+    /// Removes a piece on given position from board
     /// </summary>
     public void Remove(Position position)
     {
         this[position] = null;
+        HandleKingChecked();
     }
 
     /// <summary>
-    /// Clears board<br/>
-    /// Restore: board.Restore() => only when clearMoves = false<br/>
-    /// When clearMoves = true and board has been loaded from fen => fen begin situation will be cleared
+    /// Clears board and restores begin positions
     /// </summary>
-    /// <param name="setToBeginPositions">Set begin positions after the board was cleared</param>
-    /// <param name="clearMoves">Clear performed moves, if true => cannot restore postions later with: board.Restore()</param>
-    public void Clear(bool setToBeginPositions = false, bool clearMoves = false)
+    public void Clear()
     {
-        if (setToBeginPositions)
-            if (LoadedFromFEN)
-                pieces = Fen.Pieces;
-            else
-                SetChessBeginSituation();
-        else
-            pieces = new Piece[8, 8];
-
-        if (clearMoves)
-        {
-            PerformedMoves.Clear();
-            moveIndex = -1;
-            endGame = null;
-            Fen = null;
-            HandleKingChecked();
-        }
+        SetChessBeginSituation();
+        PerformedMoves.Clear();
+        moveIndex = -1;
+        endGame = null;
+        Fen = null;
+        WhiteKingChecked = false;
+        BlackKingChecked = false;
     }
 
     /// <summary>
-    /// Restores board according to moves
+    /// Restores board according to moves and/or positions loaded from fen
     /// </summary>
     public void Restore()
     {
@@ -477,11 +453,17 @@ public partial class ChessBoard
     {
         if (moveIndex >= 0)
         {
-            if (PerformedMoves[moveIndex].Piece.Color == PieceColor.White)
-                BlackKingChecked = PerformedMoves[moveIndex].IsCheck;
+            WhiteKingChecked = false;
+            BlackKingChecked = false;
 
-            else if (PerformedMoves[moveIndex].Piece.Color == PieceColor.Black)
-                WhiteKingChecked = PerformedMoves[moveIndex].IsCheck;
+            if (PerformedMoves[moveIndex].IsCheck)
+            {
+                if (PerformedMoves[moveIndex].Piece.Color == PieceColor.White)
+                    BlackKingChecked = true;
+
+                else if (PerformedMoves[moveIndex].Piece.Color == PieceColor.Black)
+                    WhiteKingChecked = true;
+            }
         }
         else
         {
@@ -509,11 +491,11 @@ public partial class ChessBoard
             var mw = !PlayerHasMoves(PieceColor.White, this);
             var mb = !PlayerHasMoves(PieceColor.Black, this);
 
-            if (mw && IsKingChecked(PieceColor.White, this))
-                EndGame = new EndGameInfo(EndgameType.Checkmate, PieceColor.White);
-
-            else if (mb && IsKingChecked(PieceColor.Black, this))
+            if (mw && WhiteKingChecked)
                 EndGame = new EndGameInfo(EndgameType.Checkmate, PieceColor.Black);
+
+            else if (mb && BlackKingChecked)
+                EndGame = new EndGameInfo(EndgameType.Checkmate, PieceColor.White);
 
             else if (mw || mb)
                 EndGame = new EndGameInfo(EndgameType.Stalemate, null);

@@ -7,9 +7,13 @@ public partial class ChessBoard
     /// </summary>
     public event ChessCheckedChangedEventHandler OnInvalidMoveKingChecked = delegate { };
     /// <summary>
-    /// Invokes when one of kings is checked
+    /// Invokes when white king is (un)checked
     /// </summary>
-    public event ChessCheckedChangedEventHandler OnKingCheckedChanged = delegate { };
+    public event ChessCheckedChangedEventHandler OnWhiteKingCheckedChanged = delegate { };
+    /// <summary>
+    /// Invokes when black king is (un)checked
+    /// </summary>
+    public event ChessCheckedChangedEventHandler OnBlackKingCheckedChanged = delegate { };
     /// <summary>
     /// Invokes when user has to choose promote action
     /// </summary>
@@ -19,23 +23,31 @@ public partial class ChessBoard
     /// </summary>
     public event ChessEndGameEventHandler OnEndGame = delegate { };
     /// <summary>
-    /// Invokes when any piece has been captured
+    /// Async! Invokes when any piece has been captured
     /// </summary>
     public event ChessCaptureEventHandler OnCaptured = delegate { };
     private readonly SynchronizationContext context = SynchronizationContext.Current;
 
-    private void OnKingCheckedChangedEvent(CheckEventArgs e)
+    private void OnWhiteKingCheckedChangedEvent(CheckEventArgs e)
     {
         if (context != null)
-            context.Post(delegate { OnKingCheckedChanged(this, e); }, null);
+            context.Send(delegate { OnWhiteKingCheckedChanged(this, e); }, null);
         else
-            OnKingCheckedChanged(this, e);
+            OnWhiteKingCheckedChanged(this, e);
+    }
+
+    private void OnBlackKingCheckedChangedEvent(CheckEventArgs e)
+    {
+        if (context != null)
+            context.Send(delegate { OnBlackKingCheckedChanged(this, e); }, null);
+        else
+            OnBlackKingCheckedChanged(this, e);
     }
 
     private void OnInvalidMoveKingCheckedEvent(CheckEventArgs e)
     {
         if (context != null)
-            context.Post(delegate { OnInvalidMoveKingChecked(this, e); }, null);
+            context.Send(delegate { OnInvalidMoveKingChecked(this, e); }, null);
         else
             OnInvalidMoveKingChecked(this, e);
     }
@@ -51,21 +63,16 @@ public partial class ChessBoard
     private void OnEndGameEvent()
     {
         if (context != null)
-            context.Post(delegate { OnEndGame(this, new EndgameEventArgs(this, EndGame)); }, null);
+            context.Send(delegate { OnEndGame(this, new EndgameEventArgs(this, EndGame)); }, null);
         else
             OnEndGame(this, new EndgameEventArgs(this, EndGame));
     }
 
-    private async Task OnCapturedEventAsync(Piece piece)
+    private void OnCapturedEvent(Piece piece)
     {
-        await Task.Run(() => OnCapturedEvent(piece, new ChessBoard(pieces, PerformedMoves)));
-    }
-
-    private static void OnCapturedEvent(Piece piece, ChessBoard board)
-    {
-        if (board.context != null)
-            board.context.Post(delegate { board.OnCaptured(board, new CaptureEventArgs(board, piece, board.WhiteCaptured, board.BlackCaptured)); }, null);
+        if (context != null)
+            context.Send(delegate { OnCaptured(this, new CaptureEventArgs(this, piece, WhiteCaptured, BlackCaptured)); }, null);
         else
-            board.OnCaptured(board, new CaptureEventArgs(board, piece, board.WhiteCaptured, board.BlackCaptured));
+            OnCaptured(this, new CaptureEventArgs(this, piece, WhiteCaptured, BlackCaptured));
     }
 }

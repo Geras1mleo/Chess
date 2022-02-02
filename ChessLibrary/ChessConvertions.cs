@@ -284,20 +284,25 @@ public partial class ChessBoard
 
     private static int GetHalfMovesCount(ChessBoard board)
     {
-        int index = board.PerformedMoves.FindLastIndex(m => m.CapturedPiece != null || m.Piece.Type == PieceType.Pawn);
+        int index = board.PerformedMoves.GetRange(0, board.moveIndex + 1).FindLastIndex(m => m.CapturedPiece != null || m.Piece.Type == PieceType.Pawn);
 
         if (board.LoadedFromFEN && index < 0)
-            return board.Fen.HalfMoves + board.PerformedMoves.Count;
+            return board.Fen.HalfMoves + board.moveIndex + 1;
 
         if (index >= 0)
-            return board.PerformedMoves.Count - index - 1;
+            return board.moveIndex - index;
         else
-            return board.PerformedMoves.Count;
+            return board.moveIndex + 1;
     }
 
     private static int GetFullMovesCount(ChessBoard board)
     {
-        return (board.PerformedMoves.Count / 2) + (board.LoadedFromFEN ? board.Fen.FullMoves : 0);
+        var count = 0;
+
+        if (board.LoadedFromFEN)
+            count += (board.Fen.FullMoves * 2) + (board.Fen.Turn == PieceColor.Black ? 1 : 0) - 2;
+
+        return (board.moveIndex + count + 3) / 2;
     }
 
     internal class FenBoard
@@ -325,6 +330,9 @@ public partial class ChessBoard
         /// Black moves Count
         /// </summary>
         public int FullMoves { get; }
+
+        public Piece[] WhiteCaptured { get; }
+        public Piece[] BlackCaptured { get; }
 
         public FenBoard(ChessBoard board)
         {
@@ -401,6 +409,27 @@ public partial class ChessBoard
                 }
             }
 
+            var wcap = new List<Piece>();
+            var bcap = new List<Piece>();
+
+            var fpieces = pieces.Cast<Piece>().Where(p => p != null);
+
+            // Calculating missing pieces on according begin pieces in fen
+            // Math.Clamp() for get max/min taken figures (2 queens possible)
+            wcap.AddRange(Enumerable.Range(0, Math.Clamp(8 - fpieces.Where(p => p.Type == PieceType.Pawn && p.Color == PieceColor.White).Count(), 0, 8)).Select(p => new Piece(PieceColor.White, PieceType.Pawn)));
+            wcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Rook && p.Color == PieceColor.White).Count(), 0, 2)).Select(p => new Piece(PieceColor.White, PieceType.Rook)));
+            wcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Bishop && p.Color == PieceColor.White).Count(), 0, 2)).Select(p => new Piece(PieceColor.White, PieceType.Bishop)));
+            wcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Knight && p.Color == PieceColor.White).Count(), 0, 2)).Select(p => new Piece(PieceColor.White, PieceType.Knight)));
+            wcap.AddRange(Enumerable.Range(0, Math.Clamp(1 - fpieces.Where(p => p.Type == PieceType.Queen && p.Color == PieceColor.White).Count(), 0, 1)).Select(p => new Piece(PieceColor.White, PieceType.Queen)));
+
+            bcap.AddRange(Enumerable.Range(0, Math.Clamp(8 - fpieces.Where(p => p.Type == PieceType.Pawn && p.Color == PieceColor.Black).Count(), 0, 8)).Select(p => new Piece(PieceColor.Black, PieceType.Pawn)));
+            bcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Rook && p.Color == PieceColor.Black).Count(), 0, 2)).Select(p => new Piece(PieceColor.Black, PieceType.Rook)));
+            bcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Bishop && p.Color == PieceColor.Black).Count(), 0, 2)).Select(p => new Piece(PieceColor.Black, PieceType.Bishop)));
+            bcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Knight && p.Color == PieceColor.Black).Count(), 0, 2)).Select(p => new Piece(PieceColor.Black, PieceType.Knight)));
+            bcap.AddRange(Enumerable.Range(0, Math.Clamp(1 - fpieces.Where(p => p.Type == PieceType.Queen && p.Color == PieceColor.Black).Count(), 0, 1)).Select(p => new Piece(PieceColor.Black, PieceType.Queen)));
+
+            WhiteCaptured = wcap.ToArray();
+            BlackCaptured = bcap.ToArray();
         }
 
         public override string ToString()
