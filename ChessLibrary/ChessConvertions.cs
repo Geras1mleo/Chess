@@ -212,7 +212,7 @@ public partial class ChessBoard
     {
         Fen = new FenBoard(fen);
         pieces = Fen.Pieces;
-        PerformedMoves.Clear();
+        ExecutedMoves.Clear();
         moveIndex = -1;
         endGame = null;
 
@@ -284,7 +284,7 @@ public partial class ChessBoard
 
     private static int GetHalfMovesCount(ChessBoard board)
     {
-        int index = board.PerformedMoves.GetRange(0, board.moveIndex + 1).FindLastIndex(m => m.CapturedPiece != null || m.Piece.Type == PieceType.Pawn);
+        int index = board.ExecutedMoves.GetRange(0, board.moveIndex + 1).FindLastIndex(m => m.CapturedPiece != null || m.Piece.Type == PieceType.Pawn);
 
         if (board.LoadedFromFEN && index < 0)
             return board.Fen.HalfMoves + board.moveIndex + 1;

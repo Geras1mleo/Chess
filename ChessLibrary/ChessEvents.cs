@@ -3,27 +3,27 @@
 public partial class ChessBoard
 {
     /// <summary>
-    /// Invokes when trying to make or validate move but after the move would have been made, king would have been checked
+    /// Raises when trying to make or validate move but after the move would have been made, king would have been checked
     /// </summary>
     public event ChessCheckedChangedEventHandler OnInvalidMoveKingChecked = delegate { };
     /// <summary>
-    /// Invokes when white king is (un)checked
+    /// Raises when white king is (un)checked
     /// </summary>
     public event ChessCheckedChangedEventHandler OnWhiteKingCheckedChanged = delegate { };
     /// <summary>
-    /// Invokes when black king is (un)checked
+    /// Raises when black king is (un)checked
     /// </summary>
     public event ChessCheckedChangedEventHandler OnBlackKingCheckedChanged = delegate { };
     /// <summary>
-    /// Invokes when user has to choose promote action
+    /// Raises when user has to choose promote action
     /// </summary>
     public event ChessPromotionResultEventHandler OnPromotePawn = delegate { };
     /// <summary>
-    /// Invokes when it's end of game
+    /// Raises when it's end of game
     /// </summary>
     public event ChessEndGameEventHandler OnEndGame = delegate { };
     /// <summary>
-    /// Async! Invokes when any piece has been captured
+    /// Raises when any piece has been captured
     /// </summary>
     public event ChessCaptureEventHandler OnCaptured = delegate { };
     private readonly SynchronizationContext context = SynchronizationContext.Current;

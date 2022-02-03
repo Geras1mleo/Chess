@@ -14,12 +14,12 @@ public partial class ChessBoard
     /// Checks if given move is valid for current pieces positions
     /// </summary>
     /// <param name="move">Move to be checked</param>
-    /// <param name="invokeEvents">To invoke event handlers such as OnInvalidMoveKingChecked and OnPromotePawn</param>
+    /// <param name="raise">To raise event handlers such as OnInvalidMoveKingChecked and OnPromotePawn</param>
     /// <param name="checkPlayerMove">Check if given piece in move object is able to move according to board.PlayerTurn</param>
     /// <returns>Whether given move is valid</returns>
-    public bool IsValidMove(Move move, bool invokeEvents = true, bool checkPlayerMove = true)
+    public bool IsValidMove(Move move, bool raise = true, bool checkPlayerMove = true)
     {
-        return IsValidMove(move, this, invokeEvents, checkPlayerMove);
+        return IsValidMove(move, this, raise, checkPlayerMove);
     }
 
     /// <summary>
@@ -104,7 +104,7 @@ public partial class ChessBoard
         return kingPos;
     }
 
-    private static bool IsValidMove(Move move, ChessBoard board, bool invokeEvents, bool checkTurn)
+    private static bool IsValidMove(Move move, ChessBoard board, bool raise, bool checkTurn)
     {
         if (move == null || !move.HasValue)
             throw new ArgumentNullException(nameof(move));
@@ -134,7 +134,7 @@ public partial class ChessBoard
                 move.CapturedPiece = board.pieces[move.NewPosition.Y, move.NewPosition.X];
 
             // Promote
-            if (invokeEvents && move.Parameter == MoveParameter.PawnPromotion)
+            if (raise && move.Parameter == MoveParameter.PawnPromotion)
             {
                 var e = new PromotionEventArgs(board);
                 board.OnPromotePawnEvent(e);
@@ -152,7 +152,7 @@ public partial class ChessBoard
         }
         else
         {
-            if (isValid && invokeEvents)
+            if (isValid && raise)
                 board.OnInvalidMoveKingCheckedEvent(new CheckEventArgs(board, move.Piece.Color == PieceColor.White ? board.WhiteKing : board.BlackKing, true));
             return false;
         }
@@ -178,7 +178,7 @@ public partial class ChessBoard
     /// </summary>
     private static bool IsKingCheckedValidation(Move move, PieceColor side, ChessBoard board)
     {
-        var fboard = new ChessBoard(board.pieces, board.PerformedMoves);
+        var fboard = new ChessBoard(board.pieces, board.ExecutedMoves);
 
         // If checking for valid castle move
         // move.Piece == null only when calling recursively
@@ -195,7 +195,7 @@ public partial class ChessBoard
         }
         else if (move.OriginalPosition != move.NewPosition)
         {
-            fboard.PerformedMoves.Add(move);
+            fboard.ExecutedMoves.Add(move);
             fboard.DropPieceToNewPosition(move, false);
         }
 
@@ -227,11 +227,11 @@ public partial class ChessBoard
 
     private static bool PlayerHasMovesValidation(Move move, PieceColor side, ChessBoard board)
     {
-        var fboard = new ChessBoard(board.pieces, board.PerformedMoves);
+        var fboard = new ChessBoard(board.pieces, board.ExecutedMoves);
 
         if (move.OriginalPosition != move.NewPosition)
         {
-            fboard.PerformedMoves.Add(move);
+            fboard.ExecutedMoves.Add(move);
             fboard.DropPieceToNewPosition(move, false);
         }
         return PlayerHasMoves(side, fboard);
@@ -487,7 +487,7 @@ public partial class ChessBoard
 
     private static bool PieceEverMoved(Position piecePos, ChessBoard board)
     {
-        return board.PerformedMoves.GetRange(0, board.moveIndex + 1).Any(p => p.OriginalPosition == piecePos);
+        return board.ExecutedMoves.GetRange(0, board.moveIndex + 1).Any(p => p.OriginalPosition == piecePos);
     }
 
     private static bool IsValidEnPassant(Move move, ChessBoard board, short v, short h)
@@ -517,7 +517,7 @@ public partial class ChessBoard
     {
         Position pos = new();
 
-        var lastMove = board.PerformedMoves.GetRange(0, board.moveIndex + 1).LastOrDefault();
+        var lastMove = board.ExecutedMoves.GetRange(0, board.moveIndex + 1).LastOrDefault();
 
         if (lastMove != null && lastMove.Piece.Type == PieceType.Pawn && Math.Abs(lastMove.NewPosition.Y - lastMove.OriginalPosition.Y) == 2)
         {

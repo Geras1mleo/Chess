@@ -155,7 +155,7 @@ namespace ChessUnitTests
             board.Load("rnb1kbnr/pppppppp/8/8/8/8/4q3/7K b kq - 0 1");
             board.Move("Qf2");
 
-            Assert.Equal("Qf2$", board.PerformedMoves[^1].San);
+            Assert.Equal("Qf2$", board.ExecutedMoves[^1].San);
         }
 
         [Fact]
