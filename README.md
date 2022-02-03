@@ -20,9 +20,9 @@
   -  `OnInvalidMoveKingChecked` - Raises when trying to execute move that places own king in check
   -  `OnWhiteKingCheckedChanged`/`OnBlackKingCheckedChanged` with state (checked or not) and its position
   -  `OnPromotePawn` with PromotionEventArgs.PromotionResult (default: PromotionToQueen)
-  -  `OnEndGame` with according end game info
+  -  `OnEndGame` with according end game info (`Checkmate`/`Stalemate`/`Resigned`/`Draw`)
   -  `OnCaptured` with captured piece and all recently captured pieces (White/Black)
-- `End Game` Declaration: `Draw` or `Resign` with resigned side
+- `End Game` Declaration: `Draw` or `Resign` of one of sides
 - `Navigation` between executed moves:
   - `First`/`Last`
   - `Next`/`Previous`
