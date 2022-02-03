@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="128" align="center" src="https://github.com/Geras1mleo/ChessOld/blob/master/ChessScreenshots/knight.png">
+  <img width="128" align="center" src="/Images/knight.png">
 </p>
 <h1 align="center">Gera Chess Library</h1>
 <div>
