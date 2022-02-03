@@ -196,7 +196,7 @@ public partial class ChessBoard
         else if (move.OriginalPosition != move.NewPosition)
         {
             fboard.PerformedMoves.Add(move);
-            fboard.DropPieceToNewPosition(move);
+            fboard.DropPieceToNewPosition(move, false);
         }
 
         return IsKingChecked(side, fboard);
@@ -232,7 +232,7 @@ public partial class ChessBoard
         if (move.OriginalPosition != move.NewPosition)
         {
             fboard.PerformedMoves.Add(move);
-            fboard.DropPieceToNewPosition(move);
+            fboard.DropPieceToNewPosition(move, false);
         }
         return PlayerHasMoves(side, fboard);
     }
@@ -461,7 +461,7 @@ public partial class ChessBoard
                     valid = board.Fen.CastleBQ;
             }
 
-            if (board.PerformedMoves.Count > 0 && valid)
+            if (board.moveIndex >= 0 && valid)
                 valid = ValidByMoves();
         }
         else
@@ -487,7 +487,7 @@ public partial class ChessBoard
 
     private static bool PieceEverMoved(Position piecePos, ChessBoard board)
     {
-        return board.PerformedMoves.Any(p => p.OriginalPosition == piecePos);
+        return board.PerformedMoves.GetRange(0, board.moveIndex + 1).Any(p => p.OriginalPosition == piecePos);
     }
 
     private static bool IsValidEnPassant(Move move, ChessBoard board, short v, short h)
@@ -504,11 +504,8 @@ public partial class ChessBoard
                 if (board.LoadedFromFEN)
                     valid = board.Fen.EnPassant == move.NewPosition;
 
-                if (board.PerformedMoves.Count > 0)
-                {
-                    var position = LastMoveEnPassantPosition(board);
-                    valid = position == move.NewPosition;
-                }
+                if (board.moveIndex >= 0)
+                    valid = LastMoveEnPassantPosition(board) == move.NewPosition;
 
                 return valid;
             }
@@ -520,7 +517,7 @@ public partial class ChessBoard
     {
         Position pos = new();
 
-        var lastMove = board.PerformedMoves.LastOrDefault();
+        var lastMove = board.PerformedMoves.GetRange(0, board.moveIndex + 1).LastOrDefault();
 
         if (lastMove != null && lastMove.Piece.Type == PieceType.Pawn && Math.Abs(lastMove.NewPosition.Y - lastMove.OriginalPosition.Y) == 2)
         {

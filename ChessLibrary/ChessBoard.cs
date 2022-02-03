@@ -5,6 +5,8 @@
 /// </summary>
 public partial class ChessBoard
 {
+    private Piece?[,] pieces;
+
     /// <param name="pos">Position on chess board</param>
     /// <returns>Piece on given position</returns>
     public Piece? this[Position pos]
@@ -24,8 +26,6 @@ public partial class ChessBoard
     /// <returns>Piece on given position</returns>
     public Piece? this[short x, short y] => pieces[y, x];
 
-    private Piece?[,] pieces;
-
     private FenBoard? Fen;
     /// <summary>
     /// Whether board has been loaded from Forsyth-Edwards Notation
@@ -39,13 +39,11 @@ public partial class ChessBoard
     {
         get
         {
-            if (IsLastMoveDisplayed)
-                if (LoadedFromFEN)
-                    return PerformedMoves.Count % 2 == 0 ? Fen.Turn : Fen.Turn.OppositeColor();
-                else
-                    return PerformedMoves.Count % 2 == 0 ? PieceColor.White : PieceColor.Black;
+            if (LoadedFromFEN)
+                return PerformedMoves.GetRange(0, moveIndex + 1).Count % 2 == 0 ? Fen.Turn : Fen.Turn.OppositeColor();
             else
-                return PerformedMoves[moveIndex].Piece.Color.OppositeColor();
+                return PerformedMoves.GetRange(0, moveIndex + 1).Count % 2 == 0 ? PieceColor.White : PieceColor.Black;
+
         }
     }
 
@@ -101,10 +99,9 @@ public partial class ChessBoard
         {
             var cap = new List<Piece>();
 
-            cap.AddRange(PerformedMoves.Where(m => m.CapturedPiece?.Color == PieceColor.White).Select(m => new Piece(m.CapturedPiece.Color, m.CapturedPiece.Type)));
+            if (LoadedFromFEN) cap.AddRange(Fen.WhiteCaptured);
 
-            if (LoadedFromFEN)
-                cap.AddRange(Fen.WhiteCaptured);
+            cap.AddRange(PerformedMoves.GetRange(0, moveIndex + 1).Where(m => m.CapturedPiece?.Color == PieceColor.White).Select(m => new Piece(m.CapturedPiece.Color, m.CapturedPiece.Type)));
 
             return cap.ToArray();
         }
@@ -119,10 +116,9 @@ public partial class ChessBoard
         {
             var cap = new List<Piece>();
 
-            cap.AddRange(PerformedMoves.Where(m => m.CapturedPiece?.Color == PieceColor.Black).Select(m => new Piece(m.CapturedPiece.Color, m.CapturedPiece.Type)));
+            if (LoadedFromFEN) cap.AddRange(Fen.BlackCaptured);
 
-            if (LoadedFromFEN)
-                cap.AddRange(Fen.BlackCaptured);
+            cap.AddRange(PerformedMoves.GetRange(0, moveIndex + 1).Where(m => m.CapturedPiece?.Color == PieceColor.Black).Select(m => new Piece(m.CapturedPiece.Color, m.CapturedPiece.Type)));
 
             return cap.ToArray();
         }
@@ -164,7 +160,7 @@ public partial class ChessBoard
         get => moveIndex;
         set
         {
-            if (value < PerformedMoves.Count && value >= 0)
+            if (value < PerformedMoves.Count && value >= -1)
                 DisplayMoves(PerformedMoves.GetRange(0, value + 1));
         }
     }
@@ -275,7 +271,7 @@ public partial class ChessBoard
 
             PerformedMoves.Add(move);
 
-            DropPieceToNewPosition(move);
+            DropPieceToNewPosition(move, true);
 
             moveIndex = PerformedMoves.Count - 1;
 
@@ -287,9 +283,9 @@ public partial class ChessBoard
         else return false;
     }
 
-    private void DropPieceToNewPosition(Move move)
+    private void DropPieceToNewPosition(Move move, bool raise)
     {
-        if (move.CapturedPiece != null)
+        if (move.CapturedPiece != null && raise)
             OnCapturedEvent(move.CapturedPiece);
 
         // Copying to the new position
@@ -380,12 +376,12 @@ public partial class ChessBoard
     /// </summary>
     public void Cancel()
     {
-        if (PerformedMoves.Count > 0)
+        if (IsLastMoveDisplayed && PerformedMoves.Count > 0)
         {
+            PerformedMoves = new List<Move>(PerformedMoves.ToArray()[..^1]);
             DisplayMoves(PerformedMoves);
 
-            if (IsEndGame)
-                EndGame = null;
+            if (IsEndGame) EndGame = null;
         }
     }
 
@@ -442,7 +438,7 @@ public partial class ChessBoard
             SetChessBeginSituation();
 
         for (int i = 0; i < moves.Count; i++)
-            DropPieceToNewPosition(moves[i]);
+            DropPieceToNewPosition(moves[i], false);
 
         moveIndex = moves.Count - 1;
 

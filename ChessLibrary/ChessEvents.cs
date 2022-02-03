@@ -1,107 +1,78 @@
-﻿#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-namespace Chess;
+﻿namespace Chess;
 
-public delegate void ChessEventHandler(object sender, ChessEventArgs e);
-public delegate void ChessCheckedChangedEventHandler(object sender, CheckEventArgs e);
-public delegate void ChessEndGameEventHandler(object sender, EndgameEventArgs e);
-public delegate void ChessCaptureEventHandler(object sender, CaptureEventArgs e);
-public delegate void ChessPromotionResultEventHandler(object sender, PromotionEventArgs e);
-
-public abstract class ChessEventArgs : EventArgs
-{
-    public ChessBoard ChessBoard { get; }
-
-    protected ChessEventArgs(ChessBoard chessBoard)
-    {
-        ChessBoard = chessBoard;
-    }
-}
-public class CaptureEventArgs : ChessEventArgs
+public partial class ChessBoard
 {
     /// <summary>
-    /// Piece that has been captured
+    /// Invokes when trying to make or validate move but after the move would have been made, king would have been checked
     /// </summary>
-    public Piece CapturedPiece { get; }
+    public event ChessCheckedChangedEventHandler OnInvalidMoveKingChecked = delegate { };
     /// <summary>
-    /// List of captured pieces where color == White
+    /// Invokes when white king is (un)checked
     /// </summary>
-    public Piece[] WhiteCapturedPieces { get; set; }
+    public event ChessCheckedChangedEventHandler OnWhiteKingCheckedChanged = delegate { };
     /// <summary>
-    /// List of captured pieces where color == Black
+    /// Invokes when black king is (un)checked
     /// </summary>
-    public Piece[] BlackCapturedPieces { get; set; }
+    public event ChessCheckedChangedEventHandler OnBlackKingCheckedChanged = delegate { };
+    /// <summary>
+    /// Invokes when user has to choose promote action
+    /// </summary>
+    public event ChessPromotionResultEventHandler OnPromotePawn = delegate { };
+    /// <summary>
+    /// Invokes when it's end of game
+    /// </summary>
+    public event ChessEndGameEventHandler OnEndGame = delegate { };
+    /// <summary>
+    /// Async! Invokes when any piece has been captured
+    /// </summary>
+    public event ChessCaptureEventHandler OnCaptured = delegate { };
+    private readonly SynchronizationContext context = SynchronizationContext.Current;
 
-    public CaptureEventArgs(ChessBoard chessBoard, Piece capturedPiece, Piece[] whiteCapturedPieces, Piece[] blackCapturedPieces) : base(chessBoard)
+    private void OnWhiteKingCheckedChangedEvent(CheckEventArgs e)
     {
-        CapturedPiece = capturedPiece;
-        WhiteCapturedPieces = whiteCapturedPieces;
-        BlackCapturedPieces = blackCapturedPieces;
-    }
-}
-public class EndgameEventArgs : ChessEventArgs
-{
-    /// <summary>
-    /// End game additional info
-    /// </summary>
-    public EndGameInfo EndgameInfo { get; }
-
-    public EndgameEventArgs(ChessBoard chessBoard, EndGameInfo endgameInfo) : base(chessBoard)
-    {
-        EndgameInfo = endgameInfo;
-    }
-}
-public class CheckEventArgs : ChessEventArgs
-{
-    /// <summary>
-    /// Position of checked king
-    /// </summary>
-    public Position KingPosition { get; }
-    /// <summary>
-    /// Checked state
-    /// </summary>
-    public bool IsChecked { get; }
-
-    public CheckEventArgs(ChessBoard chessBoard, Position kingPosition, bool isChecked) : base(chessBoard)
-    {
-        KingPosition = kingPosition;
-        IsChecked = isChecked;
-    }
-}
-
-public class PromotionEventArgs : ChessEventArgs
-{
-    private MoveParameter propmotionResult = MoveParameter.PawnPromotion;
-
-    /// <summary>
-    /// Set to true when Promotion has been handled by user
-    /// </summary>
-    public bool Handled { get; set; }
-    /// <summary>
-    /// Allowed:<br/>
-    /// MoveParameter.PawnPromotion<br/>
-    /// MoveParameter.PromotionToQueen<br/>
-    /// MoveParameter.PromotionToRook<br/>
-    /// MoveParameter.PromotionToBishop<br/>
-    /// MoveParameter.PromotionToKnight<br/>
-    /// </summary>
-    public MoveParameter PromotionResult
-    {
-        get => propmotionResult;
-        set
-        {
-            if (value == MoveParameter.PawnPromotion
-             || value == MoveParameter.PromotionToQueen
-             || value == MoveParameter.PromotionToRook
-             || value == MoveParameter.PromotionToBishop
-             || value == MoveParameter.PromotionToKnight)
-            {
-                Handled = true;
-                propmotionResult = value;
-            }
-            else throw new InvalidOperationException("MoveParameter for promotion result must be promotion type.");
-        }
+        if (context != null)
+            context.Send(delegate { OnWhiteKingCheckedChanged(this, e); }, null);
+        else
+            OnWhiteKingCheckedChanged(this, e);
     }
 
-    public PromotionEventArgs(ChessBoard chessBoard) : base(chessBoard) { }
+    private void OnBlackKingCheckedChangedEvent(CheckEventArgs e)
+    {
+        if (context != null)
+            context.Send(delegate { OnBlackKingCheckedChanged(this, e); }, null);
+        else
+            OnBlackKingCheckedChanged(this, e);
+    }
+
+    private void OnInvalidMoveKingCheckedEvent(CheckEventArgs e)
+    {
+        if (context != null)
+            context.Send(delegate { OnInvalidMoveKingChecked(this, e); }, null);
+        else
+            OnInvalidMoveKingChecked(this, e);
+    }
+
+    private void OnPromotePawnEvent(PromotionEventArgs e)
+    {
+        if (context != null)
+            context.Send(delegate { OnPromotePawn(this, e); }, null);
+        else
+            OnPromotePawn(this, e);
+    }
+
+    private void OnEndGameEvent()
+    {
+        if (context != null)
+            context.Send(delegate { OnEndGame(this, new EndgameEventArgs(this, EndGame)); }, null);
+        else
+            OnEndGame(this, new EndgameEventArgs(this, EndGame));
+    }
+
+    private void OnCapturedEvent(Piece piece)
+    {
+        if (context != null)
+            context.Send(delegate { OnCaptured(this, new CaptureEventArgs(this, piece, WhiteCaptured, BlackCaptured)); }, null);
+        else
+            OnCaptured(this, new CaptureEventArgs(this, piece, WhiteCaptured, BlackCaptured));
+    }
 }
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

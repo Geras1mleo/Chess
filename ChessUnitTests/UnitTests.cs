@@ -224,19 +224,28 @@ namespace ChessUnitTests
                 board.Move(moves[i]);
 
             board.First();
-            Assert.Equal("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1", board.ToFen());
+            Assert.Equal("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1", board.ToFen());
+            Assert.Empty(board.WhiteCaptured);
+            Assert.Empty(board.BlackCaptured);
 
             board.Last();
             Assert.Equal("rnb1kbnr/ppqp1p1p/4p1p1/2P5/4P3/2N2N2/PPP2PPP/R1BQKB1R b KQkq - 0 5", board.ToFen());
+            Assert.Empty(board.WhiteCaptured);
+            Assert.Single(board.BlackCaptured);
 
             board.MoveIndex = 2;
             Assert.Equal("rnbqkbnr/pppp1ppp/4p3/8/4P3/2N5/PPPP1PPP/R1BQKBNR b KQkq - 1 2", board.ToFen());
+            Assert.Empty(board.WhiteCaptured);
+            Assert.Empty(board.BlackCaptured);
 
             board.Next();
-            Assert.Equal("rnbqkbnr/pp1p1ppp/4p3/2p5/4P3/2N5/PPPP1PPP/R1BQKBNR w KQkq - 0 3", board.ToFen());
+            Assert.Equal("rnbqkbnr/pp1p1ppp/4p3/2p5/4P3/2N5/PPPP1PPP/R1BQKBNR w KQkq c6 0 3", board.ToFen());
 
             board.Previous();
             Assert.Equal("rnbqkbnr/pppp1ppp/4p3/8/4P3/2N5/PPPP1PPP/R1BQKBNR b KQkq - 1 2", board.ToFen());
+
+            board.MoveIndex = -1;
+            Assert.Equal("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", board.ToFen());
 
             board.Load("8/p7/8/5p2/5k2/3r2R1/PPK2P2/8 w - - 6 38");
             board.Move("Kc1");
@@ -247,6 +256,54 @@ namespace ChessUnitTests
 
             board.Last();
             Assert.Equal("8/p7/8/5p2/5k2/6R1/PP1r1P2/2K5 w - - 8 39", board.ToFen());
+
+            board.MoveIndex = -1;
+            Assert.Equal("8/p7/8/5p2/5k2/3r2R1/PPK2P2/8 w - - 6 38", board.ToFen());
+        }
+
+        [Fact]
+        public void TestCancel()
+        {
+            var board = new ChessBoard();
+            var moves = new[]
+            {
+            "e4",   "d5",
+            "exd5",  "e6",
+            "dxe6",  "fxe6"
+            };
+
+            for (int i = 0; i < moves.Length; i++)
+                board.Move(moves[i]);
+
+            board.Cancel();
+            Assert.Equal("rnbqkbnr/ppp2ppp/4P3/8/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 3", board.ToFen());
+
+            board.Cancel();
+            Assert.Equal("rnbqkbnr/ppp2ppp/4p3/3P4/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 3", board.ToFen());
+
+            board.Cancel();
+            Assert.Equal("rnbqkbnr/ppp1pppp/8/3P4/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 2", board.ToFen());
+
+            board.Cancel();
+            Assert.Equal("rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 2", board.ToFen());
+
+            board.Cancel();
+            Assert.Equal("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1", board.ToFen());
+
+            board.Cancel();
+            Assert.Equal("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", board.ToFen());
+
+            board.Load("rnbqkbnr/ppppp2p/6P1/8/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 3");
+            board.Move("hxg6");
+
+            Assert.Single(board.WhiteCaptured);
+            Assert.Equal(2, board.BlackCaptured.Length);
+
+            board.Cancel();
+
+            Assert.Equal("rnbqkbnr/ppppp2p/6P1/8/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 3", board.ToFen());
+            Assert.Empty(board.WhiteCaptured);
+            Assert.Equal(2, board.BlackCaptured.Length);
         }
     }
 }
