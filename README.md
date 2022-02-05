@@ -28,3 +28,5 @@
   - `Next`/`Previous`
   - Also: `board.MoveIndex` property to navigate direct to specific move
 - `Cancelation` of last executed move
+
+## Usage
