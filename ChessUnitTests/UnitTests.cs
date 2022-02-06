@@ -46,7 +46,7 @@ namespace ChessUnitTests
                 Assert.True(board.Move(moves[i]));
 
             // Stalemate here
-            board.Load("rnb1kbnr/pppppppp/8/8/8/8/5q2/7K b kq - 0 1");
+            board.LoadFen("rnb1kbnr/pppppppp/8/8/8/8/5q2/7K b kq - 0 1");
             Assert.Throws<ChessGameEndedException>(() => board.Move(new Move(new("f2"), new("e2"))));
         }
 
@@ -63,13 +63,13 @@ namespace ChessUnitTests
                 "Rg2+",
             };
 
-            var callEndGame = 0;
-            board.OnEndGame += (sender, e) => callEndGame++;
+            var raisedEndGame = 0;
+            board.OnEndGame += (sender, e) => raisedEndGame++;
 
             // En passant pos only 3rd rank possible of 6th
-            Assert.Throws<ArgumentException>(() => board.Load("8/p7/7R/5pk1/8/3B1r2/PP3P2/2K5 w KQkq e1 1 34"));
+            Assert.Throws<ArgumentException>(() => board.LoadFen("8/p7/7R/5pk1/8/3B1r2/PP3P2/2K5 w KQkq e1 1 34"));
 
-            board.Load("8/p7/7R/5pk1/8/3B1r2/PP3P2/2K5 w - - 1 34");
+            board.LoadFen("8/p7/7R/5pk1/8/3B1r2/PP3P2/2K5 w - - 1 34");
 
             for (int i = 0; i < moves.Length; i++)
                 Assert.True(board.Move(moves[i]));
@@ -77,16 +77,16 @@ namespace ChessUnitTests
             Assert.Equal("8/p7/8/5pk1/8/5r2/PPK2PR1/8 b - - 3 36", board.ToFen());
 
             // Checkmate
-            board.Load("rnb1kbnr/pppppppp/8/8/5PPq/8/PPPPP2P/RNBQKBNR w KQkq - 0 1");
+            board.LoadFen("rnb1kbnr/pppppppp/8/8/5PPq/8/PPPPP2P/RNBQKBNR w KQkq - 0 1");
 
-            Assert.Equal(1, callEndGame);
+            Assert.Equal(1, raisedEndGame);
             Assert.Equal(EndgameType.Checkmate, board.EndGame.EndgameType);
-            callEndGame = 0;
+            raisedEndGame = 0;
 
             // Stalemate
-            board.Load("rnb1kbnr/pppppppp/8/8/8/8/5q2/7K w kq - 0 1");
+            board.LoadFen("rnb1kbnr/pppppppp/8/8/8/8/5q2/7K w kq - 0 1");
 
-            Assert.Equal(1, callEndGame);
+            Assert.Equal(1, raisedEndGame);
             Assert.Equal(EndgameType.Stalemate, board.EndGame.EndgameType);
         }
 
@@ -95,38 +95,38 @@ namespace ChessUnitTests
         {
             var board = new ChessBoard();
 
-            var wCalledCheck = 0;
-            var bCalledCheck = 0;
+            var wRaisedCheck = 0;
+            var bRaisedCheck = 0;
 
-            board.OnWhiteKingCheckedChanged += (sender, args) => wCalledCheck++;
-            board.OnBlackKingCheckedChanged += (sender, args) => bCalledCheck++;
+            board.OnWhiteKingCheckedChanged += (sender, args) => wRaisedCheck++;
+            board.OnBlackKingCheckedChanged += (sender, args) => bRaisedCheck++;
 
-            board.Load("rnb1kbnr/pppppppp/8/8/5PPq/8/PPPPP2P/RNBQKBNR w KQkq - 0 1");
+            board.LoadFen("rnb1kbnr/pppppppp/8/8/5PPq/8/PPPPP2P/RNBQKBNR w KQkq - 0 1");
 
-            Assert.Equal(1, wCalledCheck);
-            Assert.Equal(0, bCalledCheck);
-            wCalledCheck = 0;
-            bCalledCheck = 0;
+            Assert.Equal(1, wRaisedCheck);
+            Assert.Equal(0, bRaisedCheck);
+            wRaisedCheck = 0;
+            bRaisedCheck = 0;
 
             board.Clear();
 
-            Assert.Equal(1, wCalledCheck);
-            Assert.Equal(0, bCalledCheck);
-            wCalledCheck = 0;
-            bCalledCheck = 0;
+            Assert.Equal(1, wRaisedCheck);
+            Assert.Equal(0, bRaisedCheck);
+            wRaisedCheck = 0;
+            bRaisedCheck = 0;
 
-            board.Load("rnb1bknr/ppp3pp/8/8/7q/8/PPP1Q1PP/RNB1KBNR w KQkq - 0 1");
+            board.LoadFen("rnb1bknr/ppp3pp/8/8/7q/8/PPP1Q1PP/RNB1KBNR w KQkq - 0 1");
             board.Move(new Move(new("e2"), new("f2")));
 
-            Assert.Equal(2, wCalledCheck);
-            Assert.Equal(1, bCalledCheck);
-            wCalledCheck = 0;
-            bCalledCheck = 0;
+            Assert.Equal(2, wRaisedCheck);
+            Assert.Equal(1, bRaisedCheck);
+            wRaisedCheck = 0;
+            bRaisedCheck = 0;
 
             board.Move(new Move(new("h4"), new("f6")));
 
-            Assert.Equal(0, wCalledCheck);
-            Assert.Equal(1, bCalledCheck);
+            Assert.Equal(0, wRaisedCheck);
+            Assert.Equal(1, bRaisedCheck);
         }
 
         [Fact]
@@ -152,7 +152,7 @@ namespace ChessUnitTests
             Assert.Throws<ChessSanNotFoundException>(() => board.San("Nc4"));
             Assert.Throws<ChessSanNotFoundException>(() => board.San("O-O"));
 
-            board.Load("rnb1kbnr/pppppppp/8/8/8/8/4q3/7K b kq - 0 1");
+            board.LoadFen("rnb1kbnr/pppppppp/8/8/8/8/4q3/7K b kq - 0 1");
             board.Move("Qf2");
 
             Assert.Equal("Qf2$", board.ExecutedMoves[^1].San);
@@ -162,7 +162,7 @@ namespace ChessUnitTests
         public void TestCapturedPieces()
         {
             var board = new ChessBoard();
-            board.Load("1nbqkb1r/pppp1ppp/2N5/4p3/3P4/8/PPP1PPPP/RN2KB1R w KQk - 0 1");
+            board.LoadFen("1nbqkb1r/pppp1ppp/2N5/4p3/3P4/8/PPP1PPPP/RN2KB1R w KQk - 0 1");
 
             Assert.Equal(2, board.WhiteCaptured.Length);
             Assert.Equal(2, board.BlackCaptured.Length);
@@ -173,12 +173,12 @@ namespace ChessUnitTests
             Assert.Equal(3, board.WhiteCaptured.Length);
             Assert.Equal(3, board.BlackCaptured.Length);
 
-            board.Load("rnbqkbnr/8/8/8/8/8/P7/RNBQKBNR w KQkq - 0 1");
+            board.LoadFen("rnbqkbnr/8/8/8/8/8/P7/RNBQKBNR w KQkq - 0 1");
 
             Assert.Equal(7, board.WhiteCaptured.Length);
             Assert.Equal(8, board.BlackCaptured.Length);
 
-            board.Load("1nbqkbn1/pppppppp/NpNpNpNp/pBpBpBpB/bPbPbPbP/PnPnPnPn/PPPPPPPP/1NBQKBN1 w - - 0 1");
+            board.LoadFen("1nbqkbn1/pppppppp/NpNpNpNp/pBpBpBpB/bPbPbPbP/PnPnPnPn/PPPPPPPP/1NBQKBN1 w - - 0 1");
 
             Assert.Equal(2, board.WhiteCaptured.Length);
             Assert.Equal(2, board.BlackCaptured.Length);
@@ -194,7 +194,7 @@ namespace ChessUnitTests
         {
             var board = new ChessBoard();
 
-            board.Load("rnb2bnr/pppppppp/4q3/1k6/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1");
+            board.LoadFen("rnb2bnr/pppppppp/4q3/1k6/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1");
             board.Remove(new("e2"));
 
             // Impossible in fact
@@ -247,7 +247,7 @@ namespace ChessUnitTests
             board.MoveIndex = -1;
             Assert.Equal("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", board.ToFen());
 
-            board.Load("8/p7/8/5p2/5k2/3r2R1/PPK2P2/8 w - - 6 38");
+            board.LoadFen("8/p7/8/5p2/5k2/3r2R1/PPK2P2/8 w - - 6 38");
             board.Move("Kc1");
             board.Move("Rd2");
 
@@ -293,7 +293,7 @@ namespace ChessUnitTests
             board.Cancel();
             Assert.Equal("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", board.ToFen());
 
-            board.Load("rnbqkbnr/ppppp2p/6P1/8/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 3");
+            board.LoadFen("rnbqkbnr/ppppp2p/6P1/8/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 3");
             board.Move("hxg6");
 
             Assert.Single(board.WhiteCaptured);
@@ -304,6 +304,54 @@ namespace ChessUnitTests
             Assert.Equal("rnbqkbnr/ppppp2p/6P1/8/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 3", board.ToFen());
             Assert.Empty(board.WhiteCaptured);
             Assert.Equal(2, board.BlackCaptured.Length);
+        }
+
+        [Fact]
+        public void TestMoves()
+        {
+            var board = new ChessBoard();
+
+            Assert.Equal(20, board.Moves().Length);
+
+            // Stalemate
+            board.LoadFen("rnb1kbnr/pppppppp/8/8/8/8/5q2/7K w kq - 0 1");
+            Assert.Empty(board.Moves());
+
+            board.LoadFen("rnb1kbnr/pppppppp/8/8/5P1q/8/PPPPP1PP/RNBQKBNR w KQkq - 0 1");
+            Assert.Single(board.Moves());
+        }
+
+        [Fact]
+        public void TestEvents()
+        {
+            var raisedCapture = 0;
+            var raisedInvalidMoveKingChecked = 0;
+            var raisedPromotePawn = 0;
+            var raisedEndGame = 0;
+
+            var board = new ChessBoard();
+
+            board.OnCaptured += (sender, e) => raisedCapture++;
+            board.OnPromotePawn += (sender, e) => raisedPromotePawn++;
+            board.OnInvalidMoveKingChecked += (sender, e) => raisedInvalidMoveKingChecked++;
+            board.OnEndGame+= (sender, e) => raisedEndGame++;
+
+            board.LoadFen("rnb1kbnr/pppppppp/8/8/5Q1q/8/PPPPP1PP/RNB1KBNR w KQkq - 0 1");
+            board.Move(new Move(new("f4"), new("h4")));
+
+            board.LoadFen("r1bqkbnr/pPpppppp/8/8/8/8/PPPP3P/RNBQKBNR w KQkq - 0 1");
+            board.Move(new Move(new("b7"), new("b8")));
+
+            board.LoadFen("rnb1kbnr/pppppppp/8/8/5P1q/8/PPPPP1PP/RNBQKBNR w KQkq - 0 1");
+            board.Move(new Move(new("e2"), new("e3")));
+
+            board.LoadFen("rnbqkbnr/pppp1ppp/8/8/8/8/PPPPP2P/RNBQKBNR b KQkq - 0 1");
+            board.Move(new Move(new("d8"), new("h4")));
+
+            Assert.Equal(1, raisedCapture);
+            Assert.Equal(1, raisedPromotePawn);
+            Assert.Equal(1, raisedInvalidMoveKingChecked);
+            Assert.Equal(1, raisedEndGame);
         }
     }
 }

@@ -189,8 +189,9 @@ public partial class ChessBoard
          || move.Parameter == MoveParameter.PromotionToKnight)
             sMove += move.Parameter.AsShortString;
 
-        else if (move.Parameter == MoveParameter.EnPassant)
-            sMove += " " + move.Parameter.AsShortString;
+        // Not required
+        //else if (move.Parameter == MoveParameter.EnPassant)
+        //    sMove += " " + move.Parameter.AsShortString;
 
         CheckOrMateValidation:
         if (move.IsCheck && move.IsMate) sMove += "#";
@@ -208,7 +209,7 @@ public partial class ChessBoard
     /// </summary>
     /// <param name="fen">FEN string</param>
     /// <exception cref="ArgumentException">Given FEN string didn't match the Regex pattern</exception>
-    public void Load(string fen)
+    public void LoadFen(string fen)
     {
         Fen = new FenBoard(fen);
         pieces = Fen.Pieces;
@@ -227,6 +228,40 @@ public partial class ChessBoard
     public string ToFen()
     {
         return new FenBoard(this).ToString();
+    }
+
+    /// <summary>
+    /// Load Chess game from Portable Game Notation<br/>
+    /// ex.:<br/>
+    /// [Event "Live Chess"]<br/>
+    /// [Site "Chess.com"]<br/>
+    /// [Date "2022.01.11"]<br/>
+    /// [Round "?"]<br/>
+    /// [White "Milan1905"]<br/>
+    /// [Black "Geras1mleo"]<br/>
+    /// [Result "1-0"]<br/>
+    /// [ECO "C47"]<br/>
+    /// [WhiteElo "1006"]<br/>
+    /// [BlackElo "626"]<br/>
+    /// [TimeControl "600"]<br/>
+    /// [EndTime "11:58:56 PST"]<br/>
+    /// [Termination "Milan1905 won by resignation"]<br/>
+    /// <br/>
+    /// 1. e4 e5 2. Nf3 Nf6 3. Nc3 Nc6 4. Bb5 Bc5 5. Bxc6 bxc6 6. Nxe5 Bxf2+ 7. Kxf2 O-O
+    /// 8. d4 d5 (8... c5 9. b4 (9. a3 c4 10. b4 cxb3) 9... c4) 9. exd5 cxd5 10. Nc6
+    /// Ng4+ 11. Kg1 Qf6 12. Qf1 Qxc6 13. h3 Nf6 14. Bg5 Qb6 15. Bxf6 Qxf6 16. Qxf6 gxf6
+    /// 17. Nxd5 Rb8 18. Nxf6+ Kh8 19. b3 Rb4 20. c3 Bb7 21. cxb4 1-0
+    /// </summary>
+    /// <param name="pgn">PGN string</param>
+    public void LoadPgn(string pgn)
+    {
+        var headers = Regex.Match(pgn, @"\[.* "".*""\]");
+
+        // todo
+        // dictionary
+        // if header fen => load from fen
+        // Alternative moves??? objects for each variant LINKED LIST!!!
+        // 
     }
 
     private static string HandleAmbiguousMovesNotation(Move move, ChessBoard board)

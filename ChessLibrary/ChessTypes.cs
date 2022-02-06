@@ -33,8 +33,8 @@ public class Piece
     /// </summary>
     public Piece(string piece)
     {
-        if (!Regex.IsMatch(piece, "^((w|b)(b|k|n|p|q|r))$"))
-            throw new ArgumentException("Piece should match pattern: ^((w|b)(b|k|n|p|q|r))$");
+        if (!Regex.IsMatch(piece, "^[wb][bknpqr]$"))
+            throw new ArgumentException("Piece should match pattern: ^[wb][bknpqr]$");
 
         Color = PieceColor.FromChar(piece[0]);
         Type = PieceType.FromChar(piece[1]);
@@ -49,8 +49,8 @@ public class Piece
     /// </summary>
     public Piece(char fenChar)
     {
-        if (!Regex.IsMatch(fenChar.ToString(), "^((b|k|n|p|q|r)|(B|K|N|P|Q|R))$"))
-            throw new ArgumentException("FEN piece should match pattern: ^((b|k|n|p|q|r)|(B|K|N|P|Q|R))$");
+        if (!Regex.IsMatch(fenChar.ToString(), "^([bknpqr]|[BKNPQR])$"))
+            throw new ArgumentException("FEN piece should match pattern: ^([bknpqr]|[BKNPQR])$");
 
         Type = PieceType.FromChar(fenChar);
         Color = char.IsLower(fenChar) ? PieceColor.Black : PieceColor.White;
@@ -301,7 +301,7 @@ public class Move
     public Piece? CapturedPiece { get; internal set; }
 
     /// <summary>
-    /// Move additional parameter
+    /// Move additional parameter   
     /// </summary>
     public MoveParameter? Parameter { get; internal set; }
 
@@ -309,6 +309,7 @@ public class Move
     /// Move places opponent's king in check? => true
     /// </summary>
     public bool IsCheck { get; internal set; }
+
     /// <summary>
     /// Move places opponent's king in checkmate => true
     /// </summary>
