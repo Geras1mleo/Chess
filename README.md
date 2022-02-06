@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="128" align="center" src="/Images/knight.png">
+  <img width="128" align="center" src="https://user-images.githubusercontent.com/67554762/152679427-e59a58a8-0a03-449b-9f77-3bb52aed982c.png">
 </p>
 <h1 align="center">Gera Chess Library</h1>
 <div>
@@ -29,4 +29,4 @@
   - Also: `board.MoveIndex` property to navigate direct to specific move
 - `Cancelation` of last executed move
 
-## Usage
+## Usage!
