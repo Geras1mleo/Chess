@@ -110,11 +110,15 @@ public class MoveParameter : SmartEnum<MoveParameter>
     public static readonly MoveParameter CastleKing = new("CastleKing", 2, "O-O");
     public static readonly MoveParameter CastleQueen = new("CastleQueen", 3, "O-O-O");
     public static readonly MoveParameter EnPassant = new("EnPassant", 4, "e.p.");
+
+    /// <summary>
+    /// Default promotion => To Queen
+    /// </summary>
     public static readonly MoveParameter PawnPromotion = new("PawnPromotion", 5, "=");
     public static readonly MoveParameter PromotionToQueen = new("PromotionToQueen", 6, "=q");
-    public static readonly MoveParameter PromotionToRook = new("PromotionToRook", 6, "=r");
-    public static readonly MoveParameter PromotionToBishop = new("PromotionToBishop", 6, "=b");
-    public static readonly MoveParameter PromotionToKnight = new("PromotionToKnight", 6, "=n");
+    public static readonly MoveParameter PromotionToRook = new("PromotionToRook", 7, "=r");
+    public static readonly MoveParameter PromotionToBishop = new("PromotionToBishop", 8, "=b");
+    public static readonly MoveParameter PromotionToKnight = new("PromotionToKnight", 9, "=n");
 
     /// <summary>
     /// CastleKing => "O-O"<br/>

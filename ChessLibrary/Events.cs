@@ -73,10 +73,6 @@ public class PromotionEventArgs : ChessEventArgs
     private MoveParameter propmotionResult = MoveParameter.PawnPromotion;
 
     /// <summary>
-    /// Set to true when Promotion has been handled by user
-    /// </summary>
-    public bool Handled { get; set; }
-    /// <summary>
     /// Allowed:<br/>
     /// MoveParameter.PawnPromotion<br/>
     /// MoveParameter.PromotionToQueen<br/>
@@ -95,7 +91,6 @@ public class PromotionEventArgs : ChessEventArgs
              || value == MoveParameter.PromotionToBishop
              || value == MoveParameter.PromotionToKnight)
             {
-                Handled = true;
                 propmotionResult = value;
             }
             else throw new InvalidOperationException("MoveParameter for promotion result must be promotion type.");

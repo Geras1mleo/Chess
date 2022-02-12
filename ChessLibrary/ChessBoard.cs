@@ -26,11 +26,13 @@ public partial class ChessBoard
     /// <returns>Piece on given position</returns>
     public Piece? this[short x, short y] => pieces[y, x];
 
+    private readonly Dictionary<string, string> headers;
+
     private FenBoard? Fen;
     /// <summary>
     /// Whether board has been loaded from Forsyth-Edwards Notation
     /// </summary>
-    public bool LoadedFromFEN => Fen != null;
+    public bool LoadedFromFEN => Fen is not null;
 
     /// <summary>
     /// Determinize whose player turn is it now
@@ -134,13 +136,13 @@ public partial class ChessBoard
         private set
         {
             endGame = value;
-            if (value != null) OnEndGameEvent();
+            if (value is not null) OnEndGameEvent();
         }
     }
     /// <summary>
     /// When true => use: EndGame. for more info on endgame(type, won side)
     /// </summary>
-    public bool IsEndGame => EndGame != null;
+    public bool IsEndGame => EndGame is not null;
 
     /// <summary>
     /// Executed moves on this chess board
@@ -175,6 +177,7 @@ public partial class ChessBoard
     public ChessBoard()
     {
         ExecutedMoves = new List<Move>();
+        headers = new Dictionary<string, string>();
         SetChessBeginSituation();
     }
 
@@ -185,6 +188,7 @@ public partial class ChessBoard
     public ChessBoard(List<Move> moves)
     {
         ExecutedMoves = new List<Move>();
+        headers = new Dictionary<string, string>();
         SetChessBeginSituation();
         moves.ForEach(m => Move(m));
     }
@@ -265,7 +269,7 @@ public partial class ChessBoard
         if (!IsLastMoveDisplayed)
             throw new ChessInvalidMoveException(this, "Please use board.DisplayLastMove(); to be able to perform new moves in this chess game", move);
 
-        if (IsValidMove(move, true, true))
+        if (IsValidMove(move, this, true, true))
         {
             San(move);
 
@@ -283,9 +287,37 @@ public partial class ChessBoard
         else return false;
     }
 
+    /// <summary>
+    /// Adding header to this chess game<br/>
+    /// ex.:<br/>
+    /// name => Black; value => Geras1mleo<br/>
+    /// Pgn Output: [Black "Geras1mleo"]
+    /// </summary>
+    /// <param name="name">Header name</param>
+    /// <param name="value">Header value</param>
+    public void AddHeader(string name, string value)
+    {
+        if (name.ToLower() == "fen")
+            throw new ArgumentException("To load game from fen please use: board.LoadFen();");
+
+        headers.Add(name, value);
+    }
+
+    /// <summary>
+    /// Removing header from this chess game
+    /// </summary>
+    /// <param name="name">Header name</param>
+    public void RemoveHeader(string name)
+    {
+        if (name.ToLower() == "fen")
+            throw new ArgumentException("Could not remove FEN header from current game: FEN header required when loaded from fen");
+
+        headers.Remove(name);
+    }
+
     private void DropPieceToNewPosition(Move move, bool raise)
     {
-        if (move.CapturedPiece != null && raise)
+        if (move.CapturedPiece is not null && raise)
             OnCapturedEvent(move.CapturedPiece);
 
         // Copying to the new position
@@ -293,26 +325,34 @@ public partial class ChessBoard
         // Clearing old position
         this[move.OriginalPosition] = null;
 
-        if (move.Parameter != null)
+        if (move.Parameter is not null)
             switch (move.Parameter)
             {
                 case var e when e == MoveParameter.CastleKing:
 
-                    this[new Position { Y = move.NewPosition.Y, X = 6 }] = new Piece(this[move.NewPosition].Color, PieceType.King);
-                    this[new Position { Y = move.NewPosition.Y, X = 5 }] = new Piece(this[move.NewPosition].Color, PieceType.Rook);
-                    this[move.NewPosition] = null;
+                    this[new Position { Y = move.NewPosition.Y, X = 6 }] = new Piece(move.Piece.Color, PieceType.King);
+                    this[new Position { Y = move.NewPosition.Y, X = 5 }] = new Piece(move.Piece.Color, PieceType.Rook);
+                    this[new Position { Y = move.NewPosition.Y, X = 4 }] = null;
+                    this[new Position { Y = move.NewPosition.Y, X = 7 }] = null;
 
                     break;
                 case var e when e == MoveParameter.CastleQueen:
 
-                    this[new Position { Y = move.NewPosition.Y, X = 2 }] = new Piece(this[move.NewPosition].Color, PieceType.King);
-                    this[new Position { Y = move.NewPosition.Y, X = 3 }] = new Piece(this[move.NewPosition].Color, PieceType.Rook);
-                    this[move.NewPosition] = null;
+                    this[new Position { Y = move.NewPosition.Y, X = 2 }] = new Piece(move.Piece.Color, PieceType.King);
+                    this[new Position { Y = move.NewPosition.Y, X = 3 }] = new Piece(move.Piece.Color, PieceType.Rook);
+                    this[new Position { Y = move.NewPosition.Y, X = 4 }] = null;
+                    this[new Position { Y = move.NewPosition.Y, X = 0 }] = null;
 
                     break;
                 case var e when e == MoveParameter.EnPassant:
 
-                    var pawnPos = ExecutedMoves[^2].NewPosition;
+                    Position pawnPos = new();
+
+                    short step = (short)(move.Piece.Color == PieceColor.White ? 1 : -1);
+
+                    pawnPos.X = move.NewPosition.X;
+                    pawnPos.Y = (short)(move.NewPosition.Y - step);
+
                     this[pawnPos] = null;
 
                     break;
@@ -356,6 +396,7 @@ public partial class ChessBoard
     {
         SetChessBeginSituation();
         ExecutedMoves.Clear();
+        headers.Clear();
         moveIndex = -1;
         endGame = null;
         Fen = null;

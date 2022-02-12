@@ -1,8 +1,8 @@
 ﻿using BenchmarkDotNet.Running;
 using ChessBenchmarks;
 
-BenchmarkRunner.Run<ChessGenerateMovesBenchmark>();
-BenchmarkRunner.Run<ChessMoveBenchmark>();
-
+//BenchmarkRunner.Run<ChessMoveBenchmark>();
+//BenchmarkRunner.Run<ChessGenerateMovesBenchmark>();
+//BenchmarkRunner.Run<ChessIsValidMoveBenchmark>();
 
 Console.ReadLine();

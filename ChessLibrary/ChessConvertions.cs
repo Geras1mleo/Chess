@@ -3,7 +3,8 @@
 public partial class ChessBoard
 {
     /// <summary>
-    /// Converts San move into Move object
+    /// Converts San move into Move object<br/>
+    /// Long algebraic notation is also acceptable
     /// </summary>
     /// <param name="move">San move that will be converted</param>
     /// <returns>Move object according to given san</returns>
@@ -13,15 +14,15 @@ public partial class ChessBoard
     /// <exception cref="ChessSanTooAmbiguousException">Given SAN move is too ambiguous between multiple moves</exception>
     public Move San(string move)
     {
-        if (move == null)
+        if (move is null)
             throw new ArgumentNullException(nameof(move));
 
         string pattern = @"(^([PNBRQK])?([a-h])?([1-8])?(x|X|-)?([a-h][1-8])(=[NBRQ]| ?e\.p\.)?|^O-O(-O)?)(\+|\#|\$)?$";
 
-        if (!Regex.IsMatch(move, pattern))
-            throw new ArgumentException("SAN Move should match pattern: " + pattern);
-
         var matches = Regex.Matches(move, pattern);
+
+        if (matches.Count == 0)
+            throw new ArgumentException("SAN Move should match pattern: " + pattern);
 
         Move moveOut = new();
         Position originalPos = new();
@@ -95,7 +96,7 @@ public partial class ChessBoard
 
         moveOut.Piece ??= new Piece(Turn, PieceType.Pawn);
 
-        if (isCapture && this[moveOut.NewPosition] != null)
+        if (isCapture && this[moveOut.NewPosition] is not null)
             moveOut.CapturedPiece = this[moveOut.NewPosition];
 
         if (!originalPos.HasValue)
@@ -152,7 +153,7 @@ public partial class ChessBoard
     /// <exception cref="ArgumentNullException">Given move was null or didn't have valid value</exception>
     public string San(Move move)
     {
-        if (move == null || !move.HasValue)
+        if (move is null || !move.HasValue)
             throw new ArgumentNullException(nameof(move));
 
         string sMove = "";
@@ -172,7 +173,7 @@ public partial class ChessBoard
                 sMove += HandleAmbiguousMovesNotation(move, this);
         }
 
-        if (move.CapturedPiece != null)
+        if (move.CapturedPiece is not null)
         {
             if (move.Piece.Type == PieceType.Pawn)
                 sMove += move.OriginalPosition.File();
@@ -217,17 +218,12 @@ public partial class ChessBoard
         moveIndex = -1;
         endGame = null;
 
+        headers.Clear();
+        headers.Add("Variant", "From Position");
+        headers.Add("FEN", fen);
+
         HandleKingChecked();
         HandleEndGame();
-    }
-
-    /// <summary>
-    /// Generates Fen string of current board
-    /// </summary>
-    /// <returns></returns>
-    public string ToFen()
-    {
-        return new FenBoard(this).ToString();
     }
 
     /// <summary>
@@ -235,15 +231,11 @@ public partial class ChessBoard
     /// ex.:<br/>
     /// [Event "Live Chess"]<br/>
     /// [Site "Chess.com"]<br/>
-    /// [Date "2022.01.11"]<br/>
-    /// [Round "?"]<br/>
     /// [White "Milan1905"]<br/>
     /// [Black "Geras1mleo"]<br/>
     /// [Result "1-0"]<br/>
-    /// [ECO "C47"]<br/>
     /// [WhiteElo "1006"]<br/>
     /// [BlackElo "626"]<br/>
-    /// [TimeControl "600"]<br/>
     /// [EndTime "11:58:56 PST"]<br/>
     /// [Termination "Milan1905 won by resignation"]<br/>
     /// <br/>
@@ -255,13 +247,160 @@ public partial class ChessBoard
     /// <param name="pgn">PGN string</param>
     public void LoadPgn(string pgn)
     {
-        var headers = Regex.Match(pgn, @"\[.* "".*""\]");
+        SetChessBeginSituation();
+        Fen = null;
+        ExecutedMoves.Clear();
+        headers.Clear();
+        moveIndex = -1;
+        endGame = null;
 
-        // todo
-        // dictionary
-        // if header fen => load from fen
-        // Alternative moves??? objects for each variant LINKED LIST!!!
-        // 
+        var headersMatches = Regex.Matches(pgn, @"\[(.*?) ("".*?"")\]");
+
+        // Adding headers
+        for (int i = 0; i < headersMatches.Count; i++)
+        {
+            string key = headersMatches[i].Groups[1].Value;
+            string value = headersMatches[i].Groups[2].Value[1..^1];
+
+            if (key.ToLower() == "fen")
+                key = key.ToUpper();
+
+            headers.Add(key, value);
+        }
+
+        // Loading fen if exist
+        if (headers.TryGetValue("FEN", out var fen))
+        {
+            Fen = new FenBoard(fen);
+            pieces = Fen.Pieces;
+        }
+
+        // Remove all alternatives now
+        var alternatives = Regex.Matches(pgn, @"\(.*?\)");
+        // Todo...
+        // Alternative moves??? objects for each variant linked list?
+        for (int i = 0; i < alternatives.Count; i++)
+            pgn = pgn.Replace(alternatives[i].Value, "");
+
+        var movesMatches = Regex.Matches(pgn, @"([PNBRQK]?[a-h]?[1-8]?[xX-]?[a-h][1-8](=[NBRQ]| ?e\.p\.)?|O-O(?:-O)?)[+#$]?");
+
+        for (int i = 0; i < movesMatches.Count; i++)
+        {
+            var move = San(movesMatches[i].Value);
+            if (IsValidMove(move, this, false, true))
+            {
+                San(move);
+                ExecutedMoves.Add(move);
+                DropPieceToNewPosition(move, true);
+                moveIndex = ExecutedMoves.Count - 1;
+            }
+        }
+
+        HandleKingChecked();
+        HandleEndGame();
+
+        if (!IsEndGame)
+        {
+            if (pgn.Contains("1-0"))
+                Resign(PieceColor.Black);
+
+            else if (pgn.Contains("0-1"))
+                Resign(PieceColor.White);
+
+            else if (pgn.Contains("1/2-1/2"))
+                Draw();
+        }
+    }
+
+    /// <summary>
+    /// Generates Fen string of current board
+    /// </summary>
+    public string ToFen()
+    {
+        return new FenBoard(this).ToString();
+    }
+
+    /// <summary>
+    /// Generates PGN string of current board
+    /// </summary>
+    public string ToPgn()
+    {
+        string pgn = "";
+
+        foreach (var header in headers)
+            pgn += '[' + header.Key + @" """ + header.Value + '"' + ']' + '\n';
+
+        pgn += '\n';
+
+        moveIndex = -1;
+
+        for (int i = 0, count = 0; i < ExecutedMoves.Count; i++)
+        {
+            if (count != GetFullMovesCount(this))
+            {
+                count = GetFullMovesCount(this);
+                
+                if (i != 0) pgn += ' ';
+
+                pgn += count + ".";
+            }
+
+            if (moveIndex == -1)
+            {
+                if (LoadedFromFEN && Fen.Turn == PieceColor.Black)
+                    pgn += "..";
+            }
+
+            pgn += ' ' + ExecutedMoves[i].San;
+
+            Next();
+        }
+
+        Last();
+
+        return pgn;
+    }
+
+    /// <summary>
+    /// Generates ASCII string of current board
+    /// </summary>
+    public string ToAscii(bool displayFull = false)
+    {
+        string ascii = "   ┌────────────────────────┐\n";
+
+        for (int i = 8 - 1; i >= 0; i--)
+        {
+            ascii += "  " + (i + 1) + "│";
+            for (int j = 0; j < 8; j++)
+            {
+                ascii += ' ';
+
+                if (pieces[i, j] is not null)
+                    ascii += pieces[i, j].ToFenChar();
+                else
+                    ascii += '.';
+
+                ascii += ' ';
+            }
+            ascii += "│\n";
+        }
+
+        ascii += "   └────────────────────────┘\n";
+        ascii += "     a  b  c  d  e  f  g  h  \n";
+
+        if (displayFull)
+        {
+            ascii += '\n';
+
+            ascii += "  Turn: " + Turn + '\n';
+
+            if (WhiteCaptured.Length > 0)
+                ascii += "  White Captured: " + string.Join(", ", WhiteCaptured.Select(p => p.ToFenChar())) + '\n';
+            if (BlackCaptured.Length > 0)
+                ascii += "  Black Captured: " + string.Join(", ", BlackCaptured.Select(p => p.ToFenChar())) + '\n';
+        }
+
+        return ascii;
     }
 
     private static string HandleAmbiguousMovesNotation(Move move, ChessBoard board)
@@ -301,7 +440,7 @@ public partial class ChessBoard
         {
             for (short j = 0; j < 8; j++)
             {
-                if (board.pieces[i, j] != null && board.pieces[i, j].Color == piece.Color && board.pieces[i, j].Type == piece.Type)
+                if (board.pieces[i, j] is not null && board.pieces[i, j].Color == piece.Color && board.pieces[i, j].Type == piece.Type)
                 {
                     // if original pos == new pos
                     if (newPosition.Y == i && newPosition.X == j) continue;
@@ -319,7 +458,7 @@ public partial class ChessBoard
 
     private static int GetHalfMovesCount(ChessBoard board)
     {
-        int index = board.ExecutedMoves.GetRange(0, board.moveIndex + 1).FindLastIndex(m => m.CapturedPiece != null || m.Piece.Type == PieceType.Pawn);
+        int index = board.ExecutedMoves.GetRange(0, board.moveIndex + 1).FindLastIndex(m => m.CapturedPiece is not null || m.Piece.Type == PieceType.Pawn);
 
         if (board.LoadedFromFEN && index < 0)
             return board.Fen.HalfMoves + board.moveIndex + 1;
@@ -386,11 +525,12 @@ public partial class ChessBoard
         {
             string pattern = @"^(((?:[rnbqkpRNBQKP1-8]+\/){7})[rnbqkpRNBQKP1-8]+) ([b|w]) (-|[K|Q|k|q]{1,4}) (-|[a-h][36]) (\d+ \d+)$";
 
-            if (!Regex.IsMatch(fen, pattern))
+            var matches = Regex.Matches(fen, pattern);
+
+            if (matches.Count == 0)
                 throw new ArgumentException("FEN should match pattern: " + pattern);
 
             pieces = new Piece[8, 8];
-            var matches = Regex.Matches(fen, pattern);
 
             foreach (var group in matches[0].Groups.Values)
             {
@@ -447,7 +587,7 @@ public partial class ChessBoard
             var wcap = new List<Piece>();
             var bcap = new List<Piece>();
 
-            var fpieces = pieces.Cast<Piece>().Where(p => p != null);
+            var fpieces = pieces.Cast<Piece>().Where(p => p is not null);
 
             // Calculating missing pieces on according begin pieces in fen
             // Math.Clamp() for get max/min taken figures (2 queens possible)
@@ -476,7 +616,7 @@ public partial class ChessBoard
                 int emptyCount = 0;
                 for (int j = 0; j < 8; j++)
                 {
-                    if (pieces[i, j] == null)
+                    if (pieces[i, j] is null)
                         emptyCount++;
                     else
                     {

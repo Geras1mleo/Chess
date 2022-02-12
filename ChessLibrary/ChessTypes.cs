@@ -346,7 +346,7 @@ public class Move
         var pattern = "^{(((w|b)(b|k|n|p|q|r))" + ParametersSeparator + "|)" +
                     "[a-h][1-8]" + ParametersSeparator + "[a-h][1-8]" +
                     "(" + ParametersSeparator + "(w|b)(b|k|n|p|q|r)|)" +
-                    "(" + ParametersSeparator + @"((0-0)|(0-0-0)|(e\.p\.)|(=)|(=q)|(=r)|(=b)|(=n))|)" +
+                    "(" + ParametersSeparator + @"((o-o)|(o-o-o)|(e\.p\.)|(=)|(=q)|(=r)|(=b)|(=n))|)" +
                     "(" + ParametersSeparator + @"(\+|#)|)}$";
 
         if (!Regex.IsMatch(move, pattern))
@@ -409,10 +409,10 @@ public class Move
     public override string ToString()
     {
         return "{" +
-                    (Piece == null ? "" : Piece + ParametersSeparator) +
+                    (Piece is null ? "" : Piece + ParametersSeparator) +
                     OriginalPosition + ParametersSeparator + NewPosition + // Permanent
-                    (CapturedPiece == null ? "" : ParametersSeparator + CapturedPiece) +
-                    (Parameter == null ? "" : ParametersSeparator + Parameter.AsShortString) +
+                    (CapturedPiece is null ? "" : ParametersSeparator + CapturedPiece) +
+                    (Parameter is null ? "" : ParametersSeparator + Parameter.AsShortString) +
                     (!IsMate ? (IsCheck ? ParametersSeparator + "+" : "") : ParametersSeparator + "#")
                 + "}";
     }

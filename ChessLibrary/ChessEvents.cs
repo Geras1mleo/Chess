@@ -30,7 +30,7 @@ public partial class ChessBoard
 
     private void OnWhiteKingCheckedChangedEvent(CheckEventArgs e)
     {
-        if (context != null)
+        if (context is not null)
             context.Send(delegate { OnWhiteKingCheckedChanged(this, e); }, null);
         else
             OnWhiteKingCheckedChanged(this, e);
@@ -38,7 +38,7 @@ public partial class ChessBoard
 
     private void OnBlackKingCheckedChangedEvent(CheckEventArgs e)
     {
-        if (context != null)
+        if (context is not null)
             context.Send(delegate { OnBlackKingCheckedChanged(this, e); }, null);
         else
             OnBlackKingCheckedChanged(this, e);
@@ -46,7 +46,7 @@ public partial class ChessBoard
 
     private void OnInvalidMoveKingCheckedEvent(CheckEventArgs e)
     {
-        if (context != null)
+        if (context is not null)
             context.Send(delegate { OnInvalidMoveKingChecked(this, e); }, null);
         else
             OnInvalidMoveKingChecked(this, e);
@@ -54,7 +54,7 @@ public partial class ChessBoard
 
     private void OnPromotePawnEvent(PromotionEventArgs e)
     {
-        if (context != null)
+        if (context is not null)
             context.Send(delegate { OnPromotePawn(this, e); }, null);
         else
             OnPromotePawn(this, e);
@@ -62,7 +62,7 @@ public partial class ChessBoard
 
     private void OnEndGameEvent()
     {
-        if (context != null)
+        if (context is not null)
             context.Send(delegate { OnEndGame(this, new EndgameEventArgs(this, EndGame)); }, null);
         else
             OnEndGame(this, new EndgameEventArgs(this, EndGame));
@@ -70,7 +70,7 @@ public partial class ChessBoard
 
     private void OnCapturedEvent(Piece piece)
     {
-        if (context != null)
+        if (context is not null)
             context.Send(delegate { OnCaptured(this, new CaptureEventArgs(this, piece, WhiteCaptured, BlackCaptured)); }, null);
         else
             OnCaptured(this, new CaptureEventArgs(this, piece, WhiteCaptured, BlackCaptured));

@@ -51,38 +51,68 @@ public class ChessMoveBenchmark
     //  
 }
 
-    [RankColumn]
-    public class ChessGenerateMovesBenchmark
+[RankColumn]
+public class ChessGenerateMovesBenchmark
+{
+    [Benchmark]
+    public void MovesSanFalse()
     {
-        [Benchmark]
-        public void MovesSanFalse()
-        {
-            new ChessBoard().Moves(generateSan: false);
-        }
-
-        [Benchmark]
-        public void MovesSanTrue()
-        {
-            new ChessBoard().Moves(generateSan: true);
-        }
-
-        //  Tests:
-        //  30/01/2022 =>
-        //  |        Method |       Mean |    Error |    StdDev | Rank |
-        //  |-------------- |-----------:|---------:|----------:|-----:|
-        //  | MovesSanFalse |   319.5 us | 14.17 us |  41.79 us |    1 |
-        //  |  MovesSanTrue | 1,839.6 us | 56.71 us | 167.21 us |    2 |
-        //
-        //  31/01/2022 => very good
-        //  |        Method |     Mean |    Error |   StdDev | Rank |
-        //  |-------------- |---------:|---------:|---------:|-----:|
-        //  | MovesSanFalse | 316.8 us | 12.67 us | 37.16 us |    1 |
-        //  |  MovesSanTrue | 369.8 us | 20.07 us | 59.19 us |    2 |
-        //
-        //  02/02/2022 => still worthy
-        //  |        Method |     Mean |    Error |   StdDev | Rank |
-        //  |-------------- |---------:|---------:|---------:|-----:|
-        //  | MovesSanFalse | 317.3 us | 16.32 us | 48.12 us |    1 |
-        //  |  MovesSanTrue | 325.2 us |  8.84 us | 25.52 us |    2 |
-        //
+        new ChessBoard().Moves(generateSan: false);
     }
+
+    [Benchmark]
+    public void MovesSanTrue()
+    {
+        new ChessBoard().Moves(generateSan: true);
+    }
+
+    //  Tests:
+    //  30/01/2022 =>
+    //  |        Method |       Mean |    Error |    StdDev | Rank |
+    //  |-------------- |-----------:|---------:|----------:|-----:|
+    //  | MovesSanFalse |   319.5 us | 14.17 us |  41.79 us |    1 |
+    //  |  MovesSanTrue | 1,839.6 us | 56.71 us | 167.21 us |    2 |
+    //
+    //  31/01/2022 => very good
+    //  |        Method |     Mean |    Error |   StdDev | Rank |
+    //  |-------------- |---------:|---------:|---------:|-----:|
+    //  | MovesSanFalse | 316.8 us | 12.67 us | 37.16 us |    1 |
+    //  |  MovesSanTrue | 369.8 us | 20.07 us | 59.19 us |    2 |
+    //
+    //  02/02/2022 => still worthy
+    //  |        Method |     Mean |    Error |   StdDev | Rank |
+    //  |-------------- |---------:|---------:|---------:|-----:|
+    //  | MovesSanFalse | 317.3 us | 16.32 us | 48.12 us |    1 |
+    //  |  MovesSanTrue | 325.2 us |  8.84 us | 25.52 us |    2 |
+    //
+}
+
+public class ChessIsValidMoveBenchmark
+{
+    [Benchmark]
+    public void IsValidMove()
+    {
+        var board = new ChessBoard();
+        board.IsValidMove(new Move(new("b1"), new("c3")));
+        board.IsValidMove(new Move(new("c1"), new("g5")));
+        board.IsValidMove(new Move(new("d1"), new("d6")));
+        board.IsValidMove(new Move(new("e1"), new("f2")));
+        board.IsValidMove(new Move(new("e2"), new("e4")));
+        board.IsValidMove(new Move(new("g2"), new("g4")));
+        board.IsValidMove(new Move(new("b2"), new("b4")));
+    }
+
+    //  Tests:
+    //  12/02/2022 using => object == null and object != null
+    //  |      Method |     Mean |    Error |   StdDev |
+    //  |------------ |---------:|---------:|---------:|
+    //  | IsValidMove | 39.35 us | 1.109 us | 3.253 us |
+    //  
+    //  12/02/2022 using => object is null and object is not null
+    //  |      Method |     Mean |    Error |   StdDev |
+    //  |------------ |---------:|---------:|---------:|
+    //  | IsValidMove | 38.98 us | 1.036 us | 3.056 us |
+    //
+    //  Conclusion:
+    //  Pretty much the same performance
+}

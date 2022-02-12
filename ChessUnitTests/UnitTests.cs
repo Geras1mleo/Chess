@@ -1,6 +1,5 @@
 using Chess;
 using System;
-using System.Threading;
 using Xunit;
 
 namespace ChessUnitTests
@@ -88,6 +87,91 @@ namespace ChessUnitTests
 
             Assert.Equal(1, raisedEndGame);
             Assert.Equal(EndgameType.Stalemate, board.EndGame.EndgameType);
+        }
+
+        [Fact]
+        public void TestPgnLoad()
+        {
+            var board = new ChessBoard();
+
+            // Normal Pgn
+            board.LoadPgn(
+            @"[Event ""Live Chess""]
+            [Site ""Chess.com""]
+            [Date ""2022.01.11""]
+            [Round ""?""]
+            [White ""Milan1905""]
+            [Black ""Geras1mleo""]
+            [Result ""1-0""]
+            [ECO ""C47""]
+            [WhiteElo ""1006""]
+            [BlackElo ""626""]
+            [TimeControl ""600""]
+            [EndTime ""11:58:56 PST""]
+            [Termination ""Milan1905 won by resignation""]
+            
+            1.e4 e5 2.Nf3 Nf6 3.Nc3 Nc6 4.Bb5 Bc5 5.Bxc6 bxc6 6.Nxe5 Bxf2+ 7.Kxf2 O-O
+            8.d4 d5 9.exd5 cxd5 10.Nc6 Ng4+ 11.Kg1 Qf6 12.Qf1 Qxc6 13.h3 Nf6 14.Bg5
+            Qb6 15.Bxf6 Qxf6 16.Qxf6 gxf6 17.Nxd5 Rb8 18.Nxf6+ Kh8 19.b3 Rb4 20.c3 Bb7
+            21.cxb4 1-0");
+
+            Assert.Equal("5r1k/pbp2p1p/5N2/8/1P1P4/1P5P/P5P1/R5KR b - - 0 21", board.ToFen());
+            Assert.Equal(EndgameType.Resigned, board.EndGame.EndgameType);
+
+            // From Position
+            board.LoadPgn(
+            @"[Variant ""From Position""]
+            [FEN ""rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1""]
+            
+            1.exd5 e6 2.dxe6 fxe6");
+            Assert.Equal("rnbqkbnr/ppp3pp/4p3/8/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 3", board.ToFen());
+
+            board.LoadPgn("");
+            Assert.Equal("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", board.ToFen());
+
+            // With alternative moves
+            board.LoadPgn(
+            @"[Variant ""From Position""]
+            [FEN ""rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1""]
+            
+            1.exd5 e6 2.dxe6 fxe6 3.d4(3.f4 g5 4.fxg5) 3... c5 4.b4");
+            Assert.Equal("rnbqkbnr/pp4pp/4p3/2p5/1P1P4/8/P1P2PPP/RNBQKBNR b KQkq b3 0 4", board.ToFen());
+
+            board.LoadPgn(
+            @"[Variant ""From Position""]
+            [FEN ""rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1""]
+            
+            1... dxe4 2.g4");
+            Assert.Equal("rnbqkbnr/ppp1pppp/8/8/4p1P1/8/PPPP1P1P/RNBQKBNR b KQkq g3 0 2", board.ToFen());
+
+            // Ultimate pgn
+            board.LoadPgn(
+            @"[Event ""Live Chess""]
+            [Site ""Chess.com""]
+            [Date ""2022.01.03""]
+            [Round ""?""]
+            [White ""Milan1905""]
+            [Black ""Geras1mleo""]
+            [Result ""1/2-1/2""]
+            [ECO ""C42""]
+            [WhiteElo ""1006""]
+            [BlackElo ""626""]
+            [TimeControl ""600""]
+            [EndTime ""9:19:18 PST""]
+            [Termination ""Game drawn by insufficient material""]
+            
+            1.e4 e5 2.Nf3 Nf6 3.Nxe5 Nxe4 4.Qe2 d5 5.d3 Bd6 6.dxe4 Bxe5 7.exd5 Qxd5
+            8.c4 Qc5 9.Bf4 Nd7 10.Bxe5 Nxe5 11.Nc3 O-O 12.O-O-O Nxc4 13.Na4 Qc6 14.
+            Qxc4 Bg4 15.Qxc6 bxc6 16.Rd2 Rad8 17.Rxd8 Rxd8 18.Ba6 h6 19.h3 Bf5 20.g4
+            Be4 21.Re1 Rd4 22.Nc3 Bf3 23.Re8+ Kh7 24.Ne2 Bxe2 25.Bxe2 Rf4 26.Bd3+ g6
+            27.Re2 f5 28.gxf5 gxf5 29.Re7+ Kg6 30.Rxc7 Rf3 31.Rxc6+ Kg5 32.h4+ Kxh4
+            33.Rxh6+ Kg5 34.Rh2 Rxd3 35.Kc2 Rf3 36.Rg2+ Kh4 37.Kd2 Kh3 38.Rg8 Rxf2+
+            39.Kc3 Rf3+ 40.Kb4 Rf4+ 41.Ka3 Rf3+ 42.b3 a5 43.Ka4 Rf2 44.a3 Rf4+ 45.b4
+            axb4 46.axb4 Rg4 47.Rh8+ Rh4 48.Rxh4+ Kxh4 49.b5 f4 50.b6 f3 51.b7 f2 52.
+            b8=Q f1=Q 53.Qb4+ Kg3 54.Qb3+ Qf3 55.Qxf3+ Kxf3 1/2-1/2");
+
+            Assert.Equal("8/8/8/8/K7/5k2/8/8 w - - 0 56", board.ToFen());
+            Assert.True(board.IsEndGame);
         }
 
         [Fact]
@@ -319,6 +403,14 @@ namespace ChessUnitTests
 
             board.LoadFen("rnb1kbnr/pppppppp/8/8/5P1q/8/PPPPP1PP/RNBQKBNR w KQkq - 0 1");
             Assert.Single(board.Moves());
+
+            // King Castle 2 moves offering (e1-h1 OR e1-g1)
+            board.LoadFen("r3kbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1");
+            Assert.Equal(3, board.Moves(new Position("e1")).Length);
+
+            // 2 castles
+            board.LoadFen("r3kbnr/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1");
+            Assert.Equal(6, board.Moves(new Position("e1")).Length);
         }
 
         [Fact]
@@ -334,7 +426,7 @@ namespace ChessUnitTests
             board.OnCaptured += (sender, e) => raisedCapture++;
             board.OnPromotePawn += (sender, e) => raisedPromotePawn++;
             board.OnInvalidMoveKingChecked += (sender, e) => raisedInvalidMoveKingChecked++;
-            board.OnEndGame+= (sender, e) => raisedEndGame++;
+            board.OnEndGame += (sender, e) => raisedEndGame++;
 
             board.LoadFen("rnb1kbnr/pppppppp/8/8/5Q1q/8/PPPPP1PP/RNB1KBNR w KQkq - 0 1");
             board.Move(new Move(new("f4"), new("h4")));
@@ -352,6 +444,72 @@ namespace ChessUnitTests
             Assert.Equal(1, raisedPromotePawn);
             Assert.Equal(1, raisedInvalidMoveKingChecked);
             Assert.Equal(1, raisedEndGame);
+        }
+
+        [Fact]
+        public void TestChessMechanics()
+        {
+            var board = new ChessBoard();
+
+            // En Passant
+            board.LoadFen("rnbqkbnr/ppppp1pp/8/4Pp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 1");
+            Assert.True(board.IsValidMove(new Move(new("e5"), new("e6"))));
+            Assert.True(board.IsValidMove(new Move(new("e5"), new("f6"))));
+
+            board.LoadFen("rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
+            Assert.True(board.IsValidMove(new Move(new("d4"), new("d3"))));
+            Assert.True(board.IsValidMove(new Move(new("d4"), new("e3"))));
+
+            board.Move("e5");
+            board.Move("c4");
+
+            Assert.True(board.IsValidMove(new Move(new("d4"), new("d3"))));
+            Assert.True(board.IsValidMove(new Move(new("d4"), new("c3"))));
+
+            board.Move("dxc3 e.p."); // e.p. is optional (from Long Algebraic Notation)
+            Assert.True(board["c4"] is null);
+
+            board.MoveIndex = -1;
+            Assert.True(board.IsValidMove(new Move(new("d4"), new("d3"))));
+            Assert.True(board.IsValidMove(new Move(new("d4"), new("e3"))));
+
+            // Castle
+            board.LoadFen("r3kbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1");
+            Assert.True(board.IsValidMove(new Move(new("e1"), new("h1"))));
+
+            board.LoadFen("r3kbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R b KQkq - 0 1");
+            Assert.True(board.IsValidMove(new Move(new("e8"), new("a8"))));
+
+            board.LoadFen("r3kbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w Qk - 0 1");
+            Assert.False(board.IsValidMove(new Move(new("e1"), new("h1"))));
+
+            board.LoadFen("r3kbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R b Qk - 0 1");
+            Assert.False(board.IsValidMove(new Move(new("e8"), new("a8"))));
+
+            board.LoadFen("r3kbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1");
+            board.Move("Kf1");
+            board.Move("Kd8");
+            board.Move("Ke1");
+            board.Move("Ke8");
+            Assert.Equal("r3kbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w - - 4 3", board.ToFen());
+
+            board.LoadFen("r3kbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1");
+            board.Move("Rg1");
+            board.Move("Rb8");
+            board.Move("Rh1");
+            board.Move("Ra8");
+            Assert.Equal("r3kbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w Qk - 4 3", board.ToFen());
+
+            // Promotion
+            board.LoadFen("rnbqkbnr/pPpppppp/8/8/8/8/P1PPPPPP/RNBQKBNR w KQkq - 0 1");
+            board.Move(new Move(new("b7"), new("a8")));
+            Assert.True(board["a8"].Type == PieceType.Queen);
+
+            // With prom result
+            board.OnPromotePawn += (sender, e) => e.PromotionResult = MoveParameter.PromotionToBishop;
+            board.LoadFen("rnbqkbnr/pPpppppp/8/8/8/8/P1PPPPPP/RNBQKBNR w KQkq - 0 1");
+            board.Move(new Move(new("b7"), new("a8")));
+            Assert.True(board["a8"].Type == PieceType.Bishop);
         }
     }
 }
