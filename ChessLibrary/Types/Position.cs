@@ -91,7 +91,7 @@ public struct Position
     /// '8' => 7<br/>
     /// </summary>
     public static short FromRank(char rank)
-    {   // This code is faster than convertion to short with short.TryParse(...)
+    {   // This code is faster than conversion to short with short.TryParse(...)
         return rank switch
         {
             '1' => 0,
@@ -145,7 +145,7 @@ public struct Position
     /// 7 => '8'<br/>
     /// </summary>
     public char Rank()
-    {   // This code is faster than convertion to char
+    {   // This code is faster than conversion to char
         return Y switch
         {
             0 => '1',

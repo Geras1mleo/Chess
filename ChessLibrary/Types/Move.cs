@@ -125,7 +125,7 @@ public class Move
     }
 
     /// <summary>
-    /// Needed to Generate move from SAN in ChessConvertions
+    /// Needed to Generate move from SAN in ChessConversions
     /// </summary>
     internal Move()
     {
