@@ -37,7 +37,7 @@ public partial class ChessBoard
                 case "1":
                     if (group.Value == "O-O" || group.Value == "O-O-O")
                     {
-                        moveOut.Parameter = MoveParameter.FromString(group.Value);
+                        moveOut.Parameter = IMoveParameter.FromString(group.Value);
                         if (Turn == PieceColor.White)
                         {
                             originalPos = new("e1");
@@ -54,8 +54,9 @@ public partial class ChessBoard
                             else if (group.Value == "O-O-O")
                                 moveOut.NewPosition = new("a8");
                         }
-                        if (!IsValidMove(new Move(originalPos, moveOut.NewPosition)))
-                            throw new ChessSanNotFoundException(this, move);
+                        // not realy needed
+                        //if (!IsValidMove(new Move(originalPos, moveOut.NewPosition)))
+                        //    throw new ChessSanNotFoundException(this, move);
                     }
                     break;
                 case "2":
@@ -75,7 +76,7 @@ public partial class ChessBoard
                     moveOut.NewPosition = new Position(group.Value);
                     break;
                 case "7":
-                    moveOut.Parameter = MoveParameter.FromString(group.Value.Trim());
+                    moveOut.Parameter = IMoveParameter.FromString(group.Value.Trim());
                     break;
                 case "9":
                     switch (group.Value)
@@ -84,7 +85,8 @@ public partial class ChessBoard
                             moveOut.IsCheck = true;
                             break;
                         case "#":
-                            moveOut.IsCheck = true; moveOut.IsMate = true;
+                            moveOut.IsCheck = true;
+                            moveOut.IsMate = true;
                             break;
                         case "$":
                             moveOut.IsMate = true;
@@ -94,6 +96,7 @@ public partial class ChessBoard
             }
         }
 
+        // If piece is not specified => Pawn
         moveOut.Piece ??= new Piece(Turn, PieceType.Pawn);
 
         if (isCapture && this[moveOut.NewPosition] is not null)
@@ -150,7 +153,7 @@ public partial class ChessBoard
     /// </summary>
     /// <param name="move">Move to be converted</param>
     /// <returns>Move in SAN</returns>
-    /// <exception cref="ArgumentNullException">Given move was null or didn't have valid value</exception>
+    /// <exception cref="ArgumentNullException">Given move was null or didn't have valid positions values</exception>
     public string San(Move move)
     {
         if (move is null || !move.HasValue)
@@ -158,9 +161,9 @@ public partial class ChessBoard
 
         string sMove = "";
 
-        if (move.Parameter == MoveParameter.CastleKing || move.Parameter == MoveParameter.CastleQueen)
+        if (move.Parameter is MoveCastle castle)
         {
-            sMove = move.Parameter.AsShortString;
+            sMove = castle.ShortStr;
             goto CheckOrMateValidation;
         }
 
@@ -183,12 +186,8 @@ public partial class ChessBoard
 
         sMove += move.NewPosition;
 
-        if (move.Parameter == MoveParameter.PawnPromotion
-         || move.Parameter == MoveParameter.PromotionToQueen
-         || move.Parameter == MoveParameter.PromotionToRook
-         || move.Parameter == MoveParameter.PromotionToBishop
-         || move.Parameter == MoveParameter.PromotionToKnight)
-            sMove += move.Parameter.AsShortString;
+        if (move.Parameter is MovePromotion prom)
+            sMove += prom.ShortStr;
 
         // Not required
         //else if (move.Parameter == MoveParameter.EnPassant)
@@ -204,7 +203,7 @@ public partial class ChessBoard
     }
 
     /// <summary>
-    /// Load Chess game from Forsyth-Edwards Notation<br/>
+    /// Loads Chess game from Forsyth-Edwards Notation<br/>
     /// ex.:<br/>
     /// rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1
     /// </summary>
@@ -212,9 +211,9 @@ public partial class ChessBoard
     /// <exception cref="ArgumentException">Given FEN string didn't match the Regex pattern</exception>
     public void LoadFen(string fen)
     {
-        Fen = new FenBoard(fen);
-        pieces = Fen.Pieces;
-        ExecutedMoves.Clear();
+        FenObj = new FenBoard(fen);
+        pieces = FenObj.Pieces;
+        executedMoves.Clear();
         moveIndex = -1;
         endGame = null;
 
@@ -227,7 +226,7 @@ public partial class ChessBoard
     }
 
     /// <summary>
-    /// Load Chess game from Portable Game Notation<br/>
+    /// Loads Chess game from Portable Game Notation<br/>
     /// ex.:<br/>
     /// [Event "Live Chess"]<br/>
     /// [Site "Chess.com"]<br/>
@@ -248,8 +247,8 @@ public partial class ChessBoard
     public void LoadPgn(string pgn)
     {
         SetChessBeginSituation();
-        Fen = null;
-        ExecutedMoves.Clear();
+        FenObj = null;
+        executedMoves.Clear();
         headers.Clear();
         moveIndex = -1;
         endGame = null;
@@ -271,8 +270,8 @@ public partial class ChessBoard
         // Loading fen if exist
         if (headers.TryGetValue("FEN", out var fen))
         {
-            Fen = new FenBoard(fen);
-            pieces = Fen.Pieces;
+            FenObj = new FenBoard(fen);
+            pieces = FenObj.Pieces;
         }
 
         // Remove all alternatives now
@@ -290,9 +289,9 @@ public partial class ChessBoard
             if (IsValidMove(move, this, false, true))
             {
                 San(move);
-                ExecutedMoves.Add(move);
+                executedMoves.Add(move);
                 DropPieceToNewPosition(move, true);
-                moveIndex = ExecutedMoves.Count - 1;
+                moveIndex = executedMoves.Count - 1;
             }
         }
 
@@ -313,7 +312,7 @@ public partial class ChessBoard
     }
 
     /// <summary>
-    /// Generates Fen string of current board
+    /// Generates FEN string representing current board
     /// </summary>
     public string ToFen()
     {
@@ -321,7 +320,7 @@ public partial class ChessBoard
     }
 
     /// <summary>
-    /// Generates PGN string of current board
+    /// Generates PGN string representing current board
     /// </summary>
     public string ToPgn()
     {
@@ -334,12 +333,14 @@ public partial class ChessBoard
 
         moveIndex = -1;
 
-        for (int i = 0, count = 0; i < ExecutedMoves.Count; i++)
+        for (int i = 0, count = 0; i < executedMoves.Count; i++)
         {
+            // Adding moves count when needed
             if (count != GetFullMovesCount(this))
             {
                 count = GetFullMovesCount(this);
-                
+
+                // Add space before move count if not first move
                 if (i != 0) pgn += ' ';
 
                 pgn += count + ".";
@@ -347,22 +348,33 @@ public partial class ChessBoard
 
             if (moveIndex == -1)
             {
-                if (LoadedFromFEN && Fen.Turn == PieceColor.Black)
+                // From position?
+                if (LoadedFromFEN && FenObj.Turn == PieceColor.Black)
                     pgn += "..";
             }
 
-            pgn += ' ' + ExecutedMoves[i].San;
+            pgn += ' ' + executedMoves[i].San;
 
             Next();
         }
 
         Last();
 
+        if (IsEndGame)
+        {
+            if (EndGame.WonSide == PieceColor.White)
+                pgn += " 1-0";
+            else if (EndGame.WonSide == PieceColor.Black)
+                pgn += " 0-1";
+            else
+                pgn += " 1/2-1/2";
+        }
+
         return pgn;
     }
 
     /// <summary>
-    /// Generates ASCII string of current board
+    /// Generates ASCII string representing current board
     /// </summary>
     public string ToAscii(bool displayFull = false)
     {
@@ -394,10 +406,10 @@ public partial class ChessBoard
 
             ascii += "  Turn: " + Turn + '\n';
 
-            if (WhiteCaptured.Length > 0)
-                ascii += "  White Captured: " + string.Join(", ", WhiteCaptured.Select(p => p.ToFenChar())) + '\n';
-            if (BlackCaptured.Length > 0)
-                ascii += "  Black Captured: " + string.Join(", ", BlackCaptured.Select(p => p.ToFenChar())) + '\n';
+            if (CapturedWhite.Length > 0)
+                ascii += "  White Captured: " + string.Join(", ", CapturedWhite.Select(p => p.ToFenChar())) + '\n';
+            if (CapturedBlack.Length > 0)
+                ascii += "  Black Captured: " + string.Join(", ", CapturedBlack.Select(p => p.ToFenChar())) + '\n';
         }
 
         return ascii;
@@ -440,7 +452,9 @@ public partial class ChessBoard
         {
             for (short j = 0; j < 8; j++)
             {
-                if (board.pieces[i, j] is not null && board.pieces[i, j].Color == piece.Color && board.pieces[i, j].Type == piece.Type)
+                if (board.pieces[i, j] is not null
+                 && board.pieces[i, j].Color == piece.Color
+                 && board.pieces[i, j].Type == piece.Type)
                 {
                     // if original pos == new pos
                     if (newPosition.Y == i && newPosition.X == j) continue;
@@ -456,12 +470,12 @@ public partial class ChessBoard
         return moves.ToArray();
     }
 
-    private static int GetHalfMovesCount(ChessBoard board)
+    internal static int GetHalfMovesCount(ChessBoard board)
     {
-        int index = board.ExecutedMoves.GetRange(0, board.moveIndex + 1).FindLastIndex(m => m.CapturedPiece is not null || m.Piece.Type == PieceType.Pawn);
+        int index = board.executedMoves.GetRange(0, board.moveIndex + 1).FindLastIndex(m => m.CapturedPiece is not null || m.Piece.Type == PieceType.Pawn);
 
         if (board.LoadedFromFEN && index < 0)
-            return board.Fen.HalfMoves + board.moveIndex + 1;
+            return board.FenObj.HalfMoves + board.moveIndex + 1;
 
         if (index >= 0)
             return board.moveIndex - index;
@@ -469,193 +483,13 @@ public partial class ChessBoard
             return board.moveIndex + 1;
     }
 
-    private static int GetFullMovesCount(ChessBoard board)
+    internal static int GetFullMovesCount(ChessBoard board)
     {
         var count = 0;
 
         if (board.LoadedFromFEN)
-            count += (board.Fen.FullMoves * 2) + (board.Fen.Turn == PieceColor.Black ? 1 : 0) - 2;
+            count += (board.FenObj.FullMoves * 2) + (board.FenObj.Turn == PieceColor.Black ? 1 : 0) - 2;
 
         return (board.moveIndex + count + 3) / 2;
-    }
-
-    internal class FenBoard
-    {
-        private readonly Piece?[,] pieces;
-
-        /// <summary>
-        /// "Begin Situation"
-        /// </summary>
-        public Piece?[,] Pieces => (Piece?[,])pieces.Clone();
-        public PieceColor Turn { get; }
-
-        public bool CastleWK { get; }
-        public bool CastleWQ { get; }
-        public bool CastleBK { get; }
-        public bool CastleBQ { get; }
-
-        public Position EnPassant { get; }
-
-        /// <summary>
-        /// Count since the last pawn advance or piece capture
-        /// </summary>
-        public int HalfMoves { get; }
-        /// <summary>
-        /// Black moves Count
-        /// </summary>
-        public int FullMoves { get; }
-
-        public Piece[] WhiteCaptured { get; }
-        public Piece[] BlackCaptured { get; }
-
-        public FenBoard(ChessBoard board)
-        {
-            pieces = board.pieces;
-            Turn = board.Turn;
-            CastleWK = HasRightToCastle(PieceColor.White, MoveParameter.CastleKing, board);
-            CastleWQ = HasRightToCastle(PieceColor.White, MoveParameter.CastleQueen, board);
-            CastleBK = HasRightToCastle(PieceColor.Black, MoveParameter.CastleKing, board);
-            CastleBQ = HasRightToCastle(PieceColor.Black, MoveParameter.CastleQueen, board);
-            EnPassant = LastMoveEnPassantPosition(board);
-            HalfMoves = GetHalfMovesCount(board);
-            FullMoves = GetFullMovesCount(board);
-        }
-
-        public FenBoard(string fen)
-        {
-            string pattern = @"^(((?:[rnbqkpRNBQKP1-8]+\/){7})[rnbqkpRNBQKP1-8]+) ([b|w]) (-|[K|Q|k|q]{1,4}) (-|[a-h][36]) (\d+ \d+)$";
-
-            var matches = Regex.Matches(fen, pattern);
-
-            if (matches.Count == 0)
-                throw new ArgumentException("FEN should match pattern: " + pattern);
-
-            pieces = new Piece[8, 8];
-
-            foreach (var group in matches[0].Groups.Values)
-            {
-                switch (group.Name)
-                {
-                    case "1":
-                        int x = 0, y = 7;
-                        for (int i = 0; i < group.Length; i++)
-                        {
-                            if (group.Value[i] == '/')
-                            {
-                                y--;
-                                x = 0;
-                                continue;
-                            }
-                            if (x < 8)
-                                if (char.IsLetter(group.Value[i]))
-                                {
-                                    pieces[y, x] = new Piece(group.Value[i]);
-                                    x++;
-                                }
-                                else if (char.IsDigit(group.Value[i]))
-                                    x += int.Parse(group.Value[i].ToString());
-                        }
-                        break;
-                    case "3":
-                        Turn = PieceColor.FromChar(group.Value[0]);
-                        break;
-                    case "4":
-                        if (group.Value != "-")
-                        {
-                            if (group.Value.Contains('K'))
-                                CastleWK = true;
-                            if (group.Value.Contains('Q'))
-                                CastleWQ = true;
-                            if (group.Value.Contains('k'))
-                                CastleBK = true;
-                            if (group.Value.Contains('q'))
-                                CastleBQ = true;
-                        }
-                        break;
-                    case "5":
-                        if (group.Value == "-")
-                            EnPassant = new();
-                        else
-                            EnPassant = new Position(group.Value);
-                        break;
-                    case "6":
-                        (HalfMoves, FullMoves) = group.Value.Split(' ').Select(s => int.Parse(s)).ToArray();
-                        break;
-                }
-            }
-
-            var wcap = new List<Piece>();
-            var bcap = new List<Piece>();
-
-            var fpieces = pieces.Cast<Piece>().Where(p => p is not null);
-
-            // Calculating missing pieces on according begin pieces in fen
-            // Math.Clamp() for get max/min taken figures (2 queens possible)
-            wcap.AddRange(Enumerable.Range(0, Math.Clamp(8 - fpieces.Where(p => p.Type == PieceType.Pawn && p.Color == PieceColor.White).Count(), 0, 8)).Select(p => new Piece(PieceColor.White, PieceType.Pawn)));
-            wcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Rook && p.Color == PieceColor.White).Count(), 0, 2)).Select(p => new Piece(PieceColor.White, PieceType.Rook)));
-            wcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Bishop && p.Color == PieceColor.White).Count(), 0, 2)).Select(p => new Piece(PieceColor.White, PieceType.Bishop)));
-            wcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Knight && p.Color == PieceColor.White).Count(), 0, 2)).Select(p => new Piece(PieceColor.White, PieceType.Knight)));
-            wcap.AddRange(Enumerable.Range(0, Math.Clamp(1 - fpieces.Where(p => p.Type == PieceType.Queen && p.Color == PieceColor.White).Count(), 0, 1)).Select(p => new Piece(PieceColor.White, PieceType.Queen)));
-
-            bcap.AddRange(Enumerable.Range(0, Math.Clamp(8 - fpieces.Where(p => p.Type == PieceType.Pawn && p.Color == PieceColor.Black).Count(), 0, 8)).Select(p => new Piece(PieceColor.Black, PieceType.Pawn)));
-            bcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Rook && p.Color == PieceColor.Black).Count(), 0, 2)).Select(p => new Piece(PieceColor.Black, PieceType.Rook)));
-            bcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Bishop && p.Color == PieceColor.Black).Count(), 0, 2)).Select(p => new Piece(PieceColor.Black, PieceType.Bishop)));
-            bcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Knight && p.Color == PieceColor.Black).Count(), 0, 2)).Select(p => new Piece(PieceColor.Black, PieceType.Knight)));
-            bcap.AddRange(Enumerable.Range(0, Math.Clamp(1 - fpieces.Where(p => p.Type == PieceType.Queen && p.Color == PieceColor.Black).Count(), 0, 1)).Select(p => new Piece(PieceColor.Black, PieceType.Queen)));
-
-            WhiteCaptured = wcap.ToArray();
-            BlackCaptured = bcap.ToArray();
-        }
-
-        public override string ToString()
-        {
-            string sPieces = "";
-
-            for (int i = 7; i >= 0; i--)
-            {
-                int emptyCount = 0;
-                for (int j = 0; j < 8; j++)
-                {
-                    if (pieces[i, j] is null)
-                        emptyCount++;
-                    else
-                    {
-                        if (emptyCount > 0)
-                        {
-                            sPieces += emptyCount;
-                            emptyCount = 0;
-                        }
-                        sPieces += pieces[i, j].ToFenChar();
-                    }
-                }
-                if (emptyCount > 0)
-                    sPieces += emptyCount;
-                if (i - 1 >= 0)
-                    sPieces += "/";
-            }
-
-            string sCastles = "";
-
-            if (CastleWK)
-                sCastles += "K";
-            if (CastleWQ)
-                sCastles += "Q";
-            if (CastleBK)
-                sCastles += "k";
-            if (CastleBQ)
-                sCastles += "q";
-
-            if (sCastles == "")
-                sCastles = "-";
-
-            string sEnPas;
-
-            if (EnPassant.HasValue)
-                sEnPas = EnPassant.ToString();
-            else
-                sEnPas = "-";
-
-            return string.Join(' ', sPieces, Turn.AsChar, sCastles, sEnPas, HalfMoves, FullMoves);
-        }
     }
 }

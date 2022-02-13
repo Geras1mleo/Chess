@@ -132,8 +132,16 @@ public partial class ChessBoard
         move.IsCheck = false;
         move.IsMate = false;
         move.CapturedPiece = null;
-        move.Parameter = null;
         move.San = null;
+
+        MovePromotion? promParams = null;
+        // Promotion result can be already specified so we dont need to invoke event again to ask for prom result
+        if (move.Parameter is MovePromotion p)
+        {
+            promParams = new MovePromotion(p.PromotionType);
+        }
+
+        move.Parameter = null;
 
         bool isValid = IsValidMove(move, board);
         bool isChecked = !isValid || IsKingCheckedValidation(move, move.Piece.Color, board);
@@ -141,16 +149,24 @@ public partial class ChessBoard
         if (!isChecked)
         {
             // Capture
-            if (board.pieces[move.NewPosition.Y, move.NewPosition.X] is not null
-             && board.pieces[move.NewPosition.Y, move.NewPosition.X].Color != move.Piece.Color)
-                move.CapturedPiece = board.pieces[move.NewPosition.Y, move.NewPosition.X];
-
-            // Promote
-            if (raise && move.Parameter == MoveParameter.PawnPromotion)
+            if (board.pieces[move.NewPosition.Y, move.NewPosition.X]?.Color != move.Piece.Color)
             {
-                var e = new PromotionEventArgs(board);
-                board.OnPromotePawnEvent(e);
-                move.Parameter = e.PromotionResult;
+                move.CapturedPiece = board.pieces[move.NewPosition.Y, move.NewPosition.X];
+            }
+
+            // Promote, Invoke event only when raises == true AND promotion parameters has been not specified yet
+            if (move.Parameter is MovePromotion promotion)
+            {
+                if (promParams != null && promParams.PromotionType != PromotionType.Default)
+                {
+                    move.Parameter = promParams;
+                }
+                else if (raise)
+                {
+                    var args = new PromotionEventArgs(board);
+                    board.OnPromotePawnEvent(args);
+                    promotion.PromotionType = args.PromotionResult;
+                }
             }
 
             // Check on opposite king
@@ -164,7 +180,9 @@ public partial class ChessBoard
         else
         {
             if (isValid && raise)
+            {
                 board.OnInvalidMoveKingCheckedEvent(new CheckEventArgs(board, move.Piece.Color == PieceColor.White ? board.WhiteKing : board.BlackKing, true));
+            }
             return false;
         }
     }
@@ -189,16 +207,17 @@ public partial class ChessBoard
     /// </summary>
     private static bool IsKingCheckedValidation(Move move, PieceColor side, ChessBoard board)
     {
-        var fboard = new ChessBoard(board.pieces, board.ExecutedMoves);
+        var fboard = new ChessBoard(board.pieces, board.executedMoves);
 
         // If checking for valid castle move
         // move.Piece is null only when calling recursively
-        if (move.Piece is not null && move.Piece.Color == side && (move.Parameter == MoveParameter.CastleKing || move.Parameter == MoveParameter.CastleQueen))
+        if (move.Piece is not null && move.Piece.Color == side
+         && move.Parameter is MoveCastle castle)
         {
             var kingPos = GetKingPosition(side, board);
-            short step = (short)(move.Parameter == MoveParameter.CastleKing ? 1 : -1);
+            short step = (short)(castle.CastleType == CastleType.King ? 1 : -1);
 
-            for (short i = kingPos.X; i < 7 && i > 0; i += step)
+            for (short i = kingPos.X; i < 7 && i > 1; i += step)
                 if (IsKingCheckedValidation(new(kingPos, new() { Y = kingPos.Y, X = i }), side, board))
                     return true;
 
@@ -206,7 +225,7 @@ public partial class ChessBoard
         }
         else if (move.OriginalPosition != move.NewPosition)
         {
-            fboard.ExecutedMoves.Add(move);
+            fboard.executedMoves.Add(move);
             fboard.DropPieceToNewPosition(new(move.ToString()), false);
         }
 
@@ -225,8 +244,10 @@ public partial class ChessBoard
         {
             for (short j = 0; j < 8; j++)
             {
-                if (board.pieces[i, j] is not null && board.pieces[i, j].Color != side && !(kingPos.X == j && kingPos.Y == i))
+                if (board.pieces[i, j] is not null && board.pieces[i, j].Color != side)
                 {
+                    if (kingPos.X == j && kingPos.Y == i) continue;
+
                     if (IsValidMove(new Move(new Position { Y = i, X = j }, kingPos) { Piece = board.pieces[i, j], }, board))
                         return true;
                 }
@@ -238,11 +259,11 @@ public partial class ChessBoard
 
     private static bool PlayerHasMovesValidation(Move move, PieceColor side, ChessBoard board)
     {
-        var fboard = new ChessBoard(board.pieces, board.ExecutedMoves);
+        var fboard = new ChessBoard(board.pieces, board.executedMoves);
 
         if (move.OriginalPosition != move.NewPosition)
         {
-            fboard.ExecutedMoves.Add(move);
+            fboard.executedMoves.Add(move);
             fboard.DropPieceToNewPosition(new(move.ToString()), false);
         }
         return PlayerHasMoves(side, fboard);
@@ -288,7 +309,8 @@ public partial class ChessBoard
         if ((move.Piece.Color == PieceColor.White && v > 0) || (move.Piece.Color == PieceColor.Black && v < 0))
         {
             // 1 step forward
-            if (stepH == 0 && stepV == 1 && board.pieces[move.NewPosition.Y, move.NewPosition.X] is null)
+            if (stepH == 0 && stepV == 1
+             && board.pieces[move.NewPosition.Y, move.NewPosition.X] is null)
             {
                 ValidHandle();
                 return true;
@@ -308,11 +330,20 @@ public partial class ChessBoard
                 ValidHandle();
                 return true;
             }
-            // If En Passant => give it in parameters to replace later
+            // If En Passant => pass to parameters
             else if (IsValidEnPassant(move, board, v, h))
             {
-                move.Parameter = MoveParameter.EnPassant;
+                move.Parameter = new MoveEnPassant()
+                {
+                    CapturedPawnPosition = new()
+                    {
+                        Y = (short)(move.NewPosition.Y - v),
+                        X = move.NewPosition.X
+                    }
+                };
+
                 move.CapturedPiece = new Piece(move.Piece.Color.OppositeColor(), PieceType.Pawn);
+
                 return true;
             }
         }
@@ -322,12 +353,15 @@ public partial class ChessBoard
         {
             // If Promoting pawn
             if (move.NewPosition.Y == 7 || move.NewPosition.Y == 0)
-                move.Parameter = MoveParameter.PawnPromotion;
+            {
+                move.Parameter = new MovePromotion(PromotionType.Default);
+            }
         }
     }
 
     private static bool QueenValidation(Move move, Piece?[,] pieces)
-    {   // For queen just using validation of bishop OR rook
+    {
+        // For queen just using validation of bishop OR rook
         return BishopValidation(move, pieces) || RookValidation(move, pieces);
     }
 
@@ -339,10 +373,11 @@ public partial class ChessBoard
         // if moving horizontally or vertically
         if (v == 0 || h == 0)
         {
-            // Result is always 1 or -1
+            // These vars are always 1 or -1, one of them will stay 0
             var stepH = h != 0 ? Math.Abs(h) / h : 0;
             var stepV = v != 0 ? Math.Abs(v) / v : 0;
 
+            // A bit too difficult for loop to explain
             for (int i = move.OriginalPosition.Y + stepV, j = move.OriginalPosition.X + stepH; Math.Abs(i - move.NewPosition.Y - (j - move.NewPosition.X)) >= 0; i += stepV, j += stepH)
             {
                 if (pieces[i, j] is not null || (i == move.NewPosition.Y && j == move.NewPosition.X))
@@ -350,6 +385,7 @@ public partial class ChessBoard
                     return i == move.NewPosition.Y && j == move.NewPosition.X && move.Piece.Color != pieces[i, j]?.Color;
                 }
             }
+            // This return will never be reached (in theory)
             return false;
         }
         else return false;
@@ -357,6 +393,7 @@ public partial class ChessBoard
 
     private static bool KnightValidation(Move move, Piece?[,] pieces)
     {
+        // New position must be with stepH = 1 and steV = 2 or vice versa
         if ((Math.Abs(move.NewPosition.X - move.OriginalPosition.X) == 2 && Math.Abs(move.NewPosition.Y - move.OriginalPosition.Y) == 1)
          || (Math.Abs(move.NewPosition.X - move.OriginalPosition.X) == 1 && Math.Abs(move.NewPosition.Y - move.OriginalPosition.Y) == 2))
         {
@@ -373,10 +410,11 @@ public partial class ChessBoard
         // If moving diagonal
         if (Math.Abs(v) == Math.Abs(h))
         {
-            // Result is always 1 or -1
+            // These vars are always 1 or -1
             var stepV = Math.Abs(v) / v;
             var stepH = Math.Abs(h) / h;
 
+            // A bit too difficult for loop to explain
             for (int i = move.OriginalPosition.Y + stepV, j = move.OriginalPosition.X + stepH; Math.Abs(i - move.NewPosition.Y) >= 0; i += stepV, j += stepH)
             {
                 if (pieces[i, j] is not null || (i == move.NewPosition.Y && j == move.NewPosition.X))
@@ -406,49 +444,51 @@ public partial class ChessBoard
                 if (board.pieces[move.NewPosition.Y, move.NewPosition.X] is not null
                  && board.pieces[move.NewPosition.Y, move.NewPosition.X].Type == PieceType.Rook
                  && board.pieces[move.NewPosition.Y, move.NewPosition.X].Color == move.Piece.Color)
+                {
                     switch (move.Piece.Color)
                     {
                         case var e when e.Equals(PieceColor.White):
                             // Queen Castle
-                            if (move.NewPosition.X == 0 && HasRightToCastle(PieceColor.White, MoveParameter.CastleQueen, board))
+                            if (move.NewPosition.X == 0 && HasRightToCastle(PieceColor.White, CastleType.Queen, board))
                             {
                                 if (board.pieces[0, 1] is null && board.pieces[0, 2] is null && board.pieces[0, 3] is null)
                                 {
-                                    move.Parameter = MoveParameter.CastleQueen;
+                                    move.Parameter = new MoveCastle(CastleType.Queen);
                                     return true;
                                 }
                             }
                             // King Castle
-                            else if (move.NewPosition.X == 7 && HasRightToCastle(PieceColor.White, MoveParameter.CastleKing, board))
+                            else if (move.NewPosition.X == 7 && HasRightToCastle(PieceColor.White, CastleType.King, board))
                             {
                                 if (board.pieces[0, 5] is null && board.pieces[0, 6] is null)
                                 {
-                                    move.Parameter = MoveParameter.CastleKing;
+                                    move.Parameter = new MoveCastle(CastleType.King);
                                     return true;
                                 }
                             }
                             break;
                         case var e when e.Equals(PieceColor.Black):
                             // Queen Castle
-                            if (move.NewPosition.X == 0 && HasRightToCastle(PieceColor.Black, MoveParameter.CastleQueen, board))
+                            if (move.NewPosition.X == 0 && HasRightToCastle(PieceColor.Black, CastleType.Queen, board))
                             {
                                 if (board.pieces[7, 1] is null && board.pieces[7, 2] is null && board.pieces[7, 3] is null)
                                 {
-                                    move.Parameter = MoveParameter.CastleQueen;
+                                    move.Parameter = new MoveCastle(CastleType.Queen);
                                     return true;
                                 }
                             }
                             // King Castle
-                            else if (move.NewPosition.X == 7 && HasRightToCastle(PieceColor.Black, MoveParameter.CastleKing, board))
+                            else if (move.NewPosition.X == 7 && HasRightToCastle(PieceColor.Black, CastleType.King, board))
                             {
                                 if (board.pieces[7, 5] is null && board.pieces[7, 6] is null)
                                 {
-                                    move.Parameter = MoveParameter.CastleKing;
+                                    move.Parameter = new MoveCastle(CastleType.King);
                                     return true;
                                 }
                             }
                             break;
                     }
+                }
             }
             // if drop on kings new position after castle
             else if (Math.Abs(move.NewPosition.X - move.OriginalPosition.X) == 2)
@@ -461,11 +501,11 @@ public partial class ChessBoard
                          && board.pieces[0, 0] is not null
                          && board.pieces[0, 0].Type == PieceType.Rook
                          && board.pieces[0, 0].Color == PieceColor.White
-                         && HasRightToCastle(PieceColor.White, MoveParameter.CastleQueen, board))
+                         && HasRightToCastle(PieceColor.White, CastleType.Queen, board))
                         {
                             if (board.pieces[0, 1] is null && board.pieces[0, 2] is null && board.pieces[0, 3] is null)
                             {
-                                move.Parameter = MoveParameter.CastleQueen;
+                                move.Parameter = new MoveCastle(CastleType.Queen);
                                 return true;
                             }
                         }
@@ -474,11 +514,11 @@ public partial class ChessBoard
                               && board.pieces[0, 7] is not null
                               && board.pieces[0, 7].Type == PieceType.Rook
                               && board.pieces[0, 7].Color == PieceColor.White
-                              && HasRightToCastle(PieceColor.White, MoveParameter.CastleKing, board))
+                              && HasRightToCastle(PieceColor.White, CastleType.King, board))
                         {
                             if (board.pieces[0, 5] is null && board.pieces[0, 6] is null)
                             {
-                                move.Parameter = MoveParameter.CastleKing;
+                                move.Parameter = new MoveCastle(CastleType.King);
                                 return true;
                             }
                         }
@@ -489,11 +529,11 @@ public partial class ChessBoard
                          && board.pieces[7, 0] is not null
                          && board.pieces[7, 0].Type == PieceType.Rook
                          && board.pieces[7, 0].Color == PieceColor.Black
-                         && HasRightToCastle(PieceColor.Black, MoveParameter.CastleQueen, board))
+                         && HasRightToCastle(PieceColor.Black, CastleType.Queen, board))
                         {
                             if (board.pieces[7, 1] is null && board.pieces[7, 2] is null && board.pieces[7, 3] is null)
                             {
-                                move.Parameter = MoveParameter.CastleQueen;
+                                move.Parameter = new MoveCastle(CastleType.Queen);
                                 return true;
                             }
                         }
@@ -502,11 +542,11 @@ public partial class ChessBoard
                               && board.pieces[7, 7] is not null
                               && board.pieces[7, 7].Type == PieceType.Rook
                               && board.pieces[7, 7].Color == PieceColor.Black
-                              && HasRightToCastle(PieceColor.Black, MoveParameter.CastleKing, board))
+                              && HasRightToCastle(PieceColor.Black, CastleType.King, board))
                         {
                             if (board.pieces[7, 5] is null && board.pieces[7, 6] is null)
                             {
-                                move.Parameter = MoveParameter.CastleKing;
+                                move.Parameter = new MoveCastle(CastleType.King);
                                 return true;
                             }
                         }
@@ -517,7 +557,7 @@ public partial class ChessBoard
         return false;
     }
 
-    private static bool HasRightToCastle(PieceColor side, MoveParameter castleType, ChessBoard board)
+    internal static bool HasRightToCastle(PieceColor side, CastleType castleType, ChessBoard board)
     {
         var valid = false;
 
@@ -525,17 +565,17 @@ public partial class ChessBoard
         {
             if (side == PieceColor.White)
             {
-                if (castleType == MoveParameter.CastleKing)
-                    valid = board.Fen.CastleWK;
-                else if (castleType == MoveParameter.CastleQueen)
-                    valid = board.Fen.CastleWQ;
+                if (castleType == CastleType.King)
+                    valid = board.FenObj.CastleWK;
+                else if (castleType == CastleType.Queen)
+                    valid = board.FenObj.CastleWQ;
             }
             else if (side == PieceColor.Black)
             {
-                if (castleType == MoveParameter.CastleKing)
-                    valid = board.Fen.CastleBK;
-                else if (castleType == MoveParameter.CastleQueen)
-                    valid = board.Fen.CastleBQ;
+                if (castleType == CastleType.King)
+                    valid = board.FenObj.CastleBK;
+                else if (castleType == CastleType.Queen)
+                    valid = board.FenObj.CastleBQ;
             }
 
             if (board.moveIndex >= 0 && valid)
@@ -549,14 +589,13 @@ public partial class ChessBoard
         bool ValidByMoves()
         {
             Position kingpos = new(side == PieceColor.White ? "e1" : "e8");
-            Position rookpos;
 
-            if (castleType == MoveParameter.CastleKing)
-                rookpos = new Position(side == PieceColor.White ? "h1" : "h8");
-            else if (castleType == MoveParameter.CastleQueen)
-                rookpos = new Position(side == PieceColor.White ? "a1" : "a8");
-            else
-                throw new ArgumentException("Invalid move parameter", nameof(castleType));
+            var rookpos = castleType switch
+            {
+                CastleType.King => new Position(side == PieceColor.White ? "h1" : "h8"),
+                CastleType.Queen => new Position(side == PieceColor.White ? "a1" : "a8"),
+                _ => throw new ArgumentException("Invalid Castle type parameter", nameof(castleType)),
+            };
 
             return !PieceEverMoved(kingpos, board) && !PieceEverMoved(rookpos, board);
         }
@@ -564,7 +603,8 @@ public partial class ChessBoard
 
     private static bool PieceEverMoved(Position piecePos, ChessBoard board)
     {
-        return board.ExecutedMoves.GetRange(0, board.moveIndex + 1).Any(p => p.OriginalPosition == piecePos);
+        return board.executedMoves.GetRange(0, board.moveIndex + 1)
+                                  .Any(p => p.OriginalPosition == piecePos);
     }
 
     private static bool IsValidEnPassant(Move move, ChessBoard board, short v, short h)
@@ -582,7 +622,7 @@ public partial class ChessBoard
                     valid = LastMoveEnPassantPosition(board) == move.NewPosition;
 
                 else if (board.LoadedFromFEN)
-                    valid = board.Fen.EnPassant == move.NewPosition;
+                    valid = board.FenObj.EnPassant == move.NewPosition;
 
                 return valid;
             }
@@ -590,16 +630,23 @@ public partial class ChessBoard
         return false;
     }
 
-    private static Position LastMoveEnPassantPosition(ChessBoard board)
+    /// <summary>
+    /// Returns Valid(if not => X = -1,Y = -1) En passant move new position
+    /// </summary>
+    internal static Position LastMoveEnPassantPosition(ChessBoard board)
     {
         Position pos = new();
 
-        var lastMove = board.ExecutedMoves.GetRange(0, board.moveIndex + 1).LastOrDefault();
+        var lastMove = board.executedMoves.GetRange(0, board.moveIndex + 1).LastOrDefault();
 
-        if (lastMove is not null && lastMove.Piece.Type == PieceType.Pawn && Math.Abs(lastMove.NewPosition.Y - lastMove.OriginalPosition.Y) == 2)
+        if (lastMove is not null && lastMove.Piece.Type == PieceType.Pawn)
         {
-            pos = new() { X = lastMove.NewPosition.X, Y = (short)((lastMove.NewPosition.Y + lastMove.OriginalPosition.Y) / 2) };
+            if (Math.Abs(lastMove.NewPosition.Y - lastMove.OriginalPosition.Y) == 2)
+            {
+                pos = new() { X = lastMove.NewPosition.X, Y = (short)((lastMove.NewPosition.Y + lastMove.OriginalPosition.Y) / 2) };
+            }
         }
+
         return pos;
     }
 }

@@ -71,8 +71,8 @@ public partial class ChessBoard
     private void OnCapturedEvent(Piece piece)
     {
         if (context is not null)
-            context.Send(delegate { OnCaptured(this, new CaptureEventArgs(this, piece, WhiteCaptured, BlackCaptured)); }, null);
+            context.Send(delegate { OnCaptured(this, new CaptureEventArgs(this, piece, CapturedWhite, CapturedBlack)); }, null);
         else
-            OnCaptured(this, new CaptureEventArgs(this, piece, WhiteCaptured, BlackCaptured));
+            OnCaptured(this, new CaptureEventArgs(this, piece, CapturedWhite, CapturedBlack));
     }
 }

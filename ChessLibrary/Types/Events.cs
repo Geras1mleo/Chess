@@ -22,10 +22,12 @@ public class CaptureEventArgs : ChessEventArgs
     /// Piece that has been captured
     /// </summary>
     public Piece CapturedPiece { get; }
+
     /// <summary>
     /// List of captured pieces where color == White
     /// </summary>
     public Piece[] WhiteCapturedPieces { get; set; }
+
     /// <summary>
     /// List of captured pieces where color == Black
     /// </summary>
@@ -56,6 +58,7 @@ public class CheckEventArgs : ChessEventArgs
     /// Position of checked king
     /// </summary>
     public Position KingPosition { get; }
+
     /// <summary>
     /// Checked state
     /// </summary>
@@ -70,32 +73,10 @@ public class CheckEventArgs : ChessEventArgs
 
 public class PromotionEventArgs : ChessEventArgs
 {
-    private MoveParameter propmotionResult = MoveParameter.PawnPromotion;
-
     /// <summary>
-    /// Allowed:<br/>
-    /// MoveParameter.PawnPromotion<br/>
-    /// MoveParameter.PromotionToQueen<br/>
-    /// MoveParameter.PromotionToRook<br/>
-    /// MoveParameter.PromotionToBishop<br/>
-    /// MoveParameter.PromotionToKnight<br/>
+    /// Specified by user promotion result
     /// </summary>
-    public MoveParameter PromotionResult
-    {
-        get => propmotionResult;
-        set
-        {
-            if (value == MoveParameter.PawnPromotion
-             || value == MoveParameter.PromotionToQueen
-             || value == MoveParameter.PromotionToRook
-             || value == MoveParameter.PromotionToBishop
-             || value == MoveParameter.PromotionToKnight)
-            {
-                propmotionResult = value;
-            }
-            else throw new InvalidOperationException("MoveParameter for promotion result must be promotion type.");
-        }
-    }
+    public PromotionType PromotionResult { get; set; } = PromotionType.Default;
 
     public PromotionEventArgs(ChessBoard chessBoard) : base(chessBoard) { }
 }

@@ -1,4 +1,5 @@
 ﻿#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 namespace Chess;
 
 /// <summary>
@@ -15,11 +16,11 @@ public class PieceColor : SmartEnum<PieceColor>
     /// </summary>
     public char AsChar { get; }
 
-    /// <returns>
+    /// <summary>
     /// Opposite color <br/>
-    /// White => Black;<br/>
-    /// Black => White;<br/>
-    /// </returns>
+    /// White => Black<br/>
+    /// Black => White<br/>
+    /// </summary>
     public PieceColor OppositeColor()
     {
         return Value switch
@@ -35,11 +36,11 @@ public class PieceColor : SmartEnum<PieceColor>
         AsChar = asChar;
     }
 
-    /// <returns>
+    /// <summary>
     /// PieceColor object from char<br/>
     /// 'w' => White<br/>
     /// 'b' => Black<br/>
-    /// </returns>
+    /// </summary>
     public static PieceColor FromChar(char color)
     {
         return char.ToLower(color) switch
@@ -78,7 +79,7 @@ public class PieceType : SmartEnum<PieceType>
         AsChar = asChar;
     }
 
-    /// <returns>
+    /// <summary>
     /// PieceType object from char<br/>
     /// 'p' => Pawn<br/>
     /// 'r' => Rook<br/>
@@ -86,7 +87,7 @@ public class PieceType : SmartEnum<PieceType>
     /// 'b' => Bishop<br/>
     /// 'q' => Queen<br/>
     /// 'k' => King<br/>
-    /// </returns>
+    /// </summary>
     public static PieceType FromChar(char type)
     {
         return char.ToLower(type) switch
@@ -102,77 +103,4 @@ public class PieceType : SmartEnum<PieceType>
     }
 }
 
-/// <summary>
-/// Smart enum for Move parameter in chess game
-/// </summary>
-public class MoveParameter : SmartEnum<MoveParameter>
-{
-    public static readonly MoveParameter CastleKing = new("CastleKing", 2, "O-O");
-    public static readonly MoveParameter CastleQueen = new("CastleQueen", 3, "O-O-O");
-    public static readonly MoveParameter EnPassant = new("EnPassant", 4, "e.p.");
-
-    /// <summary>
-    /// Default promotion => To Queen
-    /// </summary>
-    public static readonly MoveParameter PawnPromotion = new("PawnPromotion", 5, "=");
-    public static readonly MoveParameter PromotionToQueen = new("PromotionToQueen", 6, "=q");
-    public static readonly MoveParameter PromotionToRook = new("PromotionToRook", 7, "=r");
-    public static readonly MoveParameter PromotionToBishop = new("PromotionToBishop", 8, "=b");
-    public static readonly MoveParameter PromotionToKnight = new("PromotionToKnight", 9, "=n");
-
-    /// <summary>
-    /// CastleKing => "O-O"<br/>
-    /// CastleQueen => "O-O-O"<br/>
-    /// EnPassant => "e.p."<br/>
-    /// PawnPromotion => "="<br/>
-    /// PromotionToQueen => "=q"<br/>
-    /// PromotionToRook => "=r"<br/>
-    /// PromotionToBishop => "=b"<br/>
-    /// PromotionToKnight => "=n"<br/>
-    /// </summary>
-    public string AsShortString { get; }
-
-    private MoveParameter(string name, int value, string asShortString) : base(name, value)
-    {
-        AsShortString = asShortString;
-    }
-
-    /// <returns>
-    /// MoveParameter object from short string<br/>
-    /// "0-0" => CastleKing<br/>
-    /// "0-0-0" => CastleQueen<br/>
-    /// "e.p." => EnPassant<br/>
-    /// "=" => PawnPromotion<br/>
-    /// "=q" => PromotionToQueen<br/>
-    /// "=r" => PromotionToRook<br/>
-    /// "=b" => PromotionToBishop<br/>
-    /// "=n" => PromotionToKnight<br/>
-    /// </returns>
-    public static MoveParameter FromString(string parameter)
-    {
-        return parameter.ToLower() switch
-        {
-            "o-o" => CastleKing,
-            "o-o-o" => CastleQueen,
-            "e.p." => EnPassant,
-            "=" => PawnPromotion,
-            "=q" => PromotionToQueen,
-            "=r" => PromotionToRook,
-            "=b" => PromotionToBishop,
-            "=n" => PromotionToKnight,
-            _ => throw new ArgumentException("Parameter.FromString"),
-        };
-    }
-}
-
-/// <summary>
-/// Endgame type enum for chess game
-/// </summary>
-public enum EndgameType : byte
-{
-    Checkmate,
-    Stalemate,
-    Resigned,
-    Draw,
-}
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

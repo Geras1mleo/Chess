@@ -43,12 +43,18 @@ public class ChessMoveBenchmark
     //  | MoveUsingMoveObject |  74.15 us | 3.776 us | 11.13 us |    1 |
     //  |        MoveUsingSan | 145.57 us | 9.105 us | 26.85 us |    2 |
     //
-    //  02/02/2022 => good, stddev?? how is it even possible??
+    //  02/02/2022 => 
     //  |              Method |      Mean |    Error |    StdDev | Rank |
     //  |-------------------- |----------:|---------:|----------:|-----:|
     //  | MoveUsingMoveObject |  70.27 us | 2.723 us |  7.985 us |    1 |
     //  |        MoveUsingSan | 126.91 us | 4.889 us | 14.337 us |    2 |
     //  
+    //  13/02/2022 => much logic added // todo OPTIMIZE that shit
+    //  |              Method |     Mean |   Error |   StdDev | Rank |
+    //  |-------------------- |---------:|--------:|---------:|-----:|
+    //  | MoveUsingMoveObject | 145.2 us | 3.89 us | 11.28 us |    1 |
+    //  |        MoveUsingSan | 234.3 us | 8.48 us | 24.61 us |    2 |
+    //
 }
 
 [RankColumn]
@@ -85,6 +91,12 @@ public class ChessGenerateMovesBenchmark
     //  | MovesSanFalse | 317.3 us | 16.32 us | 48.12 us |    1 |
     //  |  MovesSanTrue | 325.2 us |  8.84 us | 25.52 us |    2 |
     //
+    //  13/02/2022 => needs optimization
+    //  |        Method |     Mean |   Error |   StdDev | Rank |
+    //  |-------------- |---------:|--------:|---------:|-----:|
+    //  | MovesSanFalse | 469.5 us | 9.24 us | 15.44 us |    1 |
+    //  |  MovesSanTrue | 494.9 us | 9.84 us | 18.48 us |    2 |
+    //
 }
 
 public class ChessIsValidMoveBenchmark
@@ -115,4 +127,10 @@ public class ChessIsValidMoveBenchmark
     //
     //  Conclusion:
     //  Pretty much the same performance
+    //
+    //  13/02/2022 => slow af =_=
+    //  |      Method |     Mean |    Error |   StdDev |
+    //  |------------ |---------:|---------:|---------:|
+    //  | IsValidMove | 98.77 us | 4.090 us | 12.06 us |
+    //
 }
