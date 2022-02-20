@@ -49,11 +49,17 @@ public class ChessMoveBenchmark
     //  | MoveUsingMoveObject |  70.27 us | 2.723 us |  7.985 us |    1 |
     //  |        MoveUsingSan | 126.91 us | 4.889 us | 14.337 us |    2 |
     //  
-    //  13/02/2022 => much logic added // todo OPTIMIZE that shit
+    //  13/02/2022 => much logic added // need to OPTIMIZE that shit
     //  |              Method |     Mean |   Error |   StdDev | Rank |
     //  |-------------------- |---------:|--------:|---------:|-----:|
     //  | MoveUsingMoveObject | 145.2 us | 3.89 us | 11.28 us |    1 |
     //  |        MoveUsingSan | 234.3 us | 8.48 us | 24.61 us |    2 |
+    //
+    //  20/02/2022 => a bit better
+    //  |              Method |     Mean |   Error |   StdDev | Rank |
+    //  |-------------------- |---------:|--------:|---------:|-----:|
+    //  | MoveUsingMoveObject | 141.8 us | 7.93 us | 23.39 us |    1 |
+    //  |        MoveUsingSan | 193.9 us | 8.04 us | 23.32 us |    2 |
     //
 }
 
@@ -97,6 +103,12 @@ public class ChessGenerateMovesBenchmark
     //  | MovesSanFalse | 469.5 us | 9.24 us | 15.44 us |    1 |
     //  |  MovesSanTrue | 494.9 us | 9.84 us | 18.48 us |    2 |
     //
+    //  20/02/2022 => bruh... why??
+    //  |        Method |     Mean |    Error |   StdDev | Rank |
+    //  |-------------- |---------:|---------:|---------:|-----:|
+    //  | MovesSanFalse | 667.5 us | 39.11 us | 113.5 us |    1 |
+    //  |  MovesSanTrue | 745.0 us | 36.14 us | 105.4 us |    2 |
+    //
 }
 
 public class ChessIsValidMoveBenchmark
@@ -133,4 +145,113 @@ public class ChessIsValidMoveBenchmark
     //  |------------ |---------:|---------:|---------:|
     //  | IsValidMove | 98.77 us | 4.090 us | 12.06 us |
     //
+    //  20/02/2022 => alright then...
+    //  |      Method |     Mean |   Error |   StdDev |
+    //  |------------ |---------:|--------:|---------:|
+    //  | IsValidMove | 100.2 us | 4.67 us | 13.76 us |
+    //
+}
+
+[MemoryDiagnoser]
+public class ChessFenConversionsBenchmark
+{
+    [Benchmark]
+    public void FenConvertion()
+    {
+        var board = new ChessBoard();
+
+        board.LoadFen("1nbqkbn1/pppppppp/NpNpNpNp/pBpBpBpB/bPbPbPbP/PnPnPnPn/PPPPPPPP/1NBQKBN1 w - - 0 1");
+        board.LoadFen("rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
+        board.LoadFen("r3kbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1");
+        board.LoadFen("rnb1kbnr/pppppppp/8/8/8/8/5q2/7K b kq - 0 1");
+    }
+
+    //  Tests:
+    //  20/02/2022 => before optimizations
+    //  |        Method |     Mean |    Error |   StdDev |    Gen 0 | Allocated |
+    //  |-------------- |---------:|---------:|---------:|---------:|----------:|
+    //  | FenConvertion | 656.7 us | 29.29 us | 86.37 us | 168.9453 |    346 KB |
+    //
+    //  20/02/2022 => after optimizations Regex cached and compiled
+    //  |        Method |     Mean |    Error |   StdDev |    Gen 0 | Allocated |
+    //  |-------------- |---------:|---------:|---------:|---------:|----------:|
+    //  | FenConvertion | 416.8 us | 11.61 us | 33.69 us | 169.4336 |    346 KB |
+    // 
+    //  20/02/2022 =>
+    //  |        Method |     Mean |    Error |   StdDev |    Gen 0 | Allocated |
+    //  |-------------- |---------:|---------:|---------:|---------:|----------:|
+    //  | FenConvertion | 504.8 us | 35.08 us | 99.52 us | 203.1250 |    415 KB |
+}
+
+[MemoryDiagnoser]
+public class ChessPgnConversionsBenchmark
+{
+    [Benchmark]
+    public void PgnConvertion()
+    {
+        var board = new ChessBoard();
+
+        board.LoadPgn(
+        @"[Event ""Live Chess""]
+            [Site ""Chess.com""]
+            [Date ""2022.01.11""]
+            [Round ""?""]
+            [White ""Milan1905""]
+            [Black ""Geras1mleo""]
+            [Result ""1-0""]
+            [ECO ""C47""]
+            [WhiteElo ""1006""]
+            [BlackElo ""626""]
+            [TimeControl ""600""]
+            [EndTime ""11:58:56 PST""]
+            [Termination ""Milan1905 won by resignation""]
+            
+            1.e4 e5 2.Nf3 Nf6 3.Nc3 Nc6 4.Bb5 Bc5 5.Bxc6 bxc6 6.Nxe5 Bxf2+ 7.Kxf2 O-O
+            8.d4 d5 9.exd5 cxd5 10.Nc6 Ng4+ 11.Kg1 Qf6 12.Qf1 Qxc6 13.h3 Nf6 14.Bg5
+            Qb6 15.Bxf6 Qxf6 16.Qxf6 gxf6 17.Nxd5 Rb8 18.Nxf6+ Kh8 19.b3 Rb4 20.c3 Bb7
+            21.cxb4 1-0");
+
+        board.LoadPgn(
+        @"[Event ""Live Chess""]
+        [Site ""Chess.com""]
+        [Date ""2022.01.03""]
+        [Round ""?""]
+        [White ""Milan1905""]
+        [Black ""Geras1mleo""]
+        [Result ""1/2-1/2""]
+        [ECO ""C42""]
+        [WhiteElo ""1006""]
+        [BlackElo ""626""]
+        [TimeControl ""600""]
+        [EndTime ""9:19:18 PST""]
+        [Termination ""Game drawn by insufficient material""]
+            
+        1.e4 e5 2.Nf3 Nf6 3.Nxe5 Nxe4 4.Qe2 d5 5.d3 Bd6 6.dxe4 Bxe5 7.exd5 Qxd5
+        8.c4 Qc5 9.Bf4 Nd7 10.Bxe5 Nxe5 11.Nc3 O-O 12.O-O-O Nxc4 13.Na4 Qc6 14.
+        Qxc4 Bg4 15.Qxc6 bxc6 16.Rd2 Rad8 17.Rxd8 Rxd8 18.Ba6 h6 19.h3 Bf5 20.g4
+        Be4 21.Re1 Rd4 22.Nc3 Bf3 23.Re8+ Kh7 24.Ne2 Bxe2 25.Bxe2 Rf4 26.Bd3+ g6
+        27.Re2 f5 28.gxf5 gxf5 29.Re7+ Kg6 30.Rxc7 Rf3 31.Rxc6+ Kg5 32.h4+ Kxh4
+        33.Rxh6+ Kg5 34.Rh2 Rxd3 35.Kc2 Rf3 36.Rg2+ Kh4 37.Kd2 Kh3 38.Rg8 Rxf2+
+        39.Kc3 Rf3+ 40.Kb4 Rf4+ 41.Ka3 Rf3+ 42.b3 a5 43.Ka4 Rf2 44.a3 Rf4+ 45.b4
+        axb4 46.axb4 Rg4 47.Rh8+ Rh4 48.Rxh4+ Kxh4 49.b5 f4 50.b6 f3 51.b7 f2 52.
+        b8=Q f1=Q 53.Qb4+ Kg3 54.Qb3+ Qf3 55.Qxf3+ Kxf3 1/2-1/2");
+    }
+
+    //  Tests:
+    //  20/02/2022 => before optimizations
+    //  |        Method |     Mean |     Error |    StdDev |     Gen 0 | Allocated |
+    //  |-------------- |---------:|----------:|----------:|----------:|----------:|
+    //  | PgnConvertion | 8.115 ms | 0.3013 ms | 0.8836 ms | 2179.6875 |      4 MB |
+    //
+    //  20/02/2022 => after optimizations Regex cached and compiled
+    //  |        Method |     Mean |     Error |   StdDev |     Gen 0 | Allocated |
+    //  |-------------- |---------:|----------:|---------:|----------:|----------:|
+    //  | PgnConvertion | 6.876 ms | 0.3544 ms | 1.045 ms | 2179.6875 |      4 MB |
+    // 
+    //  20/02/2022 => after optimizations San with StringBuilder
+    //  |        Method |     Mean |     Error |    StdDev |     Gen 0 | Allocated |
+    //  |-------------- |---------:|----------:|----------:|----------:|----------:|
+    //  | PgnConvertion | 7.360 ms | 0.2578 ms | 0.7601 ms | 2195.3125 |      4 MB |
+    // 
+    //  Conclusion: still too much memory usage
 }

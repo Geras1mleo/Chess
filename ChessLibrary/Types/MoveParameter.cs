@@ -1,4 +1,13 @@
-﻿#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+﻿// *****************************************************
+// *                                                   *
+// * O Lord, Thank you for your goodness in our lives. *
+// *     Please bless this code to our compilers.      *
+// *                     Amen.                         *
+// *                                                   *
+// *****************************************************
+//                                    Made by Geras1mleo
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 namespace Chess;
 
@@ -144,8 +153,11 @@ internal class MovePromotion : IMoveParameter
     public void ExecuteWithParameter(Move move, ChessBoard board)
     {
         ChessBoard.DropPiece(move, board);
+        
+        // Making sure original type is saved
+        //move.Piece.Type = new Piece(move.Piece.Color, move.Piece.Type).Type;
 
-        move.Piece.Type = PromotionType switch
+        board.pieces[move.NewPosition.Y, move.NewPosition.X].Type = PromotionType switch
         {
             PromotionType.ToQueen or PromotionType.Default => PieceType.Queen,
             PromotionType.ToRook => PieceType.Rook,

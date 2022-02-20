@@ -5,6 +5,7 @@
 // *                     Amen.                         *
 // *                                                   *
 // *****************************************************
+//                                    Made by Geras1mleo
 
 namespace Chess;
 
@@ -441,67 +442,11 @@ public partial class ChessBoard
             // if drop on rook to castle
             if (move.NewPosition.X % 7 == 0 && move.NewPosition.Y % 7 == 0)
             {
-                if (board.pieces[move.NewPosition.Y, move.NewPosition.X] is not null
-                 && board.pieces[move.NewPosition.Y, move.NewPosition.X].Type == PieceType.Rook
-                 && board.pieces[move.NewPosition.Y, move.NewPosition.X].Color == move.Piece.Color)
-                {
-                    switch (move.Piece.Color)
-                    {
-                        case var e when e.Equals(PieceColor.White):
-                            // Queen Castle
-                            if (move.NewPosition.X == 0 && HasRightToCastle(PieceColor.White, CastleType.Queen, board))
-                            {
-                                if (board.pieces[0, 1] is null && board.pieces[0, 2] is null && board.pieces[0, 3] is null)
-                                {
-                                    move.Parameter = new MoveCastle(CastleType.Queen);
-                                    return true;
-                                }
-                            }
-                            // King Castle
-                            else if (move.NewPosition.X == 7 && HasRightToCastle(PieceColor.White, CastleType.King, board))
-                            {
-                                if (board.pieces[0, 5] is null && board.pieces[0, 6] is null)
-                                {
-                                    move.Parameter = new MoveCastle(CastleType.King);
-                                    return true;
-                                }
-                            }
-                            break;
-                        case var e when e.Equals(PieceColor.Black):
-                            // Queen Castle
-                            if (move.NewPosition.X == 0 && HasRightToCastle(PieceColor.Black, CastleType.Queen, board))
-                            {
-                                if (board.pieces[7, 1] is null && board.pieces[7, 2] is null && board.pieces[7, 3] is null)
-                                {
-                                    move.Parameter = new MoveCastle(CastleType.Queen);
-                                    return true;
-                                }
-                            }
-                            // King Castle
-                            else if (move.NewPosition.X == 7 && HasRightToCastle(PieceColor.Black, CastleType.King, board))
-                            {
-                                if (board.pieces[7, 5] is null && board.pieces[7, 6] is null)
-                                {
-                                    move.Parameter = new MoveCastle(CastleType.King);
-                                    return true;
-                                }
-                            }
-                            break;
-                    }
-                }
-            }
-            // if drop on kings new position after castle
-            else if (Math.Abs(move.NewPosition.X - move.OriginalPosition.X) == 2)
-            {
                 switch (move.Piece.Color)
                 {
                     case var e when e.Equals(PieceColor.White):
                         // Queen Castle
-                        if (move.NewPosition.X == 2
-                         && board.pieces[0, 0] is not null
-                         && board.pieces[0, 0].Type == PieceType.Rook
-                         && board.pieces[0, 0].Color == PieceColor.White
-                         && HasRightToCastle(PieceColor.White, CastleType.Queen, board))
+                        if (move.NewPosition.X == 0 && HasRightToCastle(PieceColor.White, CastleType.Queen, board))
                         {
                             if (board.pieces[0, 1] is null && board.pieces[0, 2] is null && board.pieces[0, 3] is null)
                             {
@@ -510,11 +455,7 @@ public partial class ChessBoard
                             }
                         }
                         // King Castle
-                        else if (move.NewPosition.X == 6
-                              && board.pieces[0, 7] is not null
-                              && board.pieces[0, 7].Type == PieceType.Rook
-                              && board.pieces[0, 7].Color == PieceColor.White
-                              && HasRightToCastle(PieceColor.White, CastleType.King, board))
+                        else if (move.NewPosition.X == 7 && HasRightToCastle(PieceColor.White, CastleType.King, board))
                         {
                             if (board.pieces[0, 5] is null && board.pieces[0, 6] is null)
                             {
@@ -525,11 +466,7 @@ public partial class ChessBoard
                         break;
                     case var e when e.Equals(PieceColor.Black):
                         // Queen Castle
-                        if (move.NewPosition.X == 2
-                         && board.pieces[7, 0] is not null
-                         && board.pieces[7, 0].Type == PieceType.Rook
-                         && board.pieces[7, 0].Color == PieceColor.Black
-                         && HasRightToCastle(PieceColor.Black, CastleType.Queen, board))
+                        if (move.NewPosition.X == 0 && HasRightToCastle(PieceColor.Black, CastleType.Queen, board))
                         {
                             if (board.pieces[7, 1] is null && board.pieces[7, 2] is null && board.pieces[7, 3] is null)
                             {
@@ -538,11 +475,7 @@ public partial class ChessBoard
                             }
                         }
                         // King Castle
-                        else if (move.NewPosition.X == 6
-                              && board.pieces[7, 7] is not null
-                              && board.pieces[7, 7].Type == PieceType.Rook
-                              && board.pieces[7, 7].Color == PieceColor.Black
-                              && HasRightToCastle(PieceColor.Black, CastleType.King, board))
+                        else if (move.NewPosition.X == 7 && HasRightToCastle(PieceColor.Black, CastleType.King, board))
                         {
                             if (board.pieces[7, 5] is null && board.pieces[7, 6] is null)
                             {
@@ -553,7 +486,54 @@ public partial class ChessBoard
                         break;
                 }
             }
-        }
+            // if drop on kings new position after castle
+            else if (Math.Abs(move.NewPosition.X - move.OriginalPosition.X) == 2)
+            {
+                switch (move.Piece.Color)
+                {
+                    case var e when e.Equals(PieceColor.White):
+                        // Queen Castle
+                        if (move.NewPosition.X == 2 && HasRightToCastle(PieceColor.White, CastleType.Queen, board))
+                        {
+                            if (board.pieces[0, 1] is null && board.pieces[0, 2] is null && board.pieces[0, 3] is null)
+                            {
+                                move.Parameter = new MoveCastle(CastleType.Queen);
+                                return true;
+                            }
+                        }
+                        // King Castle
+                        else if (move.NewPosition.X == 6 && HasRightToCastle(PieceColor.White, CastleType.King, board))
+                        {
+                            if (board.pieces[0, 5] is null && board.pieces[0, 6] is null)
+                            {
+                                move.Parameter = new MoveCastle(CastleType.King);
+                                return true;
+                            }
+                        }
+                        break;
+                    case var e when e.Equals(PieceColor.Black):
+                        // Queen Castle
+                        if (move.NewPosition.X == 2 && HasRightToCastle(PieceColor.Black, CastleType.Queen, board))
+                        {
+                            if (board.pieces[7, 1] is null && board.pieces[7, 2] is null && board.pieces[7, 3] is null)
+                            {
+                                move.Parameter = new MoveCastle(CastleType.Queen);
+                                return true;
+                            }
+                        }
+                        // King Castle
+                        else if (move.NewPosition.X == 6 && HasRightToCastle(PieceColor.Black, CastleType.King, board))
+                        {
+                            if (board.pieces[7, 5] is null && board.pieces[7, 6] is null)
+                            {
+                                move.Parameter = new MoveCastle(CastleType.King);
+                                return true;
+                            }
+                        }
+                        break;
+                }
+            }
+        } // todo shorter
         return false;
     }
 
@@ -597,7 +577,10 @@ public partial class ChessBoard
                 _ => throw new ArgumentException("Invalid Castle type parameter", nameof(castleType)),
             };
 
-            return !PieceEverMoved(kingpos, board) && !PieceEverMoved(rookpos, board);
+            return board.pieces[rookpos.Y, rookpos.X] is not null
+                && board.pieces[rookpos.Y, rookpos.X].Type == PieceType.Rook
+                && board.pieces[rookpos.Y, rookpos.X].Color == side
+                && !PieceEverMoved(kingpos, board) && !PieceEverMoved(rookpos, board);
         }
     }
 

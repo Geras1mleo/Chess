@@ -1,4 +1,13 @@
-﻿namespace Chess;
+﻿// *****************************************************
+// *                                                   *
+// * O Lord, Thank you for your goodness in our lives. *
+// *     Please bless this code to our compilers.      *
+// *                     Amen.                         *
+// *                                                   *
+// *****************************************************
+//                                    Made by Geras1mleo
+
+namespace Chess;
 
 internal class FenBoard
 {
@@ -44,12 +53,10 @@ internal class FenBoard
 
     internal FenBoard(string fen)
     {
-        string pattern = @"^(((?:[rnbqkpRNBQKP1-8]+\/){7})[rnbqkpRNBQKP1-8]+) ([b|w]) (-|[K|Q|k|q]{1,4}) (-|[a-h][36]) (\d+ \d+)$";
-
-        var matches = Regex.Matches(fen, pattern);
+        var matches = Regexes.regexFen.Matches(fen);
 
         if (matches.Count == 0)
-            throw new ArgumentException("FEN should match pattern: " + pattern);
+            throw new ArgumentException("FEN should match pattern: " + Regexes.FenPattern);
 
         pieces = new Piece[8, 8];
 
@@ -58,6 +65,7 @@ internal class FenBoard
             switch (group.Name)
             {
                 case "1":
+                    // Set pieces to given positions
                     int x = 0, y = 7;
                     for (int i = 0; i < group.Length; i++)
                     {
@@ -112,25 +120,25 @@ internal class FenBoard
 
         // Calculating missing pieces on according begin pieces in fen
         // Math.Clamp() for get max/min taken figures (2 queens possible)
-        wcap.AddRange(Enumerable.Range(0, Math.Clamp(8 - fpieces.Where(p => p.Type == PieceType.Pawn && p.Color == PieceColor.White).Count(), 0, 8)).Select(p => new Piece(PieceColor.White, PieceType.Pawn)));
-        wcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Rook && p.Color == PieceColor.White).Count(), 0, 2)).Select(p => new Piece(PieceColor.White, PieceType.Rook)));
-        wcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Bishop && p.Color == PieceColor.White).Count(), 0, 2)).Select(p => new Piece(PieceColor.White, PieceType.Bishop)));
-        wcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Knight && p.Color == PieceColor.White).Count(), 0, 2)).Select(p => new Piece(PieceColor.White, PieceType.Knight)));
-        wcap.AddRange(Enumerable.Range(0, Math.Clamp(1 - fpieces.Where(p => p.Type == PieceType.Queen && p.Color == PieceColor.White).Count(), 0, 1)).Select(p => new Piece(PieceColor.White, PieceType.Queen)));
+        wcap.AddRange(Enumerable.Range(0, Math.Clamp(8 - fpieces.Where(p => p.Type == PieceType.Pawn && p.Color == PieceColor.White).Count(), 0, 8)).Select(_ => new Piece(PieceColor.White, PieceType.Pawn)));
+        wcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Rook && p.Color == PieceColor.White).Count(), 0, 2)).Select(_ => new Piece(PieceColor.White, PieceType.Rook)));
+        wcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Bishop && p.Color == PieceColor.White).Count(), 0, 2)).Select(_ => new Piece(PieceColor.White, PieceType.Bishop)));
+        wcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Knight && p.Color == PieceColor.White).Count(), 0, 2)).Select(_ => new Piece(PieceColor.White, PieceType.Knight)));
+        wcap.AddRange(Enumerable.Range(0, Math.Clamp(1 - fpieces.Where(p => p.Type == PieceType.Queen && p.Color == PieceColor.White).Count(), 0, 1)).Select(_ => new Piece(PieceColor.White, PieceType.Queen)));
 
-        bcap.AddRange(Enumerable.Range(0, Math.Clamp(8 - fpieces.Where(p => p.Type == PieceType.Pawn && p.Color == PieceColor.Black).Count(), 0, 8)).Select(p => new Piece(PieceColor.Black, PieceType.Pawn)));
-        bcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Rook && p.Color == PieceColor.Black).Count(), 0, 2)).Select(p => new Piece(PieceColor.Black, PieceType.Rook)));
-        bcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Bishop && p.Color == PieceColor.Black).Count(), 0, 2)).Select(p => new Piece(PieceColor.Black, PieceType.Bishop)));
-        bcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Knight && p.Color == PieceColor.Black).Count(), 0, 2)).Select(p => new Piece(PieceColor.Black, PieceType.Knight)));
-        bcap.AddRange(Enumerable.Range(0, Math.Clamp(1 - fpieces.Where(p => p.Type == PieceType.Queen && p.Color == PieceColor.Black).Count(), 0, 1)).Select(p => new Piece(PieceColor.Black, PieceType.Queen)));
-
+        bcap.AddRange(Enumerable.Range(0, Math.Clamp(8 - fpieces.Where(p => p.Type == PieceType.Pawn && p.Color == PieceColor.Black).Count(), 0, 8)).Select(_ => new Piece(PieceColor.Black, PieceType.Pawn)));
+        bcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Rook && p.Color == PieceColor.Black).Count(), 0, 2)).Select(_ => new Piece(PieceColor.Black, PieceType.Rook)));
+        bcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Bishop && p.Color == PieceColor.Black).Count(), 0, 2)).Select(_ => new Piece(PieceColor.Black, PieceType.Bishop)));
+        bcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Knight && p.Color == PieceColor.Black).Count(), 0, 2)).Select(_ => new Piece(PieceColor.Black, PieceType.Knight)));
+        bcap.AddRange(Enumerable.Range(0, Math.Clamp(1 - fpieces.Where(p => p.Type == PieceType.Queen && p.Color == PieceColor.Black).Count(), 0, 1)).Select(_ => new Piece(PieceColor.Black, PieceType.Queen)));
+        
         WhiteCaptured = wcap.ToArray();
         BlackCaptured = bcap.ToArray();
     }
 
     public override string ToString()
     {
-        string sPieces = "";
+        StringBuilder piecesBuilder = new();
 
         for (int i = 7; i >= 0; i--)
         {
@@ -143,39 +151,39 @@ internal class FenBoard
                 {
                     if (emptyCount > 0)
                     {
-                        sPieces += emptyCount;
+                        piecesBuilder.Append(emptyCount);
                         emptyCount = 0;
                     }
-                    sPieces += pieces[i, j].ToFenChar();
+                    piecesBuilder.Append(pieces[i, j].ToFenChar());
                 }
             }
             if (emptyCount > 0)
-                sPieces += emptyCount;
+                piecesBuilder.Append(emptyCount);
             if (i - 1 >= 0)
-                sPieces += "/";
+                piecesBuilder.Append('/');
         }
 
-        string sCastles = "";
+        StringBuilder castlesBuilder = new();
 
         if (CastleWK)
-            sCastles += "K";
+            castlesBuilder.Append('K');
         if (CastleWQ)
-            sCastles += "Q";
+            castlesBuilder.Append('Q');
         if (CastleBK)
-            sCastles += "k";
+            castlesBuilder.Append('k');
         if (CastleBQ)
-            sCastles += "q";
+            castlesBuilder.Append('q');
 
-        if (sCastles == "")
-            sCastles = "-";
+        if (castlesBuilder.Length == 0)
+            castlesBuilder.Append('-');
 
-        string sEnPas;
+        string enPasBuilder;
 
         if (EnPassant.HasValue)
-            sEnPas = EnPassant.ToString();
+            enPasBuilder = EnPassant.ToString();
         else
-            sEnPas = "-";
+            enPasBuilder = "-";
 
-        return string.Join(' ', sPieces, Turn.AsChar, sCastles, sEnPas, HalfMoves, FullMoves);
+        return string.Join(' ', piecesBuilder, Turn.AsChar, castlesBuilder, enPasBuilder, HalfMoves, FullMoves);
     }
 }

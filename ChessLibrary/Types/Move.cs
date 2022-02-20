@@ -1,12 +1,19 @@
-﻿namespace Chess;
+﻿// *****************************************************
+// *                                                   *
+// * O Lord, Thank you for your goodness in our lives. *
+// *     Please bless this code to our compilers.      *
+// *                     Amen.                         *
+// *                                                   *
+// *****************************************************
+//                                    Made by Geras1mleo
+
+namespace Chess;
 
 /// <summary>
 /// Move on chess board
 /// </summary>
 public class Move
 {
-    const string ParametersSeparator = " - ";
-
     /// <summary>
     /// Whether Positions are initialized
     /// </summary>
@@ -71,55 +78,48 @@ public class Move
     /// Or: {a1 - h8}<br/>
     /// See: move.ToString()
     /// </param>
-    /// <exception cref="ArgumentException">Move </exception>
+    /// <exception cref="ArgumentException">Move didn't match regex pattern</exception>
     public Move(string move)
     {
         move = move.ToLower();
-        var pattern = "^{(((w|b)(b|k|n|p|q|r))" + ParametersSeparator + "|)" +
-                    "[a-h][1-8]" + ParametersSeparator + "[a-h][1-8]" +
-                    "(" + ParametersSeparator + "(w|b)(b|k|n|p|q|r)|)" +
-                    "(" + ParametersSeparator + @"((o-o)|(o-o-o)|(e\.p\.)|(=)|(=q)|(=r)|(=b)|(=n))|)" +
-                    "(" + ParametersSeparator + @"(\+|#)|)}$";
 
-        if (!Regex.IsMatch(move, pattern))
-            throw new ArgumentException("Move should match pattern: " + pattern);
+        var matches = Regexes.regexMove.Matches(move.ToLower());
 
-        var args = move[1..^1].Split(new string[] { ParametersSeparator }, StringSplitOptions.None);
+        if (matches.Count < 1)
+            throw new ArgumentException("Move should match pattern: " + Regexes.MovePattern);
 
-
-        if (Regex.IsMatch(args[0], "(w|b)(b|k|n|p|q|r)") && args.Length > 2)
+        foreach (var group in matches[0].Groups.Values)
         {
-            Piece = new Piece(args[0]);
-            OriginalPosition = new Position(args[1]);
-            NewPosition = new Position(args[2]);
-            SetArgsFrom(3);
-        }
-        else
-        {
-            OriginalPosition = new Position(args[0]);
-            NewPosition = new Position(args[1]);
-            SetArgsFrom(2);
-        }
+            if (!group.Success) continue;
 
-        void SetArgsFrom(int index)
-        {
-            for (int i = index; i < args.Length; i++)
+            switch (group.Name)
             {
-                switch (args[i])
-                {
-                    case var e when Regex.IsMatch(e, "(w|b)(b|k|n|p|q|r)"):
-                        CapturedPiece = new Piece(e);
-                        break;
-                    case var e when Regex.IsMatch(e, @"(0-0)|(0-0-0)|(e\.p\.)|(=)|(=q)|(=r)|(=b)|(=n)"):
-                        Parameter = IMoveParameter.FromString(e);
-                        break;
-                    case var e when Regex.IsMatch(e, @"(\+)"):
+                case "2":
+                    Piece = new(group.Value);
+                    break;
+                case "3":
+                    OriginalPosition = new(group.Value);
+                    break;
+                case "4":
+                    NewPosition = new(group.Value);
+                    break;
+                case "6":
+                    CapturedPiece = new(group.Value);
+                    break;
+                case "8":
+                    Parameter = IMoveParameter.FromString(group.Value);
+                    break;
+                case "10":
+                    if (group.Value == "+")
                         IsCheck = true;
-                        break;
-                    case var e when Regex.IsMatch(e, @"(#)"):
-                        IsCheck = true; IsMate = true;
-                        break;
-                }
+                    else if (group.Value == "#")
+                    {
+                        IsCheck = true;
+                        IsMate = true;
+                    }
+                    else if (group.Value == "$")
+                        IsMate = true;
+                    break;
             }
         }
     }
@@ -140,12 +140,33 @@ public class Move
     /// </summary>
     public override string ToString()
     {
-        return "{" +
-                    (Piece is null ? "" : Piece + ParametersSeparator) +
-                    OriginalPosition + ParametersSeparator + NewPosition + // Permanent
-                    (CapturedPiece is null ? "" : ParametersSeparator + CapturedPiece) +
-                    (Parameter is null ? "" : ParametersSeparator + Parameter.ShortStr) +
-                    (!IsMate ? (IsCheck ? ParametersSeparator + "+" : "") : ParametersSeparator + "#")
-                + "}";
+        StringBuilder builder = new();
+
+        builder.Append('{');
+
+        if (Piece is not null)
+            builder.Append(Piece + " - ");
+
+        builder.Append(OriginalPosition + " - " + NewPosition);
+
+        if (CapturedPiece is not null)
+            builder.Append(" - " + CapturedPiece);
+
+        if (Parameter is not null)
+            builder.Append(" - " + Parameter.ShortStr);
+
+        if (IsCheck)
+        {
+            if (IsMate)
+                builder.Append(" - #");
+            else
+                builder.Append(" - +");
+        }
+        else if (IsMate)
+            builder.Append(" - $");
+
+        builder.Append('}');
+
+        return builder.ToString();
     }
 }

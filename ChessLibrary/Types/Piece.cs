@@ -1,4 +1,13 @@
-﻿namespace Chess;
+﻿// *****************************************************
+// *                                                   *
+// * O Lord, Thank you for your goodness in our lives. *
+// *     Please bless this code to our compilers.      *
+// *                     Amen.                         *
+// *                                                   *
+// *****************************************************
+//                                    Made by Geras1mleo
+
+namespace Chess;
 
 /// <summary>
 /// Chess Piece
@@ -33,8 +42,8 @@ public class Piece
     /// </summary>
     public Piece(string piece)
     {
-        if (!Regex.IsMatch(piece, "^[wb][bknpqr]$"))
-            throw new ArgumentException("Piece should match pattern: ^[wb][bknpqr]$");
+        if (!Regexes.regexPiece.IsMatch(piece))
+            throw new ArgumentException("Piece should match pattern: " + Regexes.PiecePattern);
 
         Color = PieceColor.FromChar(piece[0]);
         Type = PieceType.FromChar(piece[1]);
@@ -48,8 +57,8 @@ public class Piece
     /// </summary>
     public Piece(char fenChar)
     {
-        if (!Regex.IsMatch(fenChar.ToString(), "^([bknpqr]|[BKNPQR])$"))
-            throw new ArgumentException("FEN piece should match pattern: ^([bknpqr]|[BKNPQR])$");
+        if (!Regexes.regexFenPiece.IsMatch(fenChar.ToString()))
+            throw new ArgumentException("FEN piece should match pattern: " + Regexes.FenPiecePattern);
 
         Type = PieceType.FromChar(fenChar);
         Color = char.IsLower(fenChar) ? PieceColor.Black : PieceColor.White;
@@ -75,7 +84,7 @@ public class Piece
         {
             var e when e == PieceColor.White => char.ToUpper(Type.AsChar),
             var e when e == PieceColor.Black => char.ToLower(Type.AsChar),
-            var _ => throw new ArgumentException("GetAsFENChar"),
+            var _ => throw new ArgumentException("ToFenChar"),
         };
     }
 }

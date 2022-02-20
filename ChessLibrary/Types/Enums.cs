@@ -1,4 +1,13 @@
-﻿#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+﻿// *****************************************************
+// *                                                   *
+// * O Lord, Thank you for your goodness in our lives. *
+// *     Please bless this code to our compilers.      *
+// *                     Amen.                         *
+// *                                                   *
+// *****************************************************
+//                                    Made by Geras1mleo
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 namespace Chess;
 
 public enum EndgameType : byte

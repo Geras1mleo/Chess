@@ -1,4 +1,13 @@
-﻿namespace Chess;
+﻿// *****************************************************
+// *                                                   *
+// * O Lord, Thank you for your goodness in our lives. *
+// *     Please bless this code to our compilers.      *
+// *                     Amen.                         *
+// *                                                   *
+// *****************************************************
+//                                    Made by Geras1mleo
+
+namespace Chess;
 
 /// <summary>
 /// Chess board logic
@@ -37,6 +46,11 @@ public partial class ChessBoard
     public Piece? this[short x, short y] => pieces[y, x];
 
     private readonly Dictionary<string, string> headers;
+
+    /// <summary>
+    /// Headers of current chess board
+    /// </summary>
+    public IReadOnlyDictionary<string, string> Headers => headers;
 
     private FenBoard? FenObj;
     /// <summary>
@@ -154,12 +168,11 @@ public partial class ChessBoard
     /// </summary>
     public bool IsEndGame => EndGame is not null;
 
-    private List<Move> executedMoves;
+    private readonly List<Move> executedMoves;
     /// <summary>
     /// Executed moves on this chess board<br/>
-    /// Returning new object of List Move to encapsulate private field
     /// </summary>
-    public List<Move> ExecutedMoves => new(executedMoves);
+    public IReadOnlyList<Move> ExecutedMoves => executedMoves;
 
     /// <summary>
     /// Performed moves in SAN
@@ -287,7 +300,7 @@ public partial class ChessBoard
     public void RemoveHeader(string name)
     {
         if (name.ToLower() == "fen")
-            throw new ArgumentException("Could not remove FEN header from current game: FEN header required when loaded from fen");
+            throw new ArgumentException("Could not remove FEN header from current game: FEN header required if loaded from it");
 
         headers.Remove(name);
     }
@@ -340,7 +353,7 @@ public partial class ChessBoard
     {
         if (IsLastMoveDisplayed && executedMoves.Count > 0)
         {
-            executedMoves = new List<Move>(executedMoves.ToArray()[..^1]);
+            executedMoves.RemoveAt(executedMoves.Count - 1);
             DisplayMoves(executedMoves);
 
             if (IsEndGame) EndGame = null;
@@ -413,7 +426,7 @@ public partial class ChessBoard
     internal static void DropPiece(Move move, ChessBoard board)
     {
         // Moving piece to its new position
-        board.pieces[move.NewPosition.Y, move.NewPosition.X] = board.pieces[move.OriginalPosition.Y, move.OriginalPosition.X];
+        board.pieces[move.NewPosition.Y, move.NewPosition.X] = new(board.pieces[move.OriginalPosition.Y, move.OriginalPosition.X].Color, board.pieces[move.OriginalPosition.Y, move.OriginalPosition.X].Type);
 
         // Clearing old position
         board.pieces[move.OriginalPosition.Y, move.OriginalPosition.X] = null;

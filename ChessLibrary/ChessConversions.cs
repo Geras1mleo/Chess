@@ -1,4 +1,13 @@
-﻿namespace Chess;
+﻿// *****************************************************
+// *                                                   *
+// * O Lord, Thank you for your goodness in our lives. *
+// *     Please bless this code to our compilers.      *
+// *                     Amen.                         *
+// *                                                   *
+// *****************************************************
+//                                    Made by Geras1mleo
+
+namespace Chess;
 
 public partial class ChessBoard
 {
@@ -17,12 +26,10 @@ public partial class ChessBoard
         if (move is null)
             throw new ArgumentNullException(nameof(move));
 
-        string pattern = @"(^([PNBRQK])?([a-h])?([1-8])?(x|X|-)?([a-h][1-8])(=[NBRQ]| ?e\.p\.)?|^O-O(-O)?)(\+|\#|\$)?$";
-
-        var matches = Regex.Matches(move, pattern);
+        var matches = Regexes.regexSanOneMove.Matches(move);
 
         if (matches.Count == 0)
-            throw new ArgumentException("SAN Move should match pattern: " + pattern);
+            throw new ArgumentException("SAN Move should match pattern: " + Regexes.SanOneMovePattern);
 
         Move moveOut = new();
         Position originalPos = new();
@@ -159,47 +166,50 @@ public partial class ChessBoard
         if (move is null || !move.HasValue)
             throw new ArgumentNullException(nameof(move));
 
-        string sMove = "";
+        StringBuilder builder = new();
 
         if (move.Parameter is MoveCastle castle)
         {
-            sMove = castle.ShortStr;
+            builder.Append(castle.ShortStr);
             goto CheckOrMateValidation;
         }
 
         if (move.Piece.Type != PieceType.Pawn)
         {
-            sMove += char.ToUpper(move.Piece.Type.AsChar);
+            builder.Append(char.ToUpper(move.Piece.Type.AsChar));
 
             // Only rook, knight, bishop(second from promotion) and queen(second from promotion) can have ambiguous moves
             if (move.Piece.Type != PieceType.King)
-                sMove += HandleAmbiguousMovesNotation(move, this);
+                builder.Append(HandleAmbiguousMovesNotation(move, this));
         }
 
         if (move.CapturedPiece is not null)
         {
             if (move.Piece.Type == PieceType.Pawn)
-                sMove += move.OriginalPosition.File();
+                builder.Append(move.OriginalPosition.File());
 
-            sMove += "x";
+            builder.Append('x');
         }
 
-        sMove += move.NewPosition;
+        builder.Append(move.NewPosition);
 
         if (move.Parameter is MovePromotion prom)
-            sMove += prom.ShortStr;
+            builder.Append(prom.ShortStr);
 
         // Not required
         //else if (move.Parameter == MoveParameter.EnPassant)
-        //    sMove += " " + move.Parameter.AsShortString;
+        //    builder.Append(" " + move.Parameter.AsShortString);
 
         CheckOrMateValidation:
-        if (move.IsCheck && move.IsMate) sMove += "#";
-        else if (move.IsCheck) sMove += "+";
-        else if (move.IsMate) sMove += "$";
 
-        move.San = sMove;
-        return sMove;
+        if (move.IsCheck && move.IsMate) builder.Append('#');
+
+        else if (move.IsCheck) builder.Append('+');
+
+        else if (move.IsMate) builder.Append('$');
+
+
+        return move.San = builder.ToString();
     }
 
     /// <summary>
@@ -253,18 +263,26 @@ public partial class ChessBoard
         moveIndex = -1;
         endGame = null;
 
-        var headersMatches = Regex.Matches(pgn, @"\[(.*?) ("".*?"")\]");
+        var headersMatches = Regexes.regexHeaders.Matches(pgn);
 
-        // Adding headers
-        for (int i = 0; i < headersMatches.Count; i++)
+        if (headersMatches.Count > 0)
         {
-            string key = headersMatches[i].Groups[1].Value;
-            string value = headersMatches[i].Groups[2].Value[1..^1];
+            // San move can occur in header ex. in nickname of player => remove headers
+            StringBuilder builderWithoutHeaders = new(pgn);
 
-            if (key.ToLower() == "fen")
-                key = key.ToUpper();
+            // Adding headers
+            for (int i = 0; i < headersMatches.Count; i++)
+            {
+                // [Black "Geras1mleo"]
+                // Groups[1] = Black
+                // Groups[2] = Geras1mleo
+                headers.Add(headersMatches[i].Groups[1].Value,
+                            headersMatches[i].Groups[2].Value);
 
-            headers.Add(key, value);
+                builderWithoutHeaders.Replace(headersMatches[i].Value, "");
+            }
+
+            pgn = builderWithoutHeaders.ToString();
         }
 
         // Loading fen if exist
@@ -275,29 +293,46 @@ public partial class ChessBoard
         }
 
         // Remove all alternatives now
-        var alternatives = Regex.Matches(pgn, @"\(.*?\)");
+        var alternatives = Regexes.regexAlternatives.Matches(pgn);
+
         // Todo...
         // Alternative moves??? objects for each variant linked list?
-        for (int i = 0; i < alternatives.Count; i++)
-            pgn = pgn.Replace(alternatives[i].Value, "");
+        if (alternatives.Count > 0)
+        {
+            StringBuilder builderWithoutAlt = new(pgn);
 
-        var movesMatches = Regex.Matches(pgn, @"([PNBRQK]?[a-h]?[1-8]?[xX-]?[a-h][1-8](=[NBRQ]| ?e\.p\.)?|O-O(?:-O)?)[+#$]?");
+            for (int i = 0; i < alternatives.Count; i++)
+            {
+                builderWithoutAlt.Replace(alternatives[i].Value, "");
+            }
+
+            pgn = builderWithoutAlt.ToString();
+        }
+
+        // todo comments
+
+        var movesMatches = Regexes.regexSanMoves.Matches(pgn);
 
         for (int i = 0; i < movesMatches.Count; i++)
         {
             var move = San(movesMatches[i].Value);
             if (IsValidMove(move, this, false, true))
             {
+                // Regenerate SAN after IsValidMove
                 San(move);
+
                 executedMoves.Add(move);
                 DropPieceToNewPosition(move, true);
+
                 moveIndex = executedMoves.Count - 1;
             }
         }
 
+        // If last move is with # or $ => endgame
         HandleKingChecked();
         HandleEndGame();
 
+        // If not actual end game but game is in fact ended => resign
         if (!IsEndGame)
         {
             if (pgn.Contains("1-0"))
@@ -324,12 +359,12 @@ public partial class ChessBoard
     /// </summary>
     public string ToPgn()
     {
-        string pgn = "";
+        StringBuilder builder = new();
 
         foreach (var header in headers)
-            pgn += '[' + header.Key + @" """ + header.Value + '"' + ']' + '\n';
+            builder.Append('[' + header.Key + @" """ + header.Value + '"' + ']' + '\n');
 
-        pgn += '\n';
+        builder.Append('\n');
 
         moveIndex = -1;
 
@@ -341,19 +376,19 @@ public partial class ChessBoard
                 count = GetFullMovesCount(this);
 
                 // Add space before move count if not first move
-                if (i != 0) pgn += ' ';
+                if (i != 0) builder.Append(' ');
 
-                pgn += count + ".";
+                builder.Append(count + ".");
             }
 
             if (moveIndex == -1)
             {
                 // From position?
                 if (LoadedFromFEN && FenObj.Turn == PieceColor.Black)
-                    pgn += "..";
+                    builder.Append("..");
             }
 
-            pgn += ' ' + executedMoves[i].San;
+            builder.Append(' ' + executedMoves[i].San);
 
             Next();
         }
@@ -363,14 +398,14 @@ public partial class ChessBoard
         if (IsEndGame)
         {
             if (EndGame.WonSide == PieceColor.White)
-                pgn += " 1-0";
+                builder.Append(" 1-0");
             else if (EndGame.WonSide == PieceColor.Black)
-                pgn += " 0-1";
+                builder.Append(" 0-1");
             else
-                pgn += " 1/2-1/2";
+                builder.Append(" 1/2-1/2");
         }
 
-        return pgn;
+        return builder.ToString();
     }
 
     /// <summary>
@@ -378,41 +413,41 @@ public partial class ChessBoard
     /// </summary>
     public string ToAscii(bool displayFull = false)
     {
-        string ascii = "   ┌────────────────────────┐\n";
+        StringBuilder builder = new("   ┌────────────────────────┐\n");
 
         for (int i = 8 - 1; i >= 0; i--)
         {
-            ascii += "  " + (i + 1) + "│";
+            builder.Append("  " + (i + 1) + "│");
             for (int j = 0; j < 8; j++)
             {
-                ascii += ' ';
+                builder.Append(' ');
 
                 if (pieces[i, j] is not null)
-                    ascii += pieces[i, j].ToFenChar();
+                    builder.Append(pieces[i, j].ToFenChar());
                 else
-                    ascii += '.';
+                    builder.Append('.');
 
-                ascii += ' ';
+                builder.Append(' ');
             }
-            ascii += "│\n";
+            builder.Append("│\n");
         }
 
-        ascii += "   └────────────────────────┘\n";
-        ascii += "     a  b  c  d  e  f  g  h  \n";
+        builder.Append("   └────────────────────────┘\n");
+        builder.Append("     a  b  c  d  e  f  g  h  \n");
 
         if (displayFull)
         {
-            ascii += '\n';
+            builder.Append('\n');
 
-            ascii += "  Turn: " + Turn + '\n';
+            builder.Append("  Turn: " + Turn + '\n');
 
             if (CapturedWhite.Length > 0)
-                ascii += "  White Captured: " + string.Join(", ", CapturedWhite.Select(p => p.ToFenChar())) + '\n';
+                builder.Append("  White Captured: " + string.Join(", ", CapturedWhite.Select(p => p.ToFenChar())) + '\n');
             if (CapturedBlack.Length > 0)
-                ascii += "  Black Captured: " + string.Join(", ", CapturedBlack.Select(p => p.ToFenChar())) + '\n';
+                builder.Append("  Black Captured: " + string.Join(", ", CapturedBlack.Select(p => p.ToFenChar())) + '\n');
         }
 
-        return ascii;
+        return builder.ToString();
     }
 
     private static string HandleAmbiguousMovesNotation(Move move, ChessBoard board)
@@ -422,6 +457,7 @@ public partial class ChessBoard
 
         if (amb.Count == 0)
             return "";
+
         else if (amb.Count == 1)
         {
             if (amb[0].OriginalPosition.X == move.OriginalPosition.X)
@@ -431,15 +467,15 @@ public partial class ChessBoard
         }
         else
         {
-            var sOut = "";
+            StringBuilder builder = new();
 
             if (amb.Any(m => m.OriginalPosition.X == move.OriginalPosition.X))
-                sOut += origPos[1];
+                builder.Append(origPos[1]);
 
             if (amb.Any(m => m.OriginalPosition.Y == move.OriginalPosition.Y))
-                sOut += origPos[0];
+                builder.Append(origPos[0]);
 
-            return sOut;
+            return builder.ToString();
         }
     }
 

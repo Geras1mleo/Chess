@@ -1,4 +1,13 @@
-﻿namespace Chess;
+﻿// *****************************************************
+// *                                                   *
+// * O Lord, Thank you for your goodness in our lives. *
+// *     Please bless this code to our compilers.      *
+// *                     Amen.                         *
+// *                                                   *
+// *****************************************************
+//                                    Made by Geras1mleo
+
+namespace Chess;
 
 /// <summary>
 /// Position on Chess table counting from 0
@@ -39,8 +48,8 @@ public struct Position
     {
         position = position.ToLower();
 
-        if (!Regex.IsMatch(position, "^[a-h][1-8]$"))
-            throw new ArgumentException("Table position should match pattern: ^[a-h][1-8]$");
+        if (!Regexes.regexPosition.IsMatch(position))
+            throw new ArgumentException("Table position should match pattern: " + Regexes.PositionPattern);
 
         X = FromFile(position[0]);
         Y = FromRank(position[1]);
