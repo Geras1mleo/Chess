@@ -62,6 +62,16 @@ public struct Position
     public Position() { }
 
     /// <summary>
+    /// Initializes a new Position in chess board<br/>
+    /// Counting from 0 
+    /// </summary>
+    public Position(short x, short y)
+    {
+        X = x;
+        Y = y;
+    }
+
+    /// <summary>
     /// Short horizontal position from file char<br/>
     /// 'a' => 0<br/>
     /// 'b' => 1<br/>

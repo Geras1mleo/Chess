@@ -50,7 +50,7 @@ public partial class ChessBoard
     /// <summary>
     /// Headers of current chess board
     /// </summary>
-    public IReadOnlyDictionary<string, string> Headers => headers;
+    public IReadOnlyDictionary<string, string> Headers => new Dictionary<string, string>(headers);
 
     private FenBoard? FenObj;
     /// <summary>
@@ -172,10 +172,10 @@ public partial class ChessBoard
     /// <summary>
     /// Executed moves on this chess board<br/>
     /// </summary>
-    public IReadOnlyList<Move> ExecutedMoves => executedMoves;
+    public IReadOnlyList<Move> ExecutedMoves => new List<Move>(executedMoves);
 
     /// <summary>
-    /// Performed moves in SAN
+    /// Executed moves in SAN
     /// </summary>
     public List<string> MovesInSan => new List<Move>(executedMoves).Select(m => m.San).ToList();
 
@@ -502,6 +502,7 @@ public partial class ChessBoard
             else if (mw || mb)
                 EndGame = new EndGameInfo(EndgameType.Stalemate, null);
         }
+        // Todo: endgame by short of pieces
     }
 
     private void SetChessBeginSituation()

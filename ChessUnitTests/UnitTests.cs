@@ -37,7 +37,7 @@ namespace ChessUnitTests
             "Bg5",
             };
             var board = new ChessBoard();
-            
+
             Assert.Throws<ArgumentNullException>(() => board.Move(new Move(new(), new())));
             Assert.Throws<ChessPieceNotFoundException>(() => board.Move(new Move(new("e3"), new("e4"))));
 
@@ -94,167 +94,177 @@ namespace ChessUnitTests
         {
             var board = new ChessBoard();
 
-            //// Normal Pgn
-            //board.LoadPgn(
-            //@"[Event ""Live Chess""]
-            //[Site ""Chess.com""]
-            //[Date ""2022.01.11""]
-            //[Round ""?""]
-            //[White ""Milan1905""]
-            //[Black ""Geras1mleo""]
-            //[Result ""1-0""]
-            //[ECO ""C47""]
-            //[WhiteElo ""1006""]
-            //[BlackElo ""626""]
-            //[TimeControl ""600""]
-            //[EndTime ""11:58:56 PST""]
-            //[Termination ""Milan1905 won by resignation""]
+            // Normal Pgn
+            board.LoadPgn(
+            @"[Event ""Live Chess""]
+            [Site ""Chess.com""]
+            [Date ""2022.01.11""]
+            [Round ""?""]
+            [White ""Milan1905""]
+            [Black ""Geras1mleo""]
+            [Result ""1-0""]
+            [ECO ""C47""]
+            [WhiteElo ""1006""]
+            [BlackElo ""626""]
+            [TimeControl ""600""]
+            [EndTime ""11:58:56 PST""]
+            [Termination ""Milan1905 won by resignation""]
             
-            //1.e4 e5 2.Nf3 Nf6 3.Nc3 Nc6 4.Bb5 Bc5 5.Bxc6 bxc6 6.Nxe5 Bxf2+ 7.Kxf2 O-O
-            //8.d4 d5 9.exd5 cxd5 10.Nc6 Ng4+ 11.Kg1 Qf6 12.Qf1 Qxc6 13.h3 Nf6 14.Bg5
-            //Qb6 15.Bxf6 Qxf6 16.Qxf6 gxf6 17.Nxd5 Rb8 18.Nxf6+ Kh8 19.b3 Rb4 20.c3 Bb7
-            //21.cxb4 1-0");
+            1.e4 e5 2.Nf3 Nf6 3.Nc3 Nc6 4.Bb5 Bc5 5.Bxc6 bxc6 6.Nxe5 Bxf2+ 7.Kxf2 O-O
+            8.d4 d5 9.exd5 cxd5 10.Nc6 Ng4+ 11.Kg1 Qf6 12.Qf1 Qxc6 13.h3 Nf6 14.Bg5
+            Qb6 15.Bxf6 Qxf6 16.Qxf6 gxf6 17.Nxd5 Rb8 18.Nxf6+ Kh8 19.b3 Rb4 20.c3 Bb7
+            21.cxb4 1-0");
 
-            //Assert.Equal("5r1k/pbp2p1p/5N2/8/1P1P4/1P5P/P5P1/R5KR b - - 0 21", board.ToFen());
-            //Assert.Equal(EndgameType.Resigned, board.EndGame.EndgameType);
+            Assert.Equal("5r1k/pbp2p1p/5N2/8/1P1P4/1P5P/P5P1/R5KR b - - 0 21", board.ToFen());
+            Assert.Equal(EndgameType.Resigned, board.EndGame.EndgameType);
 
-            //// From Position
-            //board.LoadPgn(
-            //@"[Variant ""From Position""]
-            //[FEN ""rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1""]
+            // From Position
+            board.LoadPgn(
+            @"[Variant ""From Position""]
+            [FEN ""rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1""]
             
-            //1.exd5 e6 2.dxe6 fxe6");
-            //Assert.Equal("rnbqkbnr/ppp3pp/4p3/8/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 3", board.ToFen());
+            1.exd5 e6 2.dxe6 fxe6");
+            Assert.Equal("rnbqkbnr/ppp3pp/4p3/8/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 3", board.ToFen());
 
-            //board.LoadPgn("");
-            //Assert.Equal("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", board.ToFen());
+            board.LoadPgn("");
+            Assert.Equal("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", board.ToFen());
 
-            //// With alternative moves
-            //board.LoadPgn(
-            //@"[Variant ""From Position""]
-            //[FEN ""rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1""]
+            // With alternative moves
+            board.LoadPgn(
+            @"[Variant ""From Position""]
+            [FEN ""rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1""]
             
-            //1.exd5 e6 2.dxe6 fxe6 3.d4(3.f4 g5 4.fxg5) 3... c5 4.b4");
-            //Assert.Equal("rnbqkbnr/pp4pp/4p3/2p5/1P1P4/8/P1P2PPP/RNBQKBNR b KQkq b3 0 4", board.ToFen());
+            1.exd5 e6 2.dxe6 fxe6 3.d4(3.f4 g5 4.fxg5) 3... c5 4.b4");
+            Assert.Equal("rnbqkbnr/pp4pp/4p3/2p5/1P1P4/8/P1P2PPP/RNBQKBNR b KQkq b3 0 4", board.ToFen());
 
-            //board.LoadPgn(
-            //@"[Variant ""From Position""]
-            //[FEN ""rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1""]
+            board.LoadPgn(
+            @"[Variant ""From Position""]
+            [FEN ""rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1""]
             
-            //1... dxe4 2.g4");
-            //Assert.Equal("rnbqkbnr/ppp1pppp/8/8/4p1P1/8/PPPP1P1P/RNBQKBNR b KQkq g3 0 2", board.ToFen());
+            1... dxe4 2.g4");
+            Assert.Equal("rnbqkbnr/ppp1pppp/8/8/4p1P1/8/PPPP1P1P/RNBQKBNR b KQkq g3 0 2", board.ToFen());
 
-            //// Ultimate pgn
-            //board.LoadPgn(
-            //@"[Event ""Live Chess""]
-            //[Site ""Chess.com""]
-            //[Date ""2022.01.03""]
-            //[Round ""?""]
-            //[White ""Milan1905""]
-            //[Black ""Geras1mleo""]
-            //[Result ""1/2-1/2""]
-            //[ECO ""C42""]
-            //[WhiteElo ""1006""]
-            //[BlackElo ""626""]
-            //[TimeControl ""600""]
-            //[EndTime ""9:19:18 PST""]
-            //[Termination ""Game drawn by insufficient material""]
+            // Ultimate pgn
+            board.LoadPgn(
+            @"[Event ""Live Chess""]
+            [Site ""Chess.com""]
+            [Date ""2022.01.03""]
+            [Round ""?""]
+            [White ""Milan1905""]
+            [Black ""Geras1mleo""]
+            [Result ""1/2-1/2""]
+            [ECO ""C42""]
+            [WhiteElo ""1006""]
+            [BlackElo ""626""]
+            [TimeControl ""600""]
+            [EndTime ""9:19:18 PST""]
+            [Termination ""Game drawn by insufficient material""]
             
-            //1.e4 e5 2.Nf3 Nf6 3.Nxe5 Nxe4 4.Qe2 d5 5.d3 Bd6 6.dxe4 Bxe5 7.exd5 Qxd5
-            //8.c4 Qc5 9.Bf4 Nd7 10.Bxe5 Nxe5 11.Nc3 O-O 12.O-O-O Nxc4 13.Na4 Qc6 14.
-            //Qxc4 Bg4 15.Qxc6 bxc6 16.Rd2 Rad8 17.Rxd8 Rxd8 18.Ba6 h6 19.h3 Bf5 20.g4
-            //Be4 21.Re1 Rd4 22.Nc3 Bf3 23.Re8+ Kh7 24.Ne2 Bxe2 25.Bxe2 Rf4 26.Bd3+ g6
-            //27.Re2 f5 28.gxf5 gxf5 29.Re7+ Kg6 30.Rxc7 Rf3 31.Rxc6+ Kg5 32.h4+ Kxh4
-            //33.Rxh6+ Kg5 34.Rh2 Rxd3 35.Kc2 Rf3 36.Rg2+ Kh4 37.Kd2 Kh3 38.Rg8 Rxf2+
-            //39.Kc3 Rf3+ 40.Kb4 Rf4+ 41.Ka3 Rf3+ 42.b3 a5 43.Ka4 Rf2 44.a3 Rf4+ 45.b4
-            //axb4 46.axb4 Rg4 47.Rh8+ Rh4 48.Rxh4+ Kxh4 49.b5 f4 50.b6 f3 51.b7 f2 52.
-            //b8=Q f1=Q 53.Qb4+ Kg3 54.Qb3+ Qf3 55.Qxf3+ Kxf3 1/2-1/2");
+            1.e4 e5 2.Nf3 Nf6 3.Nxe5 Nxe4 4.Qe2 d5 5.d3 Bd6 6.dxe4 Bxe5 7.exd5 Qxd5
+            8.c4 Qc5 9.Bf4 Nd7 10.Bxe5 Nxe5 11.Nc3 O-O 12.O-O-O Nxc4 13.Na4 Qc6 14.
+            Qxc4 Bg4 15.Qxc6 bxc6 16.Rd2 Rad8 17.Rxd8 Rxd8 18.Ba6 h6 19.h3 Bf5 20.g4
+            Be4 21.Re1 Rd4 22.Nc3 Bf3 23.Re8+ Kh7 24.Ne2 Bxe2 25.Bxe2 Rf4 26.Bd3+ g6
+            27.Re2 f5 28.gxf5 gxf5 29.Re7+ Kg6 30.Rxc7 Rf3 31.Rxc6+ Kg5 32.h4+ Kxh4
+            33.Rxh6+ Kg5 34.Rh2 Rxd3 35.Kc2 Rf3 36.Rg2+ Kh4 37.Kd2 Kh3 38.Rg8 Rxf2+
+            39.Kc3 Rf3+ 40.Kb4 Rf4+ 41.Ka3 Rf3+ 42.b3 a5 43.Ka4 Rf2 44.a3 Rf4+ 45.b4
+            axb4 46.axb4 Rg4 47.Rh8+ Rh4 48.Rxh4+ Kxh4 49.b5 f4 50.b6 f3 51.b7 f2 52.
+            b8=Q f1=Q 53.Qb4+ Kg3 54.Qb3+ Qf3 55.Qxf3+ Kxf3 1/2-1/2");
 
-            //Assert.Equal("8/8/8/8/K7/5k2/8/8 w - - 0 56", board.ToFen());
-            //Assert.True(board.IsEndGame);
+            Assert.Equal("8/8/8/8/K7/5k2/8/8 w - - 0 56", board.ToFen());
+            Assert.True(board.IsEndGame);
 
-            //board.LoadFen("rnb1kbnr/pppppppp/8/1q6/8/8/P1PPPPPP/R3K2R w KQkq - 0 1");
+            board.LoadFen("rnb1kbnr/pppppppp/8/1q6/8/8/P1PPPPPP/R3K2R w KQkq - 0 1");
 
-            //board.Move("e4");
-            //board.Move("d5");
-            //board.Move("exd5");
-            //board.Resign(PieceColor.Black);
+            board.Move("e4");
+            board.Move("d5");
+            board.Move("exd5");
+            board.Resign(PieceColor.Black);
 
-            //Assert.Contains("1. e4 d5 2. exd5 1-0", board.ToPgn());
+            Assert.Contains("1. e4 d5 2. exd5 1-0", board.ToPgn());
 
-            //board.LoadPgn(
-            //@"[Variant ""From Position""]
-            //[FEN ""rnbqkbnr/ppp1p1pp/8/3p1p2/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 5""]");
+            board.LoadPgn(
+            @"[Variant ""From Position""]
+            [FEN ""rnbqkbnr/ppp1p1pp/8/3p1p2/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 5""]");
 
-            //board.Move("dxe4");
-            //board.Move("f3");
-            //board.Move("exf3");
-            //board.Move("gxf3");
-            //board.Draw();
+            board.Move("dxe4");
+            board.Move("f3");
+            board.Move("exf3");
+            board.Move("gxf3");
+            board.Draw();
 
-            //Assert.Contains("5... dxe4 6. f3 exf3 7. gxf3 1/2-1/2", board.ToPgn());
+            Assert.Contains("5... dxe4 6. f3 exf3 7. gxf3 1/2-1/2", board.ToPgn());
 
-            //// Extra
-            //board.LoadPgn(
-            //@"[Event ""Live Chess""]
-            //[Site ""Chess.com""]
-            //[Date ""2022.02.20""]
-            //[Round ""?""]
-            //[White ""Hikaru""]
-            //[Black ""tptagain""]
-            //[Result ""1-0""]
-            //[ECO ""A06""]
-            //[WhiteElo ""3319""]
-            //[BlackElo ""2909""]
-            //[TimeControl ""60+1""]
-            //[EndTime ""9:42:10 PST""]
-            //[Termination ""Hikaru won by resignation""]
+            // Load with comments and alternative moves
+            board.LoadPgn(
+            @"1. e4 {[%timestamp 1]} 1... f5 {[%timestamp 1]} 2. exf5 {[%timestamp 7]} 2... g6
+            {[%timestamp 16]} 3. fxg6 {[%timestamp 7]} 3... Nf6 {[%timestamp 26]} 4. g7
+            {[%timestamp 10]} 4... Ng4 {[%timestamp 20]} (4... Ne4 5. d3 Nc3 6. f3 Nd5 7. f4
+            Nf6) 5. gxh8=N {[%timestamp 14]} 1-0");
 
-            //1. Nf3 d5 2. b3 Nf6 3. Bb2 Bf5 4. d3 e6 5. g3 h6 6. Ne5 Nbd7 7. Nxd7 Qxd7 8. Bg2
-            //Be7 9. Nd2 O-O 10. e4 Bh7 11. Qe2 Rfd8 12. e5 Ne8 13. O-O a5 14. a4 c5 15. Rfd1
-            //Nc7 16. Nf1 b5 17. Ne3 Rdb8 18. Bc1 bxa4 19. Rxa4 Rb4 20. Ra1 Nb5 21. Qe1 Nd4
-            //22. Bd2 Rb5 23. Bxa5 h5 24. Bc3 Rc8 25. h4 Bg6 26. Bb2 Rbb8 27. Ra2 Ra8 28. Rda1
-            //Rxa2 29. Rxa2 Nc6 30. Ra1 Qb7 31. Qe2 Nd4 32. Qd1 Qc7 33. f4 Qb6 34. Kh2 Rd8 35.
-            //Qd2 Rc8 36. Rb1 Ra8 37. Ra1 Rxa1 38. Bxa1 Qa7 39. Bb2 Qa2 40. Qc1 Qa6 41. Qa1
-            //Qb7 42. Bxd4 cxd4 43. Qxd4 Qc7 44. Qb2 Qb6 45. d4 Qa6 46. Bf1 Qa7 47. c3 Bd8 48.
-            //b4 Qa8 49. Be2 Qa4 50. Bd1 Qb5 51. Be2 Qa4 52. Kg1 f6 53. Kf2 fxe5 54. fxe5 Bf7
-            //55. Bd1 Qb5 56. Qa2 Qd3 57. Qa8 Qxc3 58. Qxd8+ Kh7 59. Bc2+ g6 60. Qf6 Qd2+ 61.
-            //Kf3 Kg8 62. Bxg6 1-0");
+            Assert.Equal("rnbqkb1N/ppppp2p/8/8/6n1/8/PPPP1PPP/RNBQKBNR b KQq - 0 5", board.ToFen());
+            Assert.Equal("1. e4 f5 2. exf5 g6 3. fxg6 Nf6 4. g7 Ng4 5. gxh8=N 1-0", board.ToPgn());
 
-            //Assert.Equal("6k1/5b2/4pQB1/3pP2p/1P1P3P/4NKP1/3q4/8 b - - 0 62", board.ToFen());
-            //Assert.True(board.IsEndGame);
-            //Assert.Equal(PieceColor.White, board.EndGame.WonSide);
+            // Extra
+            board.LoadPgn(
+            @"[Event ""Live Chess""]
+            [Site ""Chess.com""]
+            [Date ""2022.02.20""]
+            [Round ""?""]
+            [White ""Hikaru""]
+            [Black ""tptagain""]
+            [Result ""1-0""]
+            [ECO ""A06""]
+            [WhiteElo ""3319""]
+            [BlackElo ""2909""]
+            [TimeControl ""60+1""]
+            [EndTime ""9:42:10 PST""]
+            [Termination ""Hikaru won by resignation""]
 
-            //board.LoadPgn(
-            //@"[Event ""Live Chess""]
-            //[Site ""Chess.com""]
-            //[Date ""2022.02.19""]
-            //[Round ""?""]
-            //[White ""Hikaru""]
-            //[Black ""Bigfish1995""]
-            //[Result ""1-0""]
-            //[ECO ""B22""]
-            //[WhiteElo ""2864""]
-            //[BlackElo ""2640""]
-            //[TimeControl ""600""]
-            //[EndTime ""12:17:19 PST""]
-            //[Termination ""Hikaru won on time""]
+            1. Nf3 d5 2. b3 Nf6 3. Bb2 Bf5 4. d3 e6 5. g3 h6 6. Ne5 Nbd7 7. Nxd7 Qxd7 8. Bg2
+            Be7 9. Nd2 O-O 10. e4 Bh7 11. Qe2 Rfd8 12. e5 Ne8 13. O-O a5 14. a4 c5 15. Rfd1
+            Nc7 16. Nf1 b5 17. Ne3 Rdb8 18. Bc1 bxa4 19. Rxa4 Rb4 20. Ra1 Nb5 21. Qe1 Nd4
+            22. Bd2 Rb5 23. Bxa5 h5 24. Bc3 Rc8 25. h4 Bg6 26. Bb2 Rbb8 27. Ra2 Ra8 28. Rda1
+            Rxa2 29. Rxa2 Nc6 30. Ra1 Qb7 31. Qe2 Nd4 32. Qd1 Qc7 33. f4 Qb6 34. Kh2 Rd8 35.
+            Qd2 Rc8 36. Rb1 Ra8 37. Ra1 Rxa1 38. Bxa1 Qa7 39. Bb2 Qa2 40. Qc1 Qa6 41. Qa1
+            Qb7 42. Bxd4 cxd4 43. Qxd4 Qc7 44. Qb2 Qb6 45. d4 Qa6 46. Bf1 Qa7 47. c3 Bd8 48.
+            b4 Qa8 49. Be2 Qa4 50. Bd1 Qb5 51. Be2 Qa4 52. Kg1 f6 53. Kf2 fxe5 54. fxe5 Bf7
+            55. Bd1 Qb5 56. Qa2 Qd3 57. Qa8 Qxc3 58. Qxd8+ Kh7 59. Bc2+ g6 60. Qf6 Qd2+ 61.
+            Kf3 Kg8 62. Bxg6 1-0");
 
-            //1. e4 c5 2. Nf3 Nc6 3. c3 d5 4. exd5 Qxd5 5. Na3 Nf6 6. d4 e6 7. Nb5 Qd8 8. dxc5
-            //Bxc5 9. Qxd8+ Kxd8 10. Bf4 Nd5 11. O-O-O Ke7 12. Bg3 a6 13. c4 Nf6 14. Nc3 Rd8
-            //15. Bd3 Bd7 16. a3 a5 17. Rhe1 Nd4 18. Nxd4 Bxd4 19. Nd5+ Nxd5 20. cxd5 Bf6 21.
-            //Be4 Ba4 22. Rd2 Rac8+ 23. Kb1 b6 24. Bf4 Rc4 25. f3 h6 26. dxe6 Rxd2 27. Bxd2
-            //fxe6 28. Be3 Rc8 29. Re2 b5 30. Bb6 b4 31. Bxa5 bxa3 32. Bb4+ Kf7 33. bxa3 Bd4
-            //34. Bc2 Bb5 35. Rd2 e5 36. f4 Bc4 37. fxe5 Bxe5 38. h3 Rb8 39. Be4 Ke6 40. Rc2
-            //Bb5 41. Ka2 Ba4 42. Rd2 Bf4 43. Re2 Be5 44. Bc2 Bb5 45. Bb3+ Kf5 46. Rc2 Bd3 47.
-            //Rc5 Ke4 48. Bc2 Bxc2 49. Rxc2 Bd4 50. Kb3 g5 51. Rc6 h5 52. Kc4 Bg1 53. a4 Ra8
-            //54. a5 Kf4 55. Bd6+ Ke4 56. a6 Bf2 57. Bc5 Bxc5 58. Kxc5 Kf4 59. Kb6 Kg3 60. Rc2
-            //Rb8+ 61. Kc7 Rf8 62. a7 g4 63. hxg4 hxg4 64. Ra2 Kh2 65. Kb7 Rf7+ 66. Ka6 Rf8
-            //67. Kb5 g3 68. Kc6 Ra8 69. Kd5 Rxa7 70. Rxa7 Kxg2 71. Ke4 Kf2 72. Ra2+ Kg1 73.
-            //Kf3 g2 74. Rxg2+ Kh1 (74... Kf1 75. Rf2+ Ke1 76. Re2+ Kd1 77. Rd2+ Kxd2) 75. Rg3
-            //1-0");
+            Assert.Equal("6k1/5b2/4pQB1/3pP2p/1P1P3P/4NKP1/3q4/8 b - - 0 62", board.ToFen());
+            Assert.True(board.IsEndGame);
+            Assert.Equal(PieceColor.White, board.EndGame.WonSide);
 
-            //Assert.Equal("8/8/8/8/8/5KR1/8/7k b - - 2 75", board.ToFen());
+            board.LoadPgn(
+            @"[Event ""Live Chess""]
+            [Site ""Chess.com""]
+            [Date ""2022.02.19""]
+            [Round ""?""]
+            [White ""Hikaru""]
+            [Black ""Bigfish1995""]
+            [Result ""1-0""]
+            [ECO ""B22""]
+            [WhiteElo ""2864""]
+            [BlackElo ""2640""]
+            [TimeControl ""600""]
+            [EndTime ""12:17:19 PST""]
+            [Termination ""Hikaru won on time""]
+
+            1. e4 c5 2. Nf3 Nc6 3. c3 d5 4. exd5 Qxd5 5. Na3 Nf6 6. d4 e6 7. Nb5 Qd8 8. dxc5
+            Bxc5 9. Qxd8+ Kxd8 10. Bf4 Nd5 11. O-O-O Ke7 12. Bg3 a6 13. c4 Nf6 14. Nc3 Rd8
+            15. Bd3 Bd7 16. a3 a5 17. Rhe1 Nd4 18. Nxd4 Bxd4 19. Nd5+ Nxd5 20. cxd5 Bf6 21.
+            Be4 Ba4 22. Rd2 Rac8+ 23. Kb1 b6 24. Bf4 Rc4 25. f3 h6 26. dxe6 Rxd2 27. Bxd2
+            fxe6 28. Be3 Rc8 29. Re2 b5 30. Bb6 b4 31. Bxa5 bxa3 32. Bb4+ Kf7 33. bxa3 Bd4
+            34. Bc2 Bb5 35. Rd2 e5 36. f4 Bc4 37. fxe5 Bxe5 38. h3 Rb8 39. Be4 Ke6 40. Rc2
+            Bb5 41. Ka2 Ba4 42. Rd2 Bf4 43. Re2 Be5 44. Bc2 Bb5 45. Bb3+ Kf5 46. Rc2 Bd3 47.
+            Rc5 Ke4 48. Bc2 Bxc2 49. Rxc2 Bd4 50. Kb3 g5 51. Rc6 h5 52. Kc4 Bg1 53. a4 Ra8
+            54. a5 Kf4 55. Bd6+ Ke4 56. a6 Bf2 57. Bc5 Bxc5 58. Kxc5 Kf4 59. Kb6 Kg3 60. Rc2
+            Rb8+ 61. Kc7 Rf8 62. a7 g4 63. hxg4 hxg4 64. Ra2 Kh2 65. Kb7 Rf7+ 66. Ka6 Rf8
+            67. Kb5 g3 68. Kc6 Ra8 69. Kd5 Rxa7 70. Rxa7 Kxg2 71. Ke4 Kf2 72. Ra2+ Kg1 73.
+            Kf3 g2 74. Rxg2+ Kh1 (74... Kf1 75. Rf2+ Ke1 76. Re2+ Kd1 77. Rd2+ Kxd2) 75. Rg3
+            1-0");
+
+            Assert.Equal("8/8/8/8/8/5KR1/8/7k b - - 2 75", board.ToFen());
 
             board.LoadPgn(
             @"[Event ""Live Chess""]

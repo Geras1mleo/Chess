@@ -267,10 +267,7 @@ public partial class ChessBoard
 
         if (headersMatches.Count > 0)
         {
-            // San move can occur in header ex. in nickname of player => remove headers
-            StringBuilder builderWithoutHeaders = new(pgn);
-
-            // Adding headers
+            // Extracting headers
             for (int i = 0; i < headersMatches.Count; i++)
             {
                 // [Black "Geras1mleo"]
@@ -278,12 +275,11 @@ public partial class ChessBoard
                 // Groups[2] = Geras1mleo
                 headers.Add(headersMatches[i].Groups[1].Value,
                             headersMatches[i].Groups[2].Value);
-
-                builderWithoutHeaders.Replace(headersMatches[i].Value, "");
             }
-
-            pgn = builderWithoutHeaders.ToString();
         }
+
+        // San move can occur in header ex. in nickname of player => remove headers from string
+        pgn = Regexes.regexHeaders.Replace(pgn, "");
 
         // Loading fen if exist
         if (headers.TryGetValue("FEN", out var fen))
@@ -292,27 +288,17 @@ public partial class ChessBoard
             pieces = FenObj.Pieces;
         }
 
-        // Remove all alternatives now
-        var alternatives = Regexes.regexAlternatives.Matches(pgn);
+        // Remove all alternatives
+        pgn = Regexes.regexAlternatives.Replace(pgn, "");
 
-        // Todo...
-        // Alternative moves??? objects for each variant linked list?
-        if (alternatives.Count > 0)
-        {
-            StringBuilder builderWithoutAlt = new(pgn);
-
-            for (int i = 0; i < alternatives.Count; i++)
-            {
-                builderWithoutAlt.Replace(alternatives[i].Value, "");
-            }
-
-            pgn = builderWithoutAlt.ToString();
-        }
-
-        // todo comments
+        // Remove all comments
+        pgn = Regexes.regexComments.Replace(pgn, "");
+        
+        // Todo Save Alternative moves(linked list?) and Comments for moves
 
         var movesMatches = Regexes.regexSanMoves.Matches(pgn);
 
+        // Execute all found moves
         for (int i = 0; i < movesMatches.Count; i++)
         {
             var move = San(movesMatches[i].Value);
@@ -364,8 +350,10 @@ public partial class ChessBoard
         foreach (var header in headers)
             builder.Append('[' + header.Key + @" """ + header.Value + '"' + ']' + '\n');
 
-        builder.Append('\n');
+        if (headers.Count > 0)
+            builder.Append('\n');
 
+        // Needed for moves count logic
         moveIndex = -1;
 
         for (int i = 0, count = 0; i < executedMoves.Count; i++)
@@ -390,10 +378,8 @@ public partial class ChessBoard
 
             builder.Append(' ' + executedMoves[i].San);
 
-            Next();
+            moveIndex++;
         }
-
-        Last();
 
         if (IsEndGame)
         {
@@ -404,6 +390,9 @@ public partial class ChessBoard
             else
                 builder.Append(" 1/2-1/2");
         }
+
+        // Back to positions
+        Last();
 
         return builder.ToString();
     }

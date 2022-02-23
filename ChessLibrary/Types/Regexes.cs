@@ -19,6 +19,8 @@ internal class Regexes
 
     internal const string AlternativesPattern = @"\(.*?\)";
 
+    internal const string CommentsPattern = @"\{.*?\}";
+
     internal const string FenPattern = @"^(((?:[rnbqkpRNBQKP1-8]+\/){7})[rnbqkpRNBQKP1-8]+) ([b|w]) (-|[K|Q|k|q]{1,4}) (-|[a-h][36]) (\d+ \d+)$";
 
     internal const string PiecePattern = "^[wb][bknpqr]$";
@@ -35,7 +37,9 @@ internal class Regexes
 
     internal readonly static Regex regexHeaders = new(HeadersPattern, RegexOptions.Compiled, TimeSpan.FromMilliseconds(250));
 
-    internal readonly static Regex regexAlternatives = new(AlternativesPattern, RegexOptions.Compiled, TimeSpan.FromMilliseconds(250));
+    internal readonly static Regex regexAlternatives = new(AlternativesPattern, RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromMilliseconds(250));
+
+    internal readonly static Regex regexComments = new(CommentsPattern, RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromMilliseconds(250));
 
     internal readonly static Regex regexFen = new(FenPattern, RegexOptions.Compiled, TimeSpan.FromMilliseconds(250));
 
