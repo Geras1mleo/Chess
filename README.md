@@ -14,8 +14,9 @@
 - Chess board with 2-dimentional array of `Pieces`
 - Generation, Validation and Execution of `Moves` on Chess board
 - Logic to `Convert`:
-  - `Move` object into `SAN` and back into Move object
-  - `Board` object into `FEN` and back into Board object
+  - `Move` into `SAN` and back into Move object
+  - `Chess Board`into `FEN` and back into ChessBoard object
+  - `Chess Game` into `PGN` and back into ChessBoard object
 - Event Handlers:
   -  `OnInvalidMoveKingChecked` - Raises when trying to execute move that places own king in check
   -  `OnWhiteKingCheckedChanged`/`OnBlackKingCheckedChanged` with state (checked or not) and its position
@@ -31,26 +32,62 @@
 
 # Usage!
 
-Example console chess board:
+Example simple console chess game:
 
 ```csharp
+using Chess;
+
 var board = new ChessBoard();
 
-while(!board.IsEndGame)
+while (!board.IsEndGame)
 {
-    board.Move(Console.Readline());
-    Console.WriteLine(board.ToAscii()); 
+    board.Move(Console.ReadLine());
+    Console.WriteLine(board.ToAscii());
 }
 
 Console.WriteLine(board.ToPgn());
+
+// Outcome after last move:
+// Qh5
+//   ┌────────────────────────┐
+//  8│ r  n  b  q  k  b  n  r │
+//  7│ p  p  p  p  p  .  .  p │
+//  6│ .  .  .  .  .  .  .  . │
+//  5│ .  .  .  .  .  p  p  Q │
+//  4│ .  .  .  .  P  P  .  . │
+//  3│ .  .  .  .  .  .  .  . │
+//  2│ P  P  P  P  .  .  P  P │
+//  1│ R  N  B  .  K  B  N  R │
+//   └────────────────────────┘
+//     a  b  c  d  e  f  g  h
+//
+// 1. e4 f5 2. f4 g5 3. Qh5# 1-0
 ```
 
+Example random chess game:
+
+```csharp
+while (!board.IsEndGame)
+{
+    var moves = board.Moves();
+    board.Move(moves[Random.Shared.Next(moves.Length)]);
+}
+
+Console.WriteLine(board.ToAscii());
+Console.WriteLine(board.ToPgn());
+
+// Todo: Handle end of the game when not enough pieces to mate opponent
+```
+
+
 ## Tracking Pieces
+
+Track pieces using indexers:
+
 ```csharp
 board["c2"] // White Pawn
 board['g', 1] // White Bishop
-
 // Counting from 0
 board[0, 0] // White Rook
-board[new Position() { X = 4, Y = 7 }] // Black King
+board[new Position(4, 7)] // Black King
 ```
