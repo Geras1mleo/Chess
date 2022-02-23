@@ -29,5 +29,28 @@
   - Also: `board.MoveIndex` property to navigate direct to specific move
 - `Cancelation` of last executed move
 
-## Usage!
-todo
+# Usage!
+
+Example console chess board:
+
+```csharp
+var board = new ChessBoard();
+
+while(!board.IsEndGame)
+{
+    board.Move(Console.Readline());
+    Console.WriteLine(board.ToAscii()); 
+}
+
+Console.WriteLine(board.ToPgn());
+```
+
+## Tracking Pieces
+```csharp
+board["c2"] // White Pawn
+board['g', 1] // White Bishop
+
+// Counting from 0
+board[0, 0] // White Rook
+board[new Position() { X = 4, Y = 7 }] // Black King
+```
