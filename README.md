@@ -76,7 +76,7 @@ while (!board.IsEndGame)
 Console.WriteLine(board.ToAscii());
 Console.WriteLine(board.ToPgn());
 
-// Todo: Handle end of the game when not enough pieces to mate opponent
+// Todo: End game Insufficient Material
 ```
 
 
