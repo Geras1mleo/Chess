@@ -41,10 +41,11 @@ var board = new ChessBoard();
 
 while (!board.IsEndGame)
 {
-    board.Move(Console.ReadLine());
     Console.WriteLine(board.ToAscii());
+    board.Move(Console.ReadLine());
 }
 
+Console.WriteLine(board.ToAscii());
 Console.WriteLine(board.ToPgn());
 
 // Outcome after last move:
