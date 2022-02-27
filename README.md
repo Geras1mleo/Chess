@@ -88,8 +88,9 @@ Track pieces using indexers:
 ```csharp
 board["c2"] 		// White Pawn
 board['g', 8] 		// Black Bishop
+
 // Counting from 0
-board[0, 0] 		// White Rook
+board[0, 0] 		  // White Rook
 board[new Position(4, 7)] // Black King
 ```
 
