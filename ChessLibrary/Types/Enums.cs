@@ -13,9 +13,13 @@ namespace Chess;
 public enum EndgameType : byte
 {
     Checkmate,
-    Stalemate,
     Resigned,
-    Draw,
+    Timeout,
+    Stalemate,
+    DrawDeclared,
+    InsufficientMaterial,
+    Move50Rule,
+    Repetition,
 }
 
 internal enum CastleType : byte

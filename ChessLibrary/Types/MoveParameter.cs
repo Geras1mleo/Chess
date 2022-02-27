@@ -19,7 +19,9 @@ public interface IMoveParameter
     /// <summary>
     /// Special Move dropping implementation
     /// </summary>
-    internal void ExecuteWithParameter(Move move, ChessBoard board);
+    internal void Execute(Move move, ChessBoard board);
+
+    internal void Undo(Move move, ChessBoard board);
 
     internal static IMoveParameter FromString(string parameter)
     {
@@ -68,7 +70,7 @@ internal class MoveCastle : IMoveParameter
         }
     }
 
-    public void ExecuteWithParameter(Move move, ChessBoard board)
+    public void Execute(Move move, ChessBoard board)
     {
         var y = move.NewPosition.Y;
         switch (CastleType)
@@ -88,7 +90,28 @@ internal class MoveCastle : IMoveParameter
             default:
                 throw new ArgumentException(nameof(CastleType));
         }
+    }
 
+    public void Undo(Move move, ChessBoard board)
+    {
+        var y = move.NewPosition.Y;
+        switch (CastleType)
+        {
+            case CastleType.King:
+                board.pieces[y, 4] = new Piece(move.Piece.Color, PieceType.King);
+                board.pieces[y, 7] = new Piece(move.Piece.Color, PieceType.Rook);
+                board.pieces[y, 6] = null;
+                board.pieces[y, 5] = null;
+                break;
+            case CastleType.Queen:
+                board.pieces[y, 4] = new Piece(move.Piece.Color, PieceType.King);
+                board.pieces[y, 0] = new Piece(move.Piece.Color, PieceType.Rook);
+                board.pieces[y, 2] = null;
+                board.pieces[y, 3] = null;
+                break;
+            default:
+                throw new ArgumentException(nameof(CastleType));
+        }
     }
 
     public MoveCastle(CastleType castleType)
@@ -105,12 +128,20 @@ internal class MoveEnPassant : IMoveParameter
 
     public string LongStr => "En Passant";
 
-    public void ExecuteWithParameter(Move move, ChessBoard board)
+    public void Execute(Move move, ChessBoard board)
     {
         ChessBoard.DropPiece(move, board);
 
         if (CapturedPawnPosition.HasValue)
             board.pieces[CapturedPawnPosition.Y, CapturedPawnPosition.X] = null;
+    }
+
+    public void Undo(Move move, ChessBoard board)
+    {
+        ChessBoard.RestorePiece(move, board);
+        
+        board.pieces[move.NewPosition.Y, move.NewPosition.X] = null;
+        board.pieces[CapturedPawnPosition.Y, CapturedPawnPosition.X] = move.CapturedPiece;
     }
 }
 
@@ -150,12 +181,11 @@ internal class MovePromotion : IMoveParameter
         }
     }
 
-    public void ExecuteWithParameter(Move move, ChessBoard board)
+    public void Execute(Move move, ChessBoard board)
     {
         ChessBoard.DropPiece(move, board);
         
-        // Making sure original type is saved
-        //move.Piece.Type = new Piece(move.Piece.Color, move.Piece.Type).Type;
+        // Making sure original type(pawn) is saved
 
         board.pieces[move.NewPosition.Y, move.NewPosition.X].Type = PromotionType switch
         {
@@ -165,6 +195,13 @@ internal class MovePromotion : IMoveParameter
             PromotionType.ToKnight => PieceType.Knight,
             _ => throw new ArgumentException(nameof(PromotionType)),
         };
+    }
+
+    public void Undo(Move move, ChessBoard board)
+    {
+        ChessBoard.RestorePiece(move, board);
+
+        board.pieces[move.OriginalPosition.Y, move.OriginalPosition.X].Type = PieceType.Pawn;
     }
 
     public MovePromotion(PromotionType promotionType)

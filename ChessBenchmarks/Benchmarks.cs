@@ -61,6 +61,11 @@ public class ChessMoveBenchmark
     //  | MoveUsingMoveObject | 141.8 us | 7.93 us | 23.39 us |    1 |
     //  |        MoveUsingSan | 193.9 us | 8.04 us | 23.32 us |    2 |
     //
+    //  27/02/2022 => 
+    //  |              Method |     Mean |   Error |  StdDev | Rank |
+    //  |-------------------- |---------:|--------:|--------:|-----:|
+    //  | MoveUsingMoveObject | 125.9 us | 2.32 us | 4.59 us |    1 |
+    //  |        MoveUsingSan | 187.2 us | 3.50 us | 3.28 us |    2 |
 }
 
 [RankColumn]
@@ -109,6 +114,11 @@ public class ChessGenerateMovesBenchmark
     //  | MovesSanFalse | 667.5 us | 39.11 us | 113.5 us |    1 |
     //  |  MovesSanTrue | 745.0 us | 36.14 us | 105.4 us |    2 |
     //
+    //  27/02/2022 => 
+    //  |        Method |     Mean |    Error |   StdDev | Rank |
+    //  |-------------- |---------:|---------:|---------:|-----:|
+    //  | MovesSanFalse | 573.3 us | 11.05 us | 20.21 us |    1 |
+    //  |  MovesSanTrue | 584.1 us | 17.18 us | 49.29 us |    2 |
 }
 
 public class ChessIsValidMoveBenchmark
@@ -150,6 +160,10 @@ public class ChessIsValidMoveBenchmark
     //  |------------ |---------:|--------:|---------:|
     //  | IsValidMove | 100.2 us | 4.67 us | 13.76 us |
     //
+    //  27/02/2022 => 
+    //  |      Method |     Mean |    Error |   StdDev |
+    //  |------------ |---------:|---------:|---------:|
+    //  | IsValidMove | 84.19 us | 2.101 us | 6.029 us |
 }
 
 [MemoryDiagnoser]
@@ -181,6 +195,11 @@ public class ChessFenConversionsBenchmark
     //  |        Method |     Mean |    Error |   StdDev |    Gen 0 | Allocated |
     //  |-------------- |---------:|---------:|---------:|---------:|----------:|
     //  | FenConvertion | 504.8 us | 35.08 us | 99.52 us | 203.1250 |    415 KB |
+    //
+    //  27/02/2022 => 
+    //  |        Method |     Mean |   Error |  StdDev |    Gen 0 | Allocated |
+    //  |-------------- |---------:|--------:|--------:|---------:|----------:|
+    //  | FenConvertion | 467.4 us | 8.25 us | 8.10 us | 202.1484 |    414 KB |
 }
 
 [MemoryDiagnoser]
@@ -254,4 +273,9 @@ public class ChessPgnConversionsBenchmark
     //  | PgnConvertion | 7.360 ms | 0.2578 ms | 0.7601 ms | 2195.3125 |      4 MB |
     // 
     //  Conclusion: still too much memory usage
+    //
+    //  27/02/2022 => 
+    //  |        Method |     Mean |     Error |    StdDev |     Gen 0 | Allocated |
+    //  |-------------- |---------:|----------:|----------:|----------:|----------:|
+    //  | PgnConvertion | 7.918 ms | 0.2930 ms | 0.8641 ms | 2562.5000 |      5 MB |
 }

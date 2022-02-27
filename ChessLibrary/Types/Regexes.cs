@@ -13,7 +13,7 @@ internal class Regexes
 {
     internal const string SanOneMovePattern = @"(^([PNBRQK])?([a-h])?([1-8])?(x|X|-)?([a-h][1-8])(=[NBRQ]| ?e\.p\.)?|^O-O(-O)?)(\+|\#|\$)?$";
 
-    internal const string SanSanMovesPattern = @"([PNBRQK]?[a-h]?[1-8]?[xX-]?[a-h][1-8](=[NBRQ]| ?e\.p\.)?|O-O(?:-O)?)[+#$]?";
+    internal const string SanMovesPattern = @"([PNBRQK]?[a-h]?[1-8]?[xX-]?[a-h][1-8](=[NBRQ]| ?e\.p\.)?|O-O(?:-O)?)[+#$]?";
 
     internal const string HeadersPattern = @"\[(.*?) ""(.*?)""\]";
 
@@ -33,7 +33,7 @@ internal class Regexes
 
     internal readonly static Regex regexSanOneMove = new(SanOneMovePattern, RegexOptions.Compiled, TimeSpan.FromMilliseconds(250));
 
-    internal readonly static Regex regexSanMoves = new(SanSanMovesPattern, RegexOptions.Compiled, TimeSpan.FromMilliseconds(250));
+    internal readonly static Regex regexSanMoves = new(SanMovesPattern, RegexOptions.Compiled, TimeSpan.FromMilliseconds(250));
 
     internal readonly static Regex regexHeaders = new(HeadersPattern, RegexOptions.Compiled, TimeSpan.FromMilliseconds(250));
 

@@ -29,7 +29,7 @@ public partial class ChessBoard
         var matches = Regexes.regexSanOneMove.Matches(move);
 
         if (matches.Count == 0)
-            throw new ArgumentException("SAN Move should match pattern: " + Regexes.SanOneMovePattern);
+            throw new ArgumentException("SAN Move should match pattern: " + Regexes.SanMovesPattern);
 
         Move moveOut = new();
         Position originalPos = new();
@@ -293,8 +293,8 @@ public partial class ChessBoard
 
         // Remove all comments
         pgn = Regexes.regexComments.Replace(pgn, "");
-        
-        // Todo Save Alternative moves(linked list?) and Comments for moves
+
+        // Todo Save Alternative moves(bracnhes) and Comments for moves
 
         var movesMatches = Regexes.regexSanMoves.Matches(pgn);
 
@@ -308,13 +308,12 @@ public partial class ChessBoard
                 San(move);
 
                 executedMoves.Add(move);
-                DropPieceToNewPosition(move, true);
+                DropPieceToNewPosition(move);
 
                 moveIndex = executedMoves.Count - 1;
             }
         }
 
-        // If last move is with # or $ => endgame
         HandleKingChecked();
         HandleEndGame();
 
@@ -497,7 +496,7 @@ public partial class ChessBoard
 
     internal static int GetHalfMovesCount(ChessBoard board)
     {
-        int index = board.executedMoves.GetRange(0, board.moveIndex + 1).FindLastIndex(m => m.CapturedPiece is not null || m.Piece.Type == PieceType.Pawn);
+        int index = board.DisplayedMoves.FindLastIndex(m => m.CapturedPiece is not null || m.Piece.Type == PieceType.Pawn);
 
         if (board.LoadedFromFEN && index < 0)
             return board.FenObj.HalfMoves + board.moveIndex + 1;
@@ -516,5 +515,43 @@ public partial class ChessBoard
             count += (board.FenObj.FullMoves * 2) + (board.FenObj.Turn == PieceColor.Black ? 1 : 0) - 2;
 
         return (board.moveIndex + count + 3) / 2;
+    }
+
+    /// <summary>
+    /// Creates new object of board and loads given FEN string<br/>
+    /// Return value indicates whether load succeeded
+    /// </summary>
+    public static bool TryLoadFen(string fen, out ChessBoard? board)
+    {
+        try
+        {
+            board = new();
+            board.LoadFen(fen);
+            return true;
+        }
+        catch (Exception)
+        {
+            board = null;
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Creates new object of board and loads given PGN string<br/>
+    /// Return value indicates whether load succeeded
+    /// </summary>
+    public static bool TryLoadPgn(string pgn, out ChessBoard? board)
+    {
+        try
+        {
+            board = new();
+            board.LoadPgn(pgn);
+            return true;
+        }
+        catch (Exception)
+        {
+            board = null;
+            return false;
+        }
     }
 }

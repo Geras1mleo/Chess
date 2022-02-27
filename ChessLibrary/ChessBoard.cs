@@ -66,9 +66,9 @@ public partial class ChessBoard
         get
         {
             if (LoadedFromFEN)
-                return executedMoves.GetRange(0, moveIndex + 1).Count % 2 == 0 ? FenObj.Turn : FenObj.Turn.OppositeColor();
+                return DisplayedMoves.Count % 2 == 0 ? FenObj.Turn : FenObj.Turn.OppositeColor();
             else
-                return executedMoves.GetRange(0, moveIndex + 1).Count % 2 == 0 ? PieceColor.White : PieceColor.Black;
+                return DisplayedMoves.Count % 2 == 0 ? PieceColor.White : PieceColor.Black;
 
         }
     }
@@ -127,7 +127,7 @@ public partial class ChessBoard
 
             if (LoadedFromFEN) cap.AddRange(FenObj.WhiteCaptured);
 
-            cap.AddRange(executedMoves.GetRange(0, moveIndex + 1).Where(m => m.CapturedPiece?.Color == PieceColor.White).Select(m => new Piece(m.CapturedPiece.Color, m.CapturedPiece.Type)));
+            cap.AddRange(DisplayedMoves.Where(m => m.CapturedPiece?.Color == PieceColor.White).Select(m => new Piece(m.CapturedPiece.Color, m.CapturedPiece.Type)));
 
             return cap.ToArray();
         }
@@ -144,7 +144,7 @@ public partial class ChessBoard
 
             if (LoadedFromFEN) cap.AddRange(FenObj.BlackCaptured);
 
-            cap.AddRange(executedMoves.GetRange(0, moveIndex + 1).Where(m => m.CapturedPiece?.Color == PieceColor.Black).Select(m => new Piece(m.CapturedPiece.Color, m.CapturedPiece.Type)));
+            cap.AddRange(DisplayedMoves.Where(m => m.CapturedPiece?.Color == PieceColor.Black).Select(m => new Piece(m.CapturedPiece.Color, m.CapturedPiece.Type)));
 
             return cap.ToArray();
         }
@@ -190,12 +190,16 @@ public partial class ChessBoard
         {
             if (value < executedMoves.Count && value >= -1)
                 DisplayMoves(executedMoves.GetRange(0, value + 1));
+            else
+                throw new IndexOutOfRangeException("Move not found");
         }
     }
     /// <summary>
     /// Is last move displayed on this chess board, false after DisplayPrevious()
     /// </summary>
     public bool IsLastMoveDisplayed => moveIndex == executedMoves.Count - 1;
+
+    private List<Move> DisplayedMoves => executedMoves.GetRange(0, moveIndex + 1);   
 
     /// <summary>
     /// Creates new chess board with default pieces positions
@@ -205,18 +209,6 @@ public partial class ChessBoard
         executedMoves = new List<Move>();
         headers = new Dictionary<string, string>();
         SetChessBeginSituation();
-    }
-
-    /// <summary>
-    /// Creates new chess board and executes all given moves
-    /// </summary>
-    /// <param name="moves">Moves to be performed</param>
-    public ChessBoard(List<Move> moves)
-    {
-        executedMoves = new List<Move>();
-        headers = new Dictionary<string, string>();
-        SetChessBeginSituation();
-        moves.ForEach(m => Move(m));
     }
 
     /// <summary>
@@ -260,7 +252,10 @@ public partial class ChessBoard
 
             executedMoves.Add(move);
 
-            DropPieceToNewPosition(move, true);
+            if (move.CapturedPiece is not null)
+                OnCapturedEvent(move.CapturedPiece);
+
+            DropPieceToNewPosition(move);
 
             moveIndex = executedMoves.Count - 1;
 
@@ -339,7 +334,8 @@ public partial class ChessBoard
     }
 
     /// <summary>
-    /// Restores board according to moves and/or positions loaded from fen
+    /// Restores board according to moves and/or positions loaded from fen<br/>
+    /// Similar to Last()
     /// </summary>
     public void Restore()
     {
@@ -353,10 +349,18 @@ public partial class ChessBoard
     {
         if (IsLastMoveDisplayed && executedMoves.Count > 0)
         {
-            executedMoves.RemoveAt(executedMoves.Count - 1);
-            DisplayMoves(executedMoves);
+            var move = executedMoves[^1];
 
-            if (IsEndGame) EndGame = null;
+            if (move.Parameter is not null)
+                move.Parameter.Undo(move, this);
+            else
+                RestorePiece(move, this);
+
+            executedMoves.RemoveAt(executedMoves.Count - 1);
+            moveIndex = executedMoves.Count - 1;
+
+            HandleKingChecked();
+            EndGame = null;
         }
     }
 
@@ -402,17 +406,14 @@ public partial class ChessBoard
         if (IsEndGame)
             throw new ChessGameEndedException(this, EndGame);
 
-        EndGame = new EndGameInfo(EndgameType.Draw, null);
+        EndGame = new EndGameInfo(EndgameType.DrawDeclared, null);
     }
 
-    private void DropPieceToNewPosition(Move move, bool raise)
+    private void DropPieceToNewPosition(Move move)
     {
-        if (move.CapturedPiece is not null && raise)
-            OnCapturedEvent(move.CapturedPiece);
-
         if (move.Parameter is not null)
         {
-            move.Parameter.ExecuteWithParameter(move, this);
+            move.Parameter.Execute(move, this);
             return;
         }
 
@@ -432,6 +433,15 @@ public partial class ChessBoard
         board.pieces[move.OriginalPosition.Y, move.OriginalPosition.X] = null;
     }
 
+    internal static void RestorePiece(Move move, ChessBoard board)
+    {
+        // Moving piece to its original position
+        board.pieces[move.OriginalPosition.Y, move.OriginalPosition.X] = new(board.pieces[move.NewPosition.Y, move.NewPosition.X].Color, board.pieces[move.NewPosition.Y, move.NewPosition.X].Type);
+
+        // Clearing new position / or setting captured piece back
+        board.pieces[move.NewPosition.Y, move.NewPosition.X] = move.CapturedPiece;
+    }
+
     private void DisplayMoves(List<Move> moves)
     {
         if (LoadedFromFEN)
@@ -440,7 +450,7 @@ public partial class ChessBoard
             SetChessBeginSituation();
 
         for (int i = 0; i < moves.Count; i++)
-            DropPieceToNewPosition(moves[i], false);
+            DropPieceToNewPosition(moves[i]);
 
         moveIndex = moves.Count - 1;
 
@@ -453,11 +463,11 @@ public partial class ChessBoard
     /// </summary>
     private void HandleKingChecked()
     {
+        WhiteKingChecked = false;
+        BlackKingChecked = false;
+
         if (moveIndex >= 0)
         {
-            WhiteKingChecked = false;
-            BlackKingChecked = false;
-
             if (executedMoves[moveIndex].IsCheck)
             {
                 if (executedMoves[moveIndex].Piece.Color == PieceColor.White)
@@ -469,8 +479,11 @@ public partial class ChessBoard
         }
         else
         {
-            WhiteKingChecked = IsKingChecked(PieceColor.White, this);
-            BlackKingChecked = IsKingChecked(PieceColor.Black, this);
+            if (LoadedFromFEN)
+            {
+                WhiteKingChecked = IsKingChecked(PieceColor.White, this);
+                BlackKingChecked = IsKingChecked(PieceColor.Black, this);
+            }
         }
     }
 
@@ -490,19 +503,26 @@ public partial class ChessBoard
         }
         else
         {
-            var mw = !PlayerHasMoves(PieceColor.White, this);
-            var mb = !PlayerHasMoves(PieceColor.Black, this);
+            if (LoadedFromFEN)
+            {
+                var mw = !PlayerHasMoves(PieceColor.White, this);
+                var mb = !PlayerHasMoves(PieceColor.Black, this);
 
-            if (mw && WhiteKingChecked)
-                EndGame = new EndGameInfo(EndgameType.Checkmate, PieceColor.Black);
+                if (mw && WhiteKingChecked)
+                    EndGame = new EndGameInfo(EndgameType.Checkmate, PieceColor.Black);
 
-            else if (mb && BlackKingChecked)
-                EndGame = new EndGameInfo(EndgameType.Checkmate, PieceColor.White);
+                else if (mb && BlackKingChecked)
+                    EndGame = new EndGameInfo(EndgameType.Checkmate, PieceColor.White);
 
-            else if (mw || mb)
-                EndGame = new EndGameInfo(EndgameType.Stalemate, null);
+                else if (mw || mb)
+                    EndGame = new EndGameInfo(EndgameType.Stalemate, null);
+            }
         }
-        // Todo: endgame by short of pieces
+
+        // Todo:
+        // InsufficientMaterial
+        // Move50Rule
+        // Repetition
     }
 
     private void SetChessBeginSituation()

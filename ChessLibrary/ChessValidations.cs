@@ -227,7 +227,7 @@ public partial class ChessBoard
         else if (move.OriginalPosition != move.NewPosition)
         {
             fboard.executedMoves.Add(move);
-            fboard.DropPieceToNewPosition(new(move.ToString()), false);
+            fboard.DropPieceToNewPosition(new(move.ToString()));
         }
 
         return IsKingChecked(side, fboard);
@@ -265,7 +265,7 @@ public partial class ChessBoard
         if (move.OriginalPosition != move.NewPosition)
         {
             fboard.executedMoves.Add(move);
-            fboard.DropPieceToNewPosition(new(move.ToString()), false);
+            fboard.DropPieceToNewPosition(new(move.ToString()));
         }
         return PlayerHasMoves(side, fboard);
     }
@@ -555,8 +555,7 @@ public partial class ChessBoard
 
     private static bool PieceEverMoved(Position piecePos, ChessBoard board)
     {
-        return board.executedMoves.GetRange(0, board.moveIndex + 1)
-                                  .Any(p => p.OriginalPosition == piecePos);
+        return board.DisplayedMoves.Any(p => p.OriginalPosition == piecePos);
     }
 
     private static bool IsValidEnPassant(Move move, ChessBoard board, short v, short h)
@@ -589,7 +588,7 @@ public partial class ChessBoard
     {
         Position pos = new();
 
-        var lastMove = board.executedMoves.GetRange(0, board.moveIndex + 1).LastOrDefault();
+        var lastMove = board.DisplayedMoves.LastOrDefault();
 
         if (lastMove is not null && lastMove.Piece.Type == PieceType.Pawn)
         {
