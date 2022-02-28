@@ -8,6 +8,7 @@
 //                                    Made by Geras1mleo
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 namespace Chess;
 
 public enum EndgameType : byte
@@ -22,7 +23,7 @@ public enum EndgameType : byte
     Repetition,
 }
 
-internal enum CastleType : byte
+public enum CastleType : byte
 {
     King,
     Queen,

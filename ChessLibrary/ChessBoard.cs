@@ -56,7 +56,7 @@ public partial class ChessBoard
     /// <summary>
     /// Whether board has been loaded from Forsyth-Edwards Notation
     /// </summary>
-    public bool LoadedFromFEN => FenObj is not null;
+    public bool LoadedFromFen => FenObj is not null;
 
     /// <summary>
     /// Determinize whose player turn is it now
@@ -65,7 +65,7 @@ public partial class ChessBoard
     {
         get
         {
-            if (LoadedFromFEN)
+            if (LoadedFromFen)
                 return DisplayedMoves.Count % 2 == 0 ? FenObj.Turn : FenObj.Turn.OppositeColor();
             else
                 return DisplayedMoves.Count % 2 == 0 ? PieceColor.White : PieceColor.Black;
@@ -112,7 +112,7 @@ public partial class ChessBoard
     /// </summary>
     public Position WhiteKing => GetKingPosition(PieceColor.White, this);
     /// <summary>
-    /// Returns White king position on chess board
+    /// Returns Black king position on chess board
     /// </summary>
     public Position BlackKing => GetKingPosition(PieceColor.Black, this);
 
@@ -125,7 +125,7 @@ public partial class ChessBoard
         {
             var cap = new List<Piece>();
 
-            if (LoadedFromFEN) cap.AddRange(FenObj.WhiteCaptured);
+            if (LoadedFromFen) cap.AddRange(FenObj.WhiteCaptured);
 
             cap.AddRange(DisplayedMoves.Where(m => m.CapturedPiece?.Color == PieceColor.White).Select(m => new Piece(m.CapturedPiece.Color, m.CapturedPiece.Type)));
 
@@ -142,7 +142,7 @@ public partial class ChessBoard
         {
             var cap = new List<Piece>();
 
-            if (LoadedFromFEN) cap.AddRange(FenObj.BlackCaptured);
+            if (LoadedFromFen) cap.AddRange(FenObj.BlackCaptured);
 
             cap.AddRange(DisplayedMoves.Where(m => m.CapturedPiece?.Color == PieceColor.Black).Select(m => new Piece(m.CapturedPiece.Color, m.CapturedPiece.Type)));
 
@@ -152,7 +152,7 @@ public partial class ChessBoard
 
     private EndGameInfo? endGame;
     /// <summary>
-    /// Represents End of game state(or null), won side(or draw) and type of end game
+    /// Represents End of game state(or null), won side(or null if draw) and type of end game
     /// </summary>
     public EndGameInfo? EndGame
     {
@@ -177,11 +177,11 @@ public partial class ChessBoard
     /// <summary>
     /// Executed moves in SAN
     /// </summary>
-    public List<string> MovesInSan => new List<Move>(executedMoves).Select(m => m.San).ToList();
+    public List<string> MovesToSan => new List<Move>(executedMoves).Select(m => m.San).ToList();
 
     private int moveIndex = -1;
     /// <summary>
-    /// Displayed move index in this chess board
+    /// Index of displayed move on this chess board
     /// </summary>
     public int MoveIndex
     {
@@ -195,7 +195,8 @@ public partial class ChessBoard
         }
     }
     /// <summary>
-    /// Is last move displayed on this chess board, false after DisplayPrevious()
+    /// Is last move displayed on this chess board<br/>
+    /// False after Previous() / First() / MoveIndex = ...
     /// </summary>
     public bool IsLastMoveDisplayed => moveIndex == executedMoves.Count - 1;
 
@@ -221,7 +222,7 @@ public partial class ChessBoard
     }
 
     /// <summary>
-    /// Converts san move into Move object and performs it on chess board
+    /// Converts SAN move into Move object and performs it on chess board
     /// </summary>
     /// <param name="sanMove">Chess move in SAN</param>
     public bool Move(string sanMove)
@@ -270,7 +271,7 @@ public partial class ChessBoard
     /// <summary>
     /// Adding header to this chess game<br/>
     /// ex.:<br/>
-    /// name => Black; value => Geras1mleo<br/>
+    /// name => Black, value => Geras1mleo<br/>
     /// Pgn Output: [Black "Geras1mleo"]
     /// </summary>
     /// <param name="name">Header name</param>
@@ -300,11 +301,13 @@ public partial class ChessBoard
         headers.Remove(name);
     }
 
+    // Temporary disabled
+
     /// <summary>
     /// Puts given piece on given position<br/>
     /// Warning! Checked state and end game state is not being updated
     /// </summary>
-    public void Put(Piece piece, Position position)
+    private void Put(Piece piece, Position position)
     {
         pieces[position.Y, position.X] = piece;
     }
@@ -313,13 +316,13 @@ public partial class ChessBoard
     /// Removes a piece on given position from board<br/>
     /// Warning! Checked state and end game state is not being updated
     /// </summary>
-    public void Remove(Position position)
+    private void Remove(Position position)
     {
         pieces[position.Y, position.X] = null;
     }
 
     /// <summary>
-    /// Clears board and restores begin positions
+    /// Clears board and sets begin positions
     /// </summary>
     public void Clear()
     {
@@ -444,7 +447,7 @@ public partial class ChessBoard
 
     private void DisplayMoves(List<Move> moves)
     {
-        if (LoadedFromFEN)
+        if (LoadedFromFen)
             pieces = FenObj.Pieces;
         else
             SetChessBeginSituation();
@@ -479,7 +482,7 @@ public partial class ChessBoard
         }
         else
         {
-            if (LoadedFromFEN)
+            if (LoadedFromFen)
             {
                 WhiteKingChecked = IsKingChecked(PieceColor.White, this);
                 BlackKingChecked = IsKingChecked(PieceColor.Black, this);
@@ -503,7 +506,7 @@ public partial class ChessBoard
         }
         else
         {
-            if (LoadedFromFEN)
+            if (LoadedFromFen)
             {
                 var mw = !PlayerHasMoves(PieceColor.White, this);
                 var mb = !PlayerHasMoves(PieceColor.Black, this);

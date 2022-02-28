@@ -24,7 +24,7 @@ public partial class ChessBoard
     /// </summary>
     public event ChessCheckedChangedEventHandler OnBlackKingCheckedChanged = delegate { };
     /// <summary>
-    /// Raises when user has to choose promote action
+    /// Raises when user has to choose promotion action
     /// </summary>
     public event ChessPromotionResultEventHandler OnPromotePawn = delegate { };
     /// <summary>

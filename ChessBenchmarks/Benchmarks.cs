@@ -11,11 +11,11 @@ public class ChessMoveBenchmark
     {
         var board = new ChessBoard();
 
-        board.Move(new Move(new Position("e2"), new Position("e4")));
-        board.Move(new Move(new Position("e7"), new Position("e5")));
-        board.Move(new Move(new Position("g1"), new Position("e2")));
-        board.Move(new Move(new Position("f7"), new Position("f6")));
-        board.Move(new Move(new Position("b1"), new Position("c3")));
+        board.Move(new Move("e2", "e4"));
+        board.Move(new Move("e7", "e5"));
+        board.Move(new Move("g1", "e2"));
+        board.Move(new Move("f7", "f6"));
+        board.Move(new Move("b1", "c3"));
     }
 
     [Benchmark]
@@ -127,13 +127,13 @@ public class ChessIsValidMoveBenchmark
     public void IsValidMove()
     {
         var board = new ChessBoard();
-        board.IsValidMove(new Move(new("b1"), new("c3")));
-        board.IsValidMove(new Move(new("c1"), new("g5")));
-        board.IsValidMove(new Move(new("d1"), new("d6")));
-        board.IsValidMove(new Move(new("e1"), new("f2")));
-        board.IsValidMove(new Move(new("e2"), new("e4")));
-        board.IsValidMove(new Move(new("g2"), new("g4")));
-        board.IsValidMove(new Move(new("b2"), new("b4")));
+        board.IsValidMove(new Move("b1", "c3"));
+        board.IsValidMove(new Move("c1", "g5"));
+        board.IsValidMove(new Move("d1", "d6"));
+        board.IsValidMove(new Move("e1", "f2"));
+        board.IsValidMove(new Move("e2", "e4"));
+        board.IsValidMove(new Move("g2", "g4"));
+        board.IsValidMove(new Move("b2", "b4"));
     }
 
     //  Tests:

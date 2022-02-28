@@ -61,7 +61,7 @@ public class Move
     public string? San { get; internal set; }
 
     /// <summary>
-    /// Initializes new Move that has to be validated
+    /// Initializes new Move object by given positions
     /// </summary>
     public Move(Position originalPosition, Position newPosition)
     {
@@ -122,6 +122,15 @@ public class Move
                     break;
             }
         }
+    }
+
+    /// <summary>
+    /// Initializes new Move object by given positions
+    /// </summary>
+    public Move(string originalPos, string newPos)
+    {
+        OriginalPosition = new(originalPos);
+        NewPosition = new(newPos);
     }
 
     /// <summary>

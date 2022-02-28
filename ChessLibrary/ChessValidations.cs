@@ -510,7 +510,7 @@ public partial class ChessBoard
     {
         var valid = false;
 
-        if (board.LoadedFromFEN)
+        if (board.LoadedFromFen)
         {
             if (side == PieceColor.White)
             {
@@ -572,7 +572,7 @@ public partial class ChessBoard
                 if (board.moveIndex >= 0)
                     valid = LastMoveEnPassantPosition(board) == move.NewPosition;
 
-                else if (board.LoadedFromFEN)
+                else if (board.LoadedFromFen)
                     valid = board.FenObj.EnPassant == move.NewPosition;
 
                 return valid;
