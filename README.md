@@ -8,6 +8,8 @@
 	</p>
 </div>
 
+Browse in <a href="https://www.nuget.org/packages/Gera.Chess/">NuGet<a/><br/>
+
 ## Chess lib includes:
 
 - Chess board with 2-dimentional array of `Pieces`
