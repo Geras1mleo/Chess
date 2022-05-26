@@ -18,7 +18,7 @@ public partial class ChessBoard
     /// <returns>Whether given move is valid</returns>
     public bool IsValidMove(string sanMove)
     {
-        return IsValidMove(San(sanMove));
+        return IsValidMove(San(sanMove, false));
     }
 
     /// <summary>
@@ -35,9 +35,10 @@ public partial class ChessBoard
     /// Returns all moves that the piece on given position can perform
     /// </summary>
     /// <param name="position">Position of piece</param>
+    /// <param name="allowAmbiguousCastle">Whether Castle move will be e1-g1 AND also e1-h1 which is in fact the same O-O</param>
     /// <param name="generateSan">Whether SAN notation needs to be generated. For higher productivity => set to false</param>
     /// <returns>All available moves for given piece</returns>
-    public Move[] Moves(Position position, bool generateSan = true)
+    public Move[] Moves(Position position, bool allowAmbiguousCastle = false, bool generateSan = true)
     {
         if (pieces[position.Y, position.X] is null)
             throw new ChessPieceNotFoundException(this, new Move(position, position));
@@ -57,11 +58,25 @@ public partial class ChessBoard
                 if (IsValidMove(move, this, false, true))
                 {
                     // Ambiguous castle
-                    //if (move.Parameter == MoveParameter.CastleKing && moves.Any(m => m.Parameter == MoveParameter.CastleKing)) continue;
-                    //if (move.Parameter == MoveParameter.CastleQueen && moves.Any(m => m.Parameter == MoveParameter.CastleQueen)) continue;
+                    if (!allowAmbiguousCastle && move.Parameter is MoveCastle)
+                    {
+                        if (move.NewPosition.X % 7 == 0)
+                            continue;
+                    }
 
-                    moves.Add(move);
-                    if (generateSan) San(move);
+                    // If promotion => 4 different moves for each promotion type
+                    if (move.Parameter is MovePromotion promotion)
+                    {
+                        moves.Add(new Move(move, PromotionType.ToQueen));
+                        moves.Add(new Move(move, PromotionType.ToRook));
+                        moves.Add(new Move(move, PromotionType.ToBishop));
+                        moves.Add(new Move(move, PromotionType.ToKnight));
+                    }
+                    else
+                        moves.Add(move);
+
+                    if (generateSan)
+                        San(move);
                 }
             }
         }
@@ -72,9 +87,10 @@ public partial class ChessBoard
     /// <summary>
     /// Generates all moves that the player whose turn it is can make
     /// </summary>
+    /// <param name="allowAmbiguousCastle">Whether Castle move will be e1-g1 AND also e1-h1 which is in fact the same O-O</param>
     /// <param name="generateSan">San notation needs to be generated</param>
     /// <returns>All generated moves</returns>
-    public Move[] Moves(bool generateSan = true)
+    public Move[] Moves(bool allowAmbiguousCastle = false, bool generateSan = true)
     {
         var moves = new List<Move>();
 
@@ -83,7 +99,7 @@ public partial class ChessBoard
             for (short j = 0; j < 8; j++)
             {
                 if (pieces[i, j] is not null)
-                    moves.AddRange(Moves(new Position { Y = i, X = j }, generateSan));
+                    moves.AddRange(Moves(new Position { Y = i, X = j }, allowAmbiguousCastle, generateSan));
             }
         }
 
@@ -150,7 +166,8 @@ public partial class ChessBoard
         if (!isChecked)
         {
             // Capture
-            if (board.pieces[move.NewPosition.Y, move.NewPosition.X]?.Color != move.Piece.Color)
+            if (board.pieces[move.NewPosition.Y, move.NewPosition.X] is not null
+             && board.pieces[move.NewPosition.Y, move.NewPosition.X].Color != move.Piece.Color)
             {
                 move.CapturedPiece = board.pieces[move.NewPosition.Y, move.NewPosition.X];
             }

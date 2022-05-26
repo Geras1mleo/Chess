@@ -16,12 +16,13 @@ public partial class ChessBoard
     /// Long algebraic notation is also acceptable
     /// </summary>
     /// <param name="move">San move to be converted</param>
+    /// <param name="resetSan">Whether SAN needs to be regenerated</param>
     /// <returns>Move object according to given san</returns>
     /// <exception cref="ArgumentNullException">move was null</exception>
     /// <exception cref="ArgumentException">Given move didn't match the Regex pattern</exception>
     /// <exception cref="ChessSanNotFoundException">Given SAN move is not valid for current board positions</exception>
     /// <exception cref="ChessSanTooAmbiguousException">Given SAN move is too ambiguous between multiple moves</exception>
-    public Move San(string move)
+    public Move San(string move, bool resetSan = false)
     {
         if (move is null)
             throw new ArgumentNullException(nameof(move));
@@ -150,7 +151,9 @@ public partial class ChessBoard
         }
 
         moveOut.OriginalPosition = originalPos;
-        San(moveOut);
+
+        if (resetSan)
+            San(moveOut);
 
         return moveOut;
     }
@@ -191,14 +194,18 @@ public partial class ChessBoard
             builder.Append('x');
         }
 
+        if (move.Parameter is MoveEnPassant enPassant)
+        {
+            builder.Append(move.OriginalPosition.File().ToString() + 'x');
+
+            // Not required (LAN)
+            // builder.Append(" " + enPassant.ShortStr);
+        }
+
         builder.Append(move.NewPosition);
 
         if (move.Parameter is MovePromotion)
             builder.Append(move.Parameter.ShortStr);
-
-        // Not required
-        //else if (move.Parameter == MoveParameter.EnPassant)
-        //    builder.Append(" " + move.Parameter.AsShortString);
 
         CheckOrMateValidation:
 
@@ -295,7 +302,7 @@ public partial class ChessBoard
         // Execute all found moves
         for (int i = 0; i < movesMatches.Count; i++)
         {
-            var move = San(movesMatches[i].Value);
+            var move = San(movesMatches[i].Value, false);
             if (IsValidMove(move, this, false, true))
             {
                 // Regenerate SAN after IsValidMove

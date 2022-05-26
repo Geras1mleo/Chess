@@ -133,6 +133,18 @@ public class Move
         NewPosition = new(newPos);
     }
 
+    internal Move(Move source, PromotionType promotion)
+    {
+        Piece = source.Piece;
+        OriginalPosition = source.OriginalPosition;
+        NewPosition = source.NewPosition;
+        CapturedPiece = source.CapturedPiece;
+        Parameter = new MovePromotion(promotion);
+        IsCheck = source.IsCheck;
+        IsMate = source.IsMate;
+        San = source.San;
+    }
+
     /// <summary>
     /// Needed to Generate move from SAN in ChessConversions
     /// </summary>

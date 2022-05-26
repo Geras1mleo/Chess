@@ -227,7 +227,7 @@ public partial class ChessBoard
     /// <param name="sanMove">Chess move in SAN</param>
     public bool Move(string sanMove)
     {
-        return Move(San(sanMove));
+        return Move(San(sanMove, false));
     }
 
     /// <summary>

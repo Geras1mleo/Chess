@@ -290,22 +290,21 @@ public class UnitChessTests
     {
         var board = new ChessBoard();
 
-        Assert.Equal(20, board.Moves().Length);
-
         // Stalemate
         board.LoadFen("rnb1kbnr/pppppppp/8/8/8/8/5q2/7K w kq - 0 1");
-        Assert.Empty(board.Moves());
+        Assert.Empty(board.Moves(false, false));
 
+        // One possible move
         board.LoadFen("rnb1kbnr/pppppppp/8/8/5P1q/8/PPPPP1PP/RNBQKBNR w KQkq - 0 1");
-        Assert.Single(board.Moves());
+        Assert.Single(board.Moves(false, false));
 
-        // King Castle 2 moves offering (e1-h1 OR e1-g1)
+        // King Castle
         board.LoadFen("r3kbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1");
-        Assert.Equal(3, board.Moves(new Position("e1")).Length);
+        Assert.Equal(2, board.Moves(new Position("e1"), false, false).Length);
 
-        // 2 castles
+        // King/Queen Castle
         board.LoadFen("r3kbnr/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1");
-        Assert.Equal(6, board.Moves(new Position("e1")).Length);
+        Assert.Equal(4, board.Moves(new Position("e1"), false, false).Length);
     }
 
     [Fact]
@@ -368,6 +367,10 @@ public class UnitChessTests
         Assert.True(board.IsValidMove(new Move("d4", "d3")));
         Assert.True(board.IsValidMove(new Move("d4", "e3")));
 
+        board.Last();
+        board.Cancel();
+        Assert.Equal("rnbqkbnr/ppp2ppp/8/4p3/2PpP3/8/PP1P1PPP/RNBQKBNR b KQkq c3 0 2", board.ToFen());
+
         // Castle
         board.LoadFen("r3kbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1");
         Assert.True(board.IsValidMove(new Move("e1", "h1")));
@@ -397,7 +400,7 @@ public class UnitChessTests
 
         // Promotion
         board.LoadFen("rnbqkbnr/pPpppppp/8/8/8/8/P1PPPPPP/RNBQKBNR w KQkq - 0 1");
-        board.Move(new Move("b7","a8"));
+        board.Move(new Move("b7", "a8"));
         Assert.True(board["a8"].Type == PieceType.Queen);
 
         board.LoadPgn(
@@ -412,6 +415,60 @@ public class UnitChessTests
         board.LoadFen("rnbqkbnr/pPpppppp/8/8/8/8/P1PPPPPP/RNBQKBNR w KQkq - 0 1");
         board.Move(new Move("b7", "a8"));
         Assert.True(board["a8"].Type == PieceType.Bishop);
+    }
+
+    [Fact]
+    public void TestNumOfMoves()
+    {
+        var board = new ChessBoard();
+
+        var numOfMoves = CountMoves(board, 1);
+        Assert.Equal(20, numOfMoves);
+
+        numOfMoves = CountMoves(board, 2);
+        Assert.Equal(400, numOfMoves);
+
+        numOfMoves = CountMoves(board, 3);
+        Assert.Equal(8_902, numOfMoves);
+
+        board.LoadFen("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8");
+
+        numOfMoves = CountMoves(board, 1);
+        Assert.Equal(44, numOfMoves);
+
+        numOfMoves = CountMoves(board, 2);
+        Assert.Equal(1_486, numOfMoves);
+
+        numOfMoves = CountMoves(board, 3);
+        Assert.Equal(62_379, numOfMoves);
+
+        board.LoadFen("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1");
+
+        numOfMoves = CountMoves(board, 1);
+        Assert.Equal(6, numOfMoves);
+
+        numOfMoves = CountMoves(board, 2);
+        Assert.Equal(264, numOfMoves);
+
+        numOfMoves = CountMoves(board, 3);
+        Assert.Equal(9_467, numOfMoves);
+    }
+
+    private int CountMoves(ChessBoard board, int depth)
+    {
+        if (depth == 0)
+            return 1;
+
+        var numOfMoves = 0;
+
+        foreach (var move in board.Moves(false, false))
+        {
+            board.Move(move);
+            numOfMoves += CountMoves(board, depth - 1);
+            board.Cancel();
+        }
+
+        return numOfMoves;
     }
 }
 public class UnitLoadingsTests
@@ -722,4 +779,5 @@ public class UnitLoadingsTests
         Assert.Equal(1, raisedEndGame);
         Assert.Equal(EndgameType.Stalemate, board.EndGame.EndgameType);
     }
+
 }
