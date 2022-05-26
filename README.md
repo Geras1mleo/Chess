@@ -8,7 +8,7 @@
 	</p>
 </div>
 
-Browse in <a href="https://www.nuget.org/packages/Gera.Chess/">NuGet<a/><br/>
+<b>Browse in <a href="https://www.nuget.org/packages/Gera.Chess/"><img height="15px" src="https://www.nuget.org/favicon.ico"> NuGet<a/></b>
 
 ## Chess lib includes:
 
