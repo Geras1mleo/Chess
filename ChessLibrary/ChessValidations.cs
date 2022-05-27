@@ -44,7 +44,6 @@ public partial class ChessBoard
             throw new ChessPieceNotFoundException(this, new Move(position, position));
 
         var moves = new List<Move>();
-        Move move;
 
         for (short i = 0; i < 8; i++)
         {
@@ -53,14 +52,14 @@ public partial class ChessBoard
                 // if original pos == new pos
                 if (position.Y == i && position.X == j) continue;
 
-                move = new Move(position, new Position { Y = i, X = j }) { Piece = pieces[position.Y, position.X] };
+                Move move = new(position, new Position { Y = i, X = j }) { Piece = pieces[position.Y, position.X] };
 
                 if (IsValidMove(move, this, false, true))
                 {
                     // Ambiguous castle
                     if (!allowAmbiguousCastle && move.Parameter is MoveCastle)
                     {
-                        if (move.NewPosition.X % 7 == 0)
+                        if (move.NewPosition.X % 7 == 0) // Dropping king on position of rook
                             continue;
                     }
 
@@ -92,16 +91,30 @@ public partial class ChessBoard
     /// <returns>All generated moves</returns>
     public Move[] Moves(bool allowAmbiguousCastle = false, bool generateSan = true)
     {
-        var moves = new List<Move>();
+        var moves = new ConcurrentBag<Move>();
+        var tasks = new List<Task>();
 
         for (short i = 0; i < 8; i++)
         {
             for (short j = 0; j < 8; j++)
             {
-                if (pieces[i, j] is not null)
-                    moves.AddRange(Moves(new Position { Y = i, X = j }, allowAmbiguousCastle, generateSan));
+                if (pieces[i, j] is null)
+                    continue;
+
+                short x = j;
+                short y = i;
+
+                tasks.Add(Task.Run(() =>
+                {
+                    foreach (var move in Moves(new Position { Y = y, X = x }, allowAmbiguousCastle, generateSan))
+                    {
+                        moves.Add(move);
+                    }
+                }));
             }
         }
+
+        Task.WaitAll(tasks.ToArray());
 
         return moves.ToArray();
     }
@@ -161,6 +174,7 @@ public partial class ChessBoard
         move.Parameter = null;
 
         bool isValid = IsValidMove(move, board);
+        // If is not valid => don't validate further
         bool isChecked = !isValid || IsKingCheckedValidation(move, move.Piece.Color, board);
 
         if (!isChecked)
@@ -207,7 +221,7 @@ public partial class ChessBoard
 
     private static bool IsValidMove(Move move, ChessBoard board)
     {
-        return (int)move.Piece.Type switch
+        return move.Piece.Type switch
         {
             var e when e == PieceType.Pawn => PawnValidation(move, board),
             var e when e == PieceType.Rook => RookValidation(move, board.pieces),
@@ -227,10 +241,9 @@ public partial class ChessBoard
     {
         var fboard = new ChessBoard(board.pieces, board.executedMoves);
 
-        // If checking for valid castle move
-        // move.Piece is null only when calling recursively
-        if (move.Piece is not null && move.Piece.Color == side
-         && move.Parameter is MoveCastle castle)
+        // If validating castle move
+        if (move.Parameter is MoveCastle castle && move.Piece.Color == side
+         && move.Piece is not null) // move.Piece is null only when calling recursively
         {
             var kingPos = GetKingPosition(side, board);
             short step = (short)(castle.CastleType == CastleType.King ? 1 : -1);

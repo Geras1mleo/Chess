@@ -119,6 +119,14 @@ public class ChessGenerateMovesBenchmark
     //  |-------------- |---------:|---------:|---------:|-----:|
     //  | MovesSanFalse | 573.3 us | 11.05 us | 20.21 us |    1 |
     //  |  MovesSanTrue | 584.1 us | 17.18 us | 49.29 us |    2 |
+    //
+    //  27/05/2022 => async approach
+    //
+    //  |        Method |     Mean |    Error |   StdDev | Rank |
+    //  |-------------- |---------:|---------:|---------:|-----:|
+    //  | MovesSanFalse | 492.7 us | 16.54 us | 46.93 us |    1 |
+    //  |  MovesSanTrue | 528.3 us | 14.13 us | 39.86 us |    2 |
+
 }
 
 public class ChessIsValidMoveBenchmark

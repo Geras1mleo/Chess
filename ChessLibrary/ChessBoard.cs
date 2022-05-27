@@ -302,7 +302,6 @@ public partial class ChessBoard
     }
 
     // Temporary disabled
-
     /// <summary>
     /// Puts given piece on given position<br/>
     /// Warning! Checked state and end game state is not being updated
