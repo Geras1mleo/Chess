@@ -13,10 +13,6 @@
 		  <PackagePath>\</PackagePath>
 		</None>
 		<None Include="..\.editorconfig" Link=".editorconfig" />
-		<None Include="..\README.md">
-		  <Pack>True</Pack>
-		  <PackagePath>\</PackagePath>
-		</None>
 		<None Include="..\LICENSE.md">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
@@ -26,6 +22,13 @@
 	<ItemGroup>
 	  <PackageReference Include="Ardalis.SmartEnum" Version="2.0.1" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="README_NUGET.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
 	<PropertyGroup>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<DebugType>embedded</DebugType>
@@ -34,13 +37,14 @@
 		<Authors>Geras1mleo</Authors>
 		<Copyright>Copyright (c) 2022 Geras1mleo</Copyright>
 		<PackageProjectUrl></PackageProjectUrl>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageReadmeFile>README_NUGET.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/Geras1mleo/Chess</RepositoryUrl>
 		<PackageTags>chess;chessboard;chess-game;chess-position;standard-algebraic-notation;chess-move;forsyth-edwards-notation;chess-validator;chess-variations</PackageTags>
-		<PackageReleaseNotes>First release</PackageReleaseNotes>
+		<PackageReleaseNotes></PackageReleaseNotes>
 		<PackageIcon>knight.png</PackageIcon>
 		<PackageId>Gera.Chess</PackageId>
 		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
 		<RepositoryType>git</RepositoryType>
+		<Version>1.0.1</Version>
 	</PropertyGroup>
 </Project>
