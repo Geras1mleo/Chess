@@ -48,7 +48,7 @@ public interface IMoveParameter
             "=r" => new MovePromotion(PromotionType.ToRook),
             "=b" => new MovePromotion(PromotionType.ToBishop),
             "=n" => new MovePromotion(PromotionType.ToKnight),
-            _ => throw new ArgumentException("Parameter not found!", nameof(parameter)),
+            _ => throw new ChessArgumentException(null!, "Parameter not recognized..."),
         };
     }
 }
@@ -65,7 +65,7 @@ public class MoveCastle : IMoveParameter
             {
                 CastleType.King => "O-O",
                 CastleType.Queen => "O-O-O",
-                _ => throw new ArgumentException(nameof(IMoveParameter.ShortStr))
+                _ => throw new ChessArgumentException(null!, nameof(CastleType), nameof(MoveCastle.ShortStr))
             };
         }
     }
@@ -78,7 +78,7 @@ public class MoveCastle : IMoveParameter
             {
                 CastleType.King => "King Side Castle",
                 CastleType.Queen => "Queen Side Castle",
-                _ => throw new ArgumentException(nameof(IMoveParameter.LongStr))
+                _ => throw new ChessArgumentException(null!, nameof(CastleType), nameof(MoveCastle.LongStr))
             };
         }
     }
@@ -101,7 +101,7 @@ public class MoveCastle : IMoveParameter
                 board.pieces[y, 0] = null;
                 break;
             default:
-                throw new ArgumentException(nameof(CastleType));
+                throw new ChessArgumentException(board, nameof(CastleType), nameof(IMoveParameter.Execute));
         }
     }
 
@@ -123,7 +123,7 @@ public class MoveCastle : IMoveParameter
                 board.pieces[y, 3] = null;
                 break;
             default:
-                throw new ArgumentException(nameof(CastleType));
+                throw new ChessArgumentException(board, nameof(CastleType), nameof(IMoveParameter.Undo));
         }
     }
 
@@ -147,6 +147,8 @@ public class MoveEnPassant : IMoveParameter
 
         if (CapturedPawnPosition.HasValue)
             board.pieces[CapturedPawnPosition.Y, CapturedPawnPosition.X] = null;
+        else
+            throw new ChessArgumentException(board, nameof(CapturedPawnPosition), nameof(IMoveParameter.Execute));
     }
 
     void IMoveParameter.Undo(Move move, ChessBoard board)
@@ -173,7 +175,7 @@ public class MovePromotion : IMoveParameter
                 PromotionType.ToRook => "=R",
                 PromotionType.ToBishop => "=B",
                 PromotionType.ToKnight => "=N",
-                _ => throw new ArgumentException(nameof(IMoveParameter.ShortStr))
+                _ => throw new ChessArgumentException(null!, nameof(PromotionType), nameof(MovePromotion.ShortStr))
             };
         }
     }
@@ -189,7 +191,7 @@ public class MovePromotion : IMoveParameter
                 PromotionType.ToRook => "Promotion To Rook",
                 PromotionType.ToBishop => "Promotion To Bishop",
                 PromotionType.ToKnight => "Promotion To Knight",
-                _ => throw new ArgumentException(nameof(IMoveParameter.LongStr))
+                _ => throw new ChessArgumentException(null!, nameof(PromotionType), nameof(MovePromotion.LongStr))
             };
         }
     }
@@ -206,7 +208,7 @@ public class MovePromotion : IMoveParameter
             PromotionType.ToRook => PieceType.Rook,
             PromotionType.ToBishop => PieceType.Bishop,
             PromotionType.ToKnight => PieceType.Knight,
-            _ => throw new ArgumentException(nameof(PromotionType)),
+            _ => throw new ChessArgumentException(board, nameof(PromotionType), nameof(IMoveParameter.Execute)),
         };
     }
 

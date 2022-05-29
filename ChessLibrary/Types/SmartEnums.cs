@@ -36,7 +36,7 @@ public class PieceColor : SmartEnum<PieceColor>
         {
             1 => Black,
             2 => White,
-            _ => throw new ArgumentException("OppositeColor"),
+            _ => throw new ChessArgumentException(null!, nameof(Value), nameof(PieceColor.OppositeColor)),
         };
     }
 
@@ -56,7 +56,7 @@ public class PieceColor : SmartEnum<PieceColor>
         {
             'w' => White,
             'b' => Black,
-            _ => throw new ArgumentException("PieceColor.FromChar"),
+            _ => throw new ChessArgumentException(null!, nameof(color), nameof(PieceColor.FromChar)),
         };
     }
 }
@@ -107,7 +107,7 @@ public class PieceType : SmartEnum<PieceType>
             'b' => Bishop,
             'q' => Queen,
             'k' => King,
-            _ => throw new ArgumentException("PieceType.FromChar"),
+            _ => throw new ChessArgumentException(null!, nameof(type), nameof(PieceType.FromChar)),
         };
     }
 }

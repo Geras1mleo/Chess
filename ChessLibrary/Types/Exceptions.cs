@@ -29,7 +29,7 @@ public class ChessInvalidMoveException : ChessException
 {
     public Move Move { get; }
     public ChessInvalidMoveException(ChessBoard board, Move move)
-        : this(board, "Given move: " + move + " is invalid for current pieces positions.", move) { }
+        : this(board, $"Given move: {move} is invalid for current pieces positions.", move) { }
     public ChessInvalidMoveException(ChessBoard board, string message, Move move) : base(board, message) => Move = move;
 }
 
@@ -37,7 +37,7 @@ public class ChessPieceNotFoundException : ChessException
 {
     public Move Move { get; }
     public ChessPieceNotFoundException(ChessBoard board, Move move)
-        : this(board, "Piece on given original position: " + move.OriginalPosition + " has been not found in current chess board", move) { }
+        : this(board, $"Piece on given original position: {move.OriginalPosition} has been not found in current chess board", move) { }
     public ChessPieceNotFoundException(ChessBoard board, string message, Move move) : base(board, message) => Move = move;
 }
 
@@ -60,6 +60,13 @@ public class ChessSanTooAmbiguousException : ChessException
         SanMove = san;
         Moves = moves;
     }
+}
+
+public class ChessArgumentException : ChessException
+{
+    public ChessArgumentException(ChessBoard board, string argument, string method)
+        : this(board, $"An argument: {argument} in method: {method} is not valid...") { }
+    public ChessArgumentException(ChessBoard board, string message) : base(board, message) { }
 }
 
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

@@ -56,7 +56,7 @@ internal class FenBoard
         var matches = Regexes.regexFen.Matches(fen);
 
         if (matches.Count == 0)
-            throw new ArgumentException("FEN should match pattern: " + Regexes.FenPattern);
+            throw new ChessArgumentException(null!, "FEN board string should match pattern: " + Regexes.FenPattern);
 
         pieces = new Piece[8, 8];
 
@@ -131,7 +131,7 @@ internal class FenBoard
         bcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Bishop && p.Color == PieceColor.Black).Count(), 0, 2)).Select(_ => new Piece(PieceColor.Black, PieceType.Bishop)));
         bcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Knight && p.Color == PieceColor.Black).Count(), 0, 2)).Select(_ => new Piece(PieceColor.Black, PieceType.Knight)));
         bcap.AddRange(Enumerable.Range(0, Math.Clamp(1 - fpieces.Where(p => p.Type == PieceType.Queen && p.Color == PieceColor.Black).Count(), 0, 1)).Select(_ => new Piece(PieceColor.Black, PieceType.Queen)));
-        
+
         WhiteCaptured = wcap.ToArray();
         BlackCaptured = bcap.ToArray();
     }

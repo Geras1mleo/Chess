@@ -49,7 +49,7 @@ public struct Position
         position = position.ToLower();
 
         if (!Regexes.regexPosition.IsMatch(position))
-            throw new ArgumentException("Table position should match pattern: " + Regexes.PositionPattern);
+            throw new ChessArgumentException(null!, "Table position should match pattern: " + Regexes.PositionPattern);
 
         X = FromFile(position[0]);
         Y = FromRank(position[1]);
@@ -94,7 +94,7 @@ public struct Position
             'f' => 5,
             'g' => 6,
             'h' => 7,
-            _ => throw new ArgumentException("Position.FromFile"),
+            _ => throw new ChessArgumentException(null!, nameof(file), nameof(Position.FromFile)),
         };
     }
 
@@ -121,7 +121,7 @@ public struct Position
             '6' => 5,
             '7' => 6,
             '8' => 7,
-            _ => throw new ArgumentException("Position.FromRank"),
+            _ => throw new ChessArgumentException(null!, nameof(rank), nameof(Position.FromRank)),
         };
     }
 
@@ -148,7 +148,7 @@ public struct Position
             5 => 'f',
             6 => 'g',
             7 => 'h',
-            _ => throw new ArgumentException("Position.File")
+            _ => throw new ChessArgumentException(null!, nameof(X), nameof(Position.File))
         };
     }
 
@@ -175,7 +175,7 @@ public struct Position
             5 => '6',
             6 => '7',
             7 => '8',
-            _ => throw new ArgumentException("Position.Rank")
+            _ => throw new ChessArgumentException(null!, nameof(Y), nameof(Position.Rank))
         };
     }
 

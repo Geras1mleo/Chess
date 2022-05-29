@@ -78,7 +78,7 @@ public class Move
     /// Or: {a1 - h8}<br/>
     /// See: move.ToString()
     /// </param>
-    /// <exception cref="ArgumentException">Move didn't match regex pattern</exception>
+    /// <exception cref="ChessArgumentException">Move didn't match regex pattern</exception>
     public Move(string move)
     {
         move = move.ToLower();
@@ -86,7 +86,7 @@ public class Move
         var matches = Regexes.regexMove.Matches(move.ToLower());
 
         if (matches.Count < 1)
-            throw new ArgumentException("Move should match pattern: " + Regexes.MovePattern);
+            throw new ChessArgumentException(null!, "Move should match pattern: " + Regexes.MovePattern);
 
         foreach (var group in matches[0].Groups.Values)
         {

@@ -112,7 +112,7 @@ public class UnitChessTests
         var board = new ChessBoard();
 
         Assert.Throws<ArgumentNullException>(() => { string? s = null; board.San(s); });
-        Assert.Throws<ArgumentException>(() => board.San("z4"));
+        Assert.Throws<ChessArgumentException>(() => board.San("z4"));
 
         // 1. e4 e5 2. Ne2 f6 3. (TEST:"Nc3")
         var moves = new[]
@@ -757,7 +757,7 @@ public class UnitLoadingsTests
         board.OnEndGame += (sender, e) => raisedEndGame++;
 
         // En passant pos only 3rd rank possible of 6th
-        Assert.Throws<ArgumentException>(() => board.LoadFen("8/p7/7R/5pk1/8/3B1r2/PP3P2/2K5 w KQkq e1 1 34"));
+        Assert.Throws<ChessArgumentException>(() => board.LoadFen("8/p7/7R/5pk1/8/3B1r2/PP3P2/2K5 w KQkq e1 1 34"));
 
         board.LoadFen("8/p7/7R/5pk1/8/3B1r2/PP3P2/2K5 w - - 1 34");
 

@@ -200,7 +200,7 @@ public partial class ChessBoard
     /// </summary>
     public bool IsLastMoveDisplayed => moveIndex == executedMoves.Count - 1;
 
-    private List<Move> DisplayedMoves => executedMoves.GetRange(0, moveIndex + 1);   
+    private List<Move> DisplayedMoves => executedMoves.GetRange(0, moveIndex + 1);
 
     /// <summary>
     /// Creates new chess board with default pieces positions
@@ -284,7 +284,7 @@ public partial class ChessBoard
             throw new ArgumentNullException(nameof(value));
 
         if (name.ToLower() == "fen")
-            throw new ArgumentException("To load game from fen please use: board.LoadFen();");
+            throw new ChessArgumentException(this, "To load game from fen please use: board.LoadFen();");
 
         headers.Add(name, value);
     }
@@ -296,7 +296,7 @@ public partial class ChessBoard
     public void RemoveHeader(string name)
     {
         if (name.ToLower() == "fen")
-            throw new ArgumentException("Could not remove FEN header from current game: FEN header required if loaded from it");
+            throw new ChessArgumentException(this, "Could not remove FEN header from current game: FEN header required when loaded from FEN...");
 
         headers.Remove(name);
     }

@@ -571,9 +571,9 @@ public partial class ChessBoard
 
             var rookpos = castleType switch
             {
-                CastleType.King => new Position(side == PieceColor.White ? "h1" : "h8"),
+                CastleType.King => new Position(side == PieceColor.White ? "h1" : "h8"), // todo
                 CastleType.Queen => new Position(side == PieceColor.White ? "a1" : "a8"),
-                _ => throw new ArgumentException("Invalid Castle type parameter", nameof(castleType)),
+                _ => throw new ChessArgumentException(board, "Invalid Castle type parameter"),
             };
 
             return board.pieces[rookpos.Y, rookpos.X] is not null

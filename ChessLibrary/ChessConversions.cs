@@ -19,7 +19,7 @@ public partial class ChessBoard
     /// <param name="resetSan">Whether SAN needs to be regenerated</param>
     /// <returns>Move object according to given san</returns>
     /// <exception cref="ArgumentNullException">move was null</exception>
-    /// <exception cref="ArgumentException">Given move didn't match the Regex pattern</exception>
+    /// <exception cref="ChessArgumentException">Given move didn't match the Regex pattern</exception>
     /// <exception cref="ChessSanNotFoundException">Given SAN move is not valid for current board positions</exception>
     /// <exception cref="ChessSanTooAmbiguousException">Given SAN move is too ambiguous between multiple moves</exception>
     public Move San(string move, bool resetSan = false)
@@ -30,7 +30,7 @@ public partial class ChessBoard
         var matches = Regexes.regexSanOneMove.Matches(move);
 
         if (matches.Count == 0)
-            throw new ArgumentException("SAN Move should match pattern: " + Regexes.SanMovesPattern);
+            throw new ChessArgumentException(this, "SAN move string should match pattern: " + Regexes.SanMovesPattern);
 
         Move moveOut = new();
         Position originalPos = new();
@@ -225,7 +225,7 @@ public partial class ChessBoard
     /// rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1
     /// </summary>
     /// <param name="fen">FEN string</param>
-    /// <exception cref="ArgumentException">Given FEN string didn't match the Regex pattern</exception>
+    /// <exception cref="ChessArgumentException">Given FEN string didn't match the Regex pattern</exception>
     public void LoadFen(string fen)
     {
         FenObj = new FenBoard(fen);
