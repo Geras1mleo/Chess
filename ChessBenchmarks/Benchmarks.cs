@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
+
 using Chess;
 
 namespace ChessBenchmarks;
@@ -180,12 +181,10 @@ public class ChessFenConversionsBenchmark
     [Benchmark]
     public void FenConvertion()
     {
-        var board = new ChessBoard();
-
-        board.LoadFen("1nbqkbn1/pppppppp/NpNpNpNp/pBpBpBpB/bPbPbPbP/PnPnPnPn/PPPPPPPP/1NBQKBN1 w - - 0 1");
-        board.LoadFen("rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
-        board.LoadFen("r3kbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1");
-        board.LoadFen("rnb1kbnr/pppppppp/8/8/8/8/5q2/7K b kq - 0 1");
+        ChessBoard.LoadFromFen("1nbqkbn1/pppppppp/NpNpNpNp/pBpBpBpB/bPbPbPbP/PnPnPnPn/PPPPPPPP/1NBQKBN1 w - - 0 1");
+        ChessBoard.LoadFromFen("rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
+        ChessBoard.LoadFromFen("r3kbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1");
+        ChessBoard.LoadFromFen("rnb1kbnr/pppppppp/8/8/8/8/5q2/7K b kq - 0 1");
     }
 
     //  Tests:
@@ -216,9 +215,7 @@ public class ChessPgnConversionsBenchmark
     [Benchmark]
     public void PgnConvertion()
     {
-        var board = new ChessBoard();
-
-        board.LoadPgn(
+        ChessBoard.LoadFromPgn(
         @"[Event ""Live Chess""]
             [Site ""Chess.com""]
             [Date ""2022.01.11""]
@@ -238,7 +235,7 @@ public class ChessPgnConversionsBenchmark
             Qb6 15.Bxf6 Qxf6 16.Qxf6 gxf6 17.Nxd5 Rb8 18.Nxf6+ Kh8 19.b3 Rb4 20.c3 Bb7
             21.cxb4 1-0");
 
-        board.LoadPgn(
+        ChessBoard.LoadFromPgn(
         @"[Event ""Live Chess""]
         [Site ""Chess.com""]
         [Date ""2022.01.03""]

@@ -14,11 +14,11 @@ public partial class ChessBoard
     /// <summary>
     /// Checks if given move is valid for current pieces positions
     /// </summary>
-    /// <param name="sanMove">San move to be checked</param>
+    /// <param name="san">San move to be checked</param>
     /// <returns>Whether given move is valid</returns>
-    public bool IsValidMove(string sanMove)
+    public bool IsValidMove(string san)
     {
-        return IsValidMove(San(sanMove, false));
+        return IsValidMove(ParseFromSan(san, false));
     }
 
     /// <summary>
@@ -75,7 +75,7 @@ public partial class ChessBoard
                         moves.Add(move);
 
                     if (generateSan)
-                        San(move);
+                        ParseToSan(move);
                 }
             }
         }
@@ -146,7 +146,7 @@ public partial class ChessBoard
         return kingPos;
     }
 
-    private static bool IsValidMove(Move move, ChessBoard board, bool raise, bool checkTurn)
+    internal static bool IsValidMove(Move move, ChessBoard board, bool raise, bool checkTurn)
     {
         if (move is null || !move.HasValue)
             throw new ArgumentNullException(nameof(move));
@@ -219,7 +219,7 @@ public partial class ChessBoard
         }
     }
 
-    private static bool IsValidMove(Move move, ChessBoard board)
+    internal static bool IsValidMove(Move move, ChessBoard board)
     {
         return move.Piece.Type switch
         {
@@ -237,7 +237,7 @@ public partial class ChessBoard
     /// Basically checking if after the move will been performed 
     /// the next move onto position of king is valid for one of pieces of opponent
     /// </summary>
-    private static bool IsKingCheckedValidation(Move move, PieceColor side, ChessBoard board)
+    internal static bool IsKingCheckedValidation(Move move, PieceColor side, ChessBoard board)
     {
         var fboard = new ChessBoard(board.pieces, board.executedMoves);
 
@@ -545,16 +545,16 @@ public partial class ChessBoard
             if (side == PieceColor.White)
             {
                 if (castleType == CastleType.King)
-                    valid = board.FenObj.CastleWK;
+                    valid = board.FenBuilder.CastleWK;
                 else if (castleType == CastleType.Queen)
-                    valid = board.FenObj.CastleWQ;
+                    valid = board.FenBuilder.CastleWQ;
             }
             else if (side == PieceColor.Black)
             {
                 if (castleType == CastleType.King)
-                    valid = board.FenObj.CastleBK;
+                    valid = board.FenBuilder.CastleBK;
                 else if (castleType == CastleType.Queen)
-                    valid = board.FenObj.CastleBQ;
+                    valid = board.FenBuilder.CastleBQ;
             }
 
             if (board.moveIndex >= 0 && valid)
@@ -603,7 +603,7 @@ public partial class ChessBoard
                     valid = LastMoveEnPassantPosition(board) == move.NewPosition;
 
                 else if (board.LoadedFromFen)
-                    valid = board.FenObj.EnPassant == move.NewPosition;
+                    valid = board.FenBuilder.EnPassant == move.NewPosition;
 
                 return valid;
             }

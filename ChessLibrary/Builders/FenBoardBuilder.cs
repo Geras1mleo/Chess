@@ -9,7 +9,7 @@
 
 namespace Chess;
 
-internal class FenBoard
+internal class FenBoardBuilder
 {
     private readonly Piece?[,] pieces;
 
@@ -17,48 +17,47 @@ internal class FenBoard
     /// "Begin Situation"
     /// </summary>
     internal Piece?[,] Pieces => (Piece?[,])pieces.Clone();
-    internal PieceColor Turn { get; }
+    internal PieceColor Turn { get; private set; }
 
-    internal bool CastleWK { get; }
-    internal bool CastleWQ { get; }
-    internal bool CastleBK { get; }
-    internal bool CastleBQ { get; }
+    internal bool CastleWK { get; private set; }
+    internal bool CastleWQ { get; private set; }
+    internal bool CastleBK { get; private set; }
+    internal bool CastleBQ { get; private set; }
 
-    internal Position EnPassant { get; }
+    internal Position EnPassant { get; private set; }
 
     /// <summary>
     /// Count since the last pawn advance or piece capture
     /// </summary>
-    internal int HalfMoves { get; }
+    internal int HalfMoves { get; private set; }
     /// <summary>
     /// Black moves Count
     /// </summary>
-    internal int FullMoves { get; }
+    internal int FullMoves { get; private set; }
 
-    internal Piece[] WhiteCaptured { get; }
-    internal Piece[] BlackCaptured { get; }
+    internal Piece[] WhiteCaptured { get; private set; }
+    internal Piece[] BlackCaptured { get; private set; }
 
-    internal FenBoard(ChessBoard board)
+    private FenBoardBuilder(Piece?[,] pieces)
     {
-        pieces = board.pieces;
-        Turn = board.Turn;
-        CastleWK = ChessBoard.HasRightToCastle(PieceColor.White, CastleType.King, board);
-        CastleWQ = ChessBoard.HasRightToCastle(PieceColor.White, CastleType.Queen, board);
-        CastleBK = ChessBoard.HasRightToCastle(PieceColor.Black, CastleType.King, board);
-        CastleBQ = ChessBoard.HasRightToCastle(PieceColor.Black, CastleType.Queen, board);
-        EnPassant = ChessBoard.LastMoveEnPassantPosition(board);
-        HalfMoves = ChessBoard.GetHalfMovesCount(board);
-        FullMoves = ChessBoard.GetFullMovesCount(board);
+        this.pieces = pieces;
     }
 
-    internal FenBoard(string fen)
+    private FenBoardBuilder()
     {
+        pieces = new Piece[8, 8];
+    }
+
+    internal static (bool succeeded, ChessException? exception) TryLoad(string fen, out FenBoardBuilder? builder)
+    {
+        builder = null;
+
         var matches = Regexes.regexFen.Matches(fen);
 
         if (matches.Count == 0)
-            throw new ChessArgumentException(null!, "FEN board string should match pattern: " + Regexes.FenPattern);
+            return (false, new ChessArgumentException(null, "FEN board string should match pattern: " + Regexes.FenPattern));
 
-        pieces = new Piece[8, 8];
+        builder = new FenBoardBuilder();
 
         foreach (var group in matches[0].Groups.Values)
         {
@@ -78,7 +77,7 @@ internal class FenBoard
                         if (x < 8)
                             if (char.IsLetter(group.Value[i]))
                             {
-                                pieces[y, x] = new Piece(group.Value[i]);
+                                builder.pieces[y, x] = new Piece(group.Value[i]);
                                 x++;
                             }
                             else if (char.IsDigit(group.Value[i]))
@@ -86,29 +85,29 @@ internal class FenBoard
                     }
                     break;
                 case "3":
-                    Turn = PieceColor.FromChar(group.Value[0]);
+                    builder.Turn = PieceColor.FromChar(group.Value[0]);
                     break;
                 case "4":
                     if (group.Value != "-")
                     {
                         if (group.Value.Contains('K'))
-                            CastleWK = true;
+                            builder.CastleWK = true;
                         if (group.Value.Contains('Q'))
-                            CastleWQ = true;
+                            builder.CastleWQ = true;
                         if (group.Value.Contains('k'))
-                            CastleBK = true;
+                            builder.CastleBK = true;
                         if (group.Value.Contains('q'))
-                            CastleBQ = true;
+                            builder.CastleBQ = true;
                     }
                     break;
                 case "5":
                     if (group.Value == "-")
-                        EnPassant = new();
+                        builder.EnPassant = new();
                     else
-                        EnPassant = new Position(group.Value);
+                        builder.EnPassant = new Position(group.Value);
                     break;
                 case "6":
-                    (HalfMoves, FullMoves) = group.Value.Split(' ').Select(s => int.Parse(s)).ToArray();
+                    (builder.HalfMoves, builder.FullMoves) = group.Value.Split(' ').Select(s => int.Parse(s)).ToArray();
                     break;
             }
         }
@@ -116,7 +115,7 @@ internal class FenBoard
         var wcap = new List<Piece>();
         var bcap = new List<Piece>();
 
-        var fpieces = pieces.Cast<Piece>().Where(p => p is not null);
+        var fpieces = builder.pieces.Cast<Piece>().Where(p => p is not null);
 
         // Calculating missing pieces on according begin pieces in fen
         // Math.Clamp() for get max/min taken figures (2 queens possible)
@@ -132,8 +131,25 @@ internal class FenBoard
         bcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Knight && p.Color == PieceColor.Black).Count(), 0, 2)).Select(_ => new Piece(PieceColor.Black, PieceType.Knight)));
         bcap.AddRange(Enumerable.Range(0, Math.Clamp(1 - fpieces.Where(p => p.Type == PieceType.Queen && p.Color == PieceColor.Black).Count(), 0, 1)).Select(_ => new Piece(PieceColor.Black, PieceType.Queen)));
 
-        WhiteCaptured = wcap.ToArray();
-        BlackCaptured = bcap.ToArray();
+        builder.WhiteCaptured = wcap.ToArray();
+        builder.BlackCaptured = bcap.ToArray();
+
+        return (true, null);
+    }
+
+    internal static FenBoardBuilder Load(ChessBoard board)
+    {
+        return new FenBoardBuilder(board.pieces)
+        {
+            Turn = board.Turn,
+            CastleWK = ChessBoard.HasRightToCastle(PieceColor.White, CastleType.King, board),
+            CastleWQ = ChessBoard.HasRightToCastle(PieceColor.White, CastleType.Queen, board),
+            CastleBK = ChessBoard.HasRightToCastle(PieceColor.Black, CastleType.King, board),
+            CastleBQ = ChessBoard.HasRightToCastle(PieceColor.Black, CastleType.Queen, board),
+            EnPassant = ChessBoard.LastMoveEnPassantPosition(board),
+            HalfMoves = board.GetHalfMovesCount(),
+            FullMoves = board.GetFullMovesCount()
+        };
     }
 
     public override string ToString()

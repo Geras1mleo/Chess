@@ -45,18 +45,18 @@ public partial class ChessBoard
     /// <param name="y">0->8</param>
     public Piece? this[short x, short y] => pieces[y, x];
 
-    private readonly Dictionary<string, string> headers;
+    internal readonly Dictionary<string, string> headers;
 
     /// <summary>
     /// Headers of current chess board
     /// </summary>
     public IReadOnlyDictionary<string, string> Headers => new Dictionary<string, string>(headers);
 
-    private FenBoard? FenObj;
+    internal FenBoardBuilder? FenBuilder;
     /// <summary>
     /// Whether board has been loaded from Forsyth-Edwards Notation
     /// </summary>
-    public bool LoadedFromFen => FenObj is not null;
+    public bool LoadedFromFen => FenBuilder is not null;
 
     /// <summary>
     /// Determinize whose player turn is it now
@@ -66,7 +66,7 @@ public partial class ChessBoard
         get
         {
             if (LoadedFromFen)
-                return DisplayedMoves.Count % 2 == 0 ? FenObj.Turn : FenObj.Turn.OppositeColor();
+                return DisplayedMoves.Count % 2 == 0 ? FenBuilder.Turn : FenBuilder.Turn.OppositeColor();
             else
                 return DisplayedMoves.Count % 2 == 0 ? PieceColor.White : PieceColor.Black;
 
@@ -125,7 +125,7 @@ public partial class ChessBoard
         {
             var cap = new List<Piece>();
 
-            if (LoadedFromFen) cap.AddRange(FenObj.WhiteCaptured);
+            if (LoadedFromFen) cap.AddRange(FenBuilder.WhiteCaptured);
 
             cap.AddRange(DisplayedMoves.Where(m => m.CapturedPiece?.Color == PieceColor.White).Select(m => new Piece(m.CapturedPiece.Color, m.CapturedPiece.Type)));
 
@@ -142,7 +142,7 @@ public partial class ChessBoard
         {
             var cap = new List<Piece>();
 
-            if (LoadedFromFen) cap.AddRange(FenObj.BlackCaptured);
+            if (LoadedFromFen) cap.AddRange(FenBuilder.BlackCaptured);
 
             cap.AddRange(DisplayedMoves.Where(m => m.CapturedPiece?.Color == PieceColor.Black).Select(m => new Piece(m.CapturedPiece.Color, m.CapturedPiece.Type)));
 
@@ -168,7 +168,7 @@ public partial class ChessBoard
     /// </summary>
     public bool IsEndGame => EndGame is not null;
 
-    private readonly List<Move> executedMoves;
+    internal readonly List<Move> executedMoves;
     /// <summary>
     /// Executed moves on this chess board<br/>
     /// </summary>
@@ -179,7 +179,7 @@ public partial class ChessBoard
     /// </summary>
     public List<string> MovesToSan => new List<Move>(executedMoves).Select(m => m.San).ToList();
 
-    private int moveIndex = -1;
+    internal int moveIndex = -1;
     /// <summary>
     /// Index of displayed move on this chess board
     /// </summary>
@@ -224,10 +224,10 @@ public partial class ChessBoard
     /// <summary>
     /// Converts SAN move into Move object and performs it on chess board
     /// </summary>
-    /// <param name="sanMove">Chess move in SAN</param>
-    public bool Move(string sanMove)
+    /// <param name="san">Chess move in SAN</param>
+    public bool Move(string san)
     {
-        return Move(San(sanMove, false));
+        return Move(ParseFromSan(san, false));
     }
 
     /// <summary>
@@ -249,7 +249,8 @@ public partial class ChessBoard
 
         if (IsValidMove(move, this, true, true))
         {
-            San(move);
+            if (move.San is null)
+                ParseToSan(move);
 
             executedMoves.Add(move);
 
@@ -330,7 +331,7 @@ public partial class ChessBoard
         headers.Clear();
         moveIndex = -1;
         endGame = null;
-        FenObj = null;
+        FenBuilder = null;
         WhiteKingChecked = false;
         BlackKingChecked = false;
     }
@@ -411,7 +412,7 @@ public partial class ChessBoard
         EndGame = new EndGameInfo(EndgameType.DrawDeclared, null);
     }
 
-    private void DropPieceToNewPosition(Move move)
+    internal void DropPieceToNewPosition(Move move)
     {
         if (move.Parameter is not null)
         {
@@ -447,7 +448,7 @@ public partial class ChessBoard
     private void DisplayMoves(List<Move> moves)
     {
         if (LoadedFromFen)
-            pieces = FenObj.Pieces;
+            pieces = FenBuilder.Pieces;
         else
             SetChessBeginSituation();
 
@@ -463,7 +464,7 @@ public partial class ChessBoard
     /// Checking if there one of kings are checked
     /// and updating checked states
     /// </summary>
-    private void HandleKingChecked()
+    internal void HandleKingChecked()
     {
         WhiteKingChecked = false;
         BlackKingChecked = false;
@@ -493,7 +494,7 @@ public partial class ChessBoard
     /// Checking if there is a checkmate or stalemate
     /// and updating end game state
     /// </summary>
-    private void HandleEndGame()
+    internal void HandleEndGame()
     {
         if (moveIndex >= 0)
         {

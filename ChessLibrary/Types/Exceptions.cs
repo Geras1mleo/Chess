@@ -12,8 +12,8 @@ namespace Chess;
 
 public class ChessException : Exception
 {
-    public ChessBoard Board { get; }
-    public ChessException(ChessBoard board, string message) : base(message) => Board = board;
+    public ChessBoard? Board { get; }
+    public ChessException(ChessBoard? board, string message) : base(message) => Board = board;
 }
 
 public class ChessGameEndedException : ChessException
@@ -64,9 +64,9 @@ public class ChessSanTooAmbiguousException : ChessException
 
 public class ChessArgumentException : ChessException
 {
-    public ChessArgumentException(ChessBoard board, string argument, string method)
+    public ChessArgumentException(ChessBoard? board, string argument, string method)
         : this(board, $"An argument: {argument} in method: {method} is not valid...") { }
-    public ChessArgumentException(ChessBoard board, string message) : base(board, message) { }
+    public ChessArgumentException(ChessBoard? board, string message) : base(board, message) { }
 }
 
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

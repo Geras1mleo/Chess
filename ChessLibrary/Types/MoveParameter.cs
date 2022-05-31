@@ -48,7 +48,7 @@ public interface IMoveParameter
             "=r" => new MovePromotion(PromotionType.ToRook),
             "=b" => new MovePromotion(PromotionType.ToBishop),
             "=n" => new MovePromotion(PromotionType.ToKnight),
-            _ => throw new ChessArgumentException(null!, "Parameter not recognized..."),
+            _ => throw new ChessArgumentException(null, "Parameter not recognized..."),
         };
     }
 }
@@ -65,7 +65,7 @@ public class MoveCastle : IMoveParameter
             {
                 CastleType.King => "O-O",
                 CastleType.Queen => "O-O-O",
-                _ => throw new ChessArgumentException(null!, nameof(CastleType), nameof(MoveCastle.ShortStr))
+                _ => throw new ChessArgumentException(null, nameof(CastleType), nameof(MoveCastle.ShortStr))
             };
         }
     }
@@ -78,7 +78,7 @@ public class MoveCastle : IMoveParameter
             {
                 CastleType.King => "King Side Castle",
                 CastleType.Queen => "Queen Side Castle",
-                _ => throw new ChessArgumentException(null!, nameof(CastleType), nameof(MoveCastle.LongStr))
+                _ => throw new ChessArgumentException(null, nameof(CastleType), nameof(MoveCastle.LongStr))
             };
         }
     }
@@ -175,7 +175,7 @@ public class MovePromotion : IMoveParameter
                 PromotionType.ToRook => "=R",
                 PromotionType.ToBishop => "=B",
                 PromotionType.ToKnight => "=N",
-                _ => throw new ChessArgumentException(null!, nameof(PromotionType), nameof(MovePromotion.ShortStr))
+                _ => throw new ChessArgumentException(null, nameof(PromotionType), nameof(MovePromotion.ShortStr))
             };
         }
     }
@@ -191,7 +191,7 @@ public class MovePromotion : IMoveParameter
                 PromotionType.ToRook => "Promotion To Rook",
                 PromotionType.ToBishop => "Promotion To Bishop",
                 PromotionType.ToKnight => "Promotion To Knight",
-                _ => throw new ChessArgumentException(null!, nameof(PromotionType), nameof(MovePromotion.LongStr))
+                _ => throw new ChessArgumentException(null, nameof(PromotionType), nameof(MovePromotion.LongStr))
             };
         }
     }
