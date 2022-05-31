@@ -9,7 +9,7 @@
 </div>
 
 
-<b>Browse in <a href="https://www.nuget.org/packages/Gera.Chess/"><img height="15px" src="https://www.nuget.org/favicon.ico"> NuGet<a/></b>
+<b>Browse in <a href="https://www.nuget.org/packages/Gera.Chess/"><img height="15px" src="https://www.nuget.org/favicon.ico"> NuGet</a></b>
 
 ## Chess lib includes:
 
@@ -79,12 +79,12 @@ while (!board.IsEndGame)
 Console.WriteLine(board.ToAscii());
 Console.WriteLine(board.ToPgn());
 
-// Todo: End game Insufficient Material
+// Todo: End game by Insufficient Material
 ```
 
 ## Track Pieces
 
-Track pieces on position using indexers:
+Track pieces on position using **indexers**:
 
 ```csharp
 board["c2"]... 		  	// => White Pawn
@@ -95,7 +95,7 @@ board[0, 0]...			// => White Rook
 board[new Position(4, 7)]... 	// => Black King
 ```
 
-Track captured pieces:
+Track **captured pieces**:
 
 ```csharp
 board.CapturedWhite... // => White pieces that has been captured by black player
@@ -103,7 +103,7 @@ board.CapturedBlack... // => Black pieces that has been captured by white player
 // Properties above work just fine when board has been loaded from FEN
 ```
 
-Track kings and their state (Checked/Unchecked):
+Track **kings** and their state (Checked/Unchecked):
 
 ```csharp
 board.WhiteKing... // => White king position on chess board (Calculated property)
@@ -115,7 +115,7 @@ board.BlackKingChecked... // => State of Black king (Referred property)
 
 ## Move Pieces
 
-Move pieces using SAN/LAN:
+Move pieces using **SAN/LAN**:
 
 ```csharp
 board.Move("e4");	// => Good
@@ -140,30 +140,33 @@ board.Move(new Move("b1", "c3"));
 Ambiguity:
 
 ```csharp
-board.LoadPgn("1. e4 e5 2. Ne2 f6");
-board.ToAscii();
-//   ┌────────────────────────┐
-// 8 │ r  n  b  q  k  b  n  r │
-// 7 │ p  p  p  p  .  .  p  p │
-// 6 │ .  .  .  .  .  p  .  . │
-// 5 │ .  .  .  .  p  .  .  . │
-// 4 │ .  .  .  .  P  .  .  . │
-// 3 │ .  .  .  .  .  .  .  . │
-// 2 │ P  P  P  P  N  P  P  P │
-// 1 │ R  N  B  Q  K  B  .  R │
-//   └────────────────────────┘
-//     a  b  c  d  e  f  g  h  
+if(ChessBoard.TryLoadFromPgn("1. e4 e5 2. Ne2 f6", out var board))
+{
+  board.LoadPgn();
+  board.ToAscii();
+  //   ┌────────────────────────┐
+  // 8 │ r  n  b  q  k  b  n  r │
+  // 7 │ p  p  p  p  .  .  p  p │
+  // 6 │ .  .  .  .  .  p  .  . │
+  // 5 │ .  .  .  .  p  .  .  . │
+  // 4 │ .  .  .  .  P  .  .  . │
+  // 3 │ .  .  .  .  .  .  .  . │
+  // 2 │ P  P  P  P  N  P  P  P │
+  // 1 │ R  N  B  Q  K  B  .  R │
+  //   └────────────────────────┘
+  //     a  b  c  d  e  f  g  h  
 
-board.Move("Nc3"); 	// => Throws exception: ChessSanTooAmbiguousException. Both knights can move to c3
-board.Move("Nc4"); 	// => Throws exception: ChessSanNotFoundException. None of knights can move to c3
+  board.Move("Nc3"); 	// => Throws exception: ChessSanTooAmbiguousException. Both knights can move to c3
+  board.Move("Nc4"); 	// => Throws exception: ChessSanNotFoundException. None of knights can move to c3
+}
 ```
 
 ## Load Chess game/board
 
-Load chess board Variant: From Position (FEN):
+Load chess board Variant: **From Position** (using FEN):
 
 ```csharp
-board.LoadFen("1nbqkb1r/pppp1ppp/2N5/4p3/3P4/8/PPP1PPPP/RN2KB1R w KQk - 0 1");
+board = ChessBoard.LoadFromFen("1nbqkb1r/pppp1ppp/2N5/4p3/3P4/8/PPP1PPPP/RN2KB1R w KQk - 0 1");
 board.ToAscii();
 //   ┌────────────────────────┐
 // 8 │ .  n  b  q  k  b  .  r │
@@ -188,7 +191,7 @@ board.EndGame... // => { EndgameType = Stalemate, WonSide = null }
 Load full chess game from PGN:
 
 ```csharp
-board.LoadPgn(
+board = ChessBoard.LoadFromPgn(
 @"[Variant ""From Position""]
 [FEN ""rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1""]
             
@@ -208,14 +211,14 @@ board.ToAscii();
 //     a  b  c  d  e  f  g  h  
 ```
 
-Alternative moves and comments are getting (temporary) skipped<br/>
+Alternative moves and comments are (temporary) skipped<br/>
 In further versions:<br/>
-Navigate between alternative branches<br/>
-Saving and adding of comments to each move<br/>
+Navigate between alternative branches, also load branches from PGN<br/>
+Adding comments to each move<br/>
 
 ## End Game
 
-Declare Draw/Resign:
+Declare **Draw/Resign**:
 
 ```csharp
 board.Draw();
@@ -229,7 +232,7 @@ board.EndGame... // => { EndgameType = Resigned, WonSide = White }
 
 ## Found a bug?
 
-Drop to <a href="https://github.com/Geras1mleo/Chess/issues">Issues<a/><br/>
+Drop to <a href="https://github.com/Geras1mleo/Chess/issues">Issues</a><br/>
 Or to: sviatoslav.harasymchuk@gmail.com<br/>
 <br/>
 Thanks in advance!
