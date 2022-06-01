@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Attributes;
-
 using Chess;
 
 namespace ChessBenchmarks;
@@ -67,6 +66,12 @@ public class ChessMoveBenchmark
     //  |-------------------- |---------:|--------:|--------:|-----:|
     //  | MoveUsingMoveObject | 125.9 us | 2.32 us | 4.59 us |    1 |
     //  |        MoveUsingSan | 187.2 us | 3.50 us | 3.28 us |    2 |
+    //
+    //  1/06/2022 => not bad
+    //  |              Method |     Mean |   Error |  StdDev | Rank |
+    //  |-------------------- |---------:|--------:|--------:|-----:|
+    //  | MoveUsingMoveObject | 117.5 us | 3.30 us | 9.72 us |    1 |
+    //  |        MoveUsingSan | 152.0 us | 3.15 us | 8.98 us |    2 |
 }
 
 [RankColumn]
@@ -127,7 +132,18 @@ public class ChessGenerateMovesBenchmark
     //  |-------------- |---------:|---------:|---------:|-----:|
     //  | MovesSanFalse | 492.7 us | 16.54 us | 46.93 us |    1 |
     //  |  MovesSanTrue | 528.3 us | 14.13 us | 39.86 us |    2 |
-
+    //
+    //  1/06/2022 => fuck yeah
+    //  |        Method |     Mean |    Error |   StdDev | Rank |
+    //  |-------------- |---------:|---------:|---------:|-----:|
+    //  | MovesSanFalse | 321.7 us | 15.32 us | 44.68 us |    1 |
+    //  |  MovesSanTrue | 341.2 us |  7.88 us | 21.83 us |    2 |
+    //
+    //  1/06/2022 2.0 => going fast as fuck
+    //  |        Method |     Mean |    Error |   StdDev |   Median | Rank |
+    //  |-------------- |---------:|---------:|---------:|---------:|-----:|
+    //  | MovesSanFalse | 308.5 us | 11.98 us | 33.39 us | 298.5 us |    1 |
+    //  |  MovesSanTrue | 360.5 us | 16.82 us | 47.43 us | 359.3 us |    2 |
 }
 
 public class ChessIsValidMoveBenchmark
@@ -173,6 +189,11 @@ public class ChessIsValidMoveBenchmark
     //  |      Method |     Mean |    Error |   StdDev |
     //  |------------ |---------:|---------:|---------:|
     //  | IsValidMove | 84.19 us | 2.101 us | 6.029 us |
+    //
+    //  1/06/2022 => very good
+    //  |      Method |     Mean |    Error |   StdDev |
+    //  |------------ |---------:|---------:|---------:|
+    //  | IsValidMove | 69.73 us | 1.385 us | 3.210 us |
 }
 
 [MemoryDiagnoser]
@@ -207,6 +228,11 @@ public class ChessFenConversionsBenchmark
     //  |        Method |     Mean |   Error |  StdDev |    Gen 0 | Allocated |
     //  |-------------- |---------:|--------:|--------:|---------:|----------:|
     //  | FenConvertion | 467.4 us | 8.25 us | 8.10 us | 202.1484 |    414 KB |
+    //
+    //  1/06/2022 => not a huge difference
+    //  |        Method |     Mean |    Error |   StdDev |    Gen 0 | Allocated |
+    //  |-------------- |---------:|---------:|---------:|---------:|----------:|
+    //  | FenConvertion | 481.1 us | 21.65 us | 63.85 us | 208.0078 |    426 KB |
 }
 
 [MemoryDiagnoser]
@@ -217,23 +243,23 @@ public class ChessPgnConversionsBenchmark
     {
         ChessBoard.LoadFromPgn(
         @"[Event ""Live Chess""]
-            [Site ""Chess.com""]
-            [Date ""2022.01.11""]
-            [Round ""?""]
-            [White ""Milan1905""]
-            [Black ""Geras1mleo""]
-            [Result ""1-0""]
-            [ECO ""C47""]
-            [WhiteElo ""1006""]
-            [BlackElo ""626""]
-            [TimeControl ""600""]
-            [EndTime ""11:58:56 PST""]
-            [Termination ""Milan1905 won by resignation""]
+        [Site ""Chess.com""]
+        [Date ""2022.01.11""]
+        [Round ""?""]
+        [White ""Milan1905""]
+        [Black ""Geras1mleo""]
+        [Result ""1-0""]
+        [ECO ""C47""]
+        [WhiteElo ""1006""]
+        [BlackElo ""626""]
+        [TimeControl ""600""]
+        [EndTime ""11:58:56 PST""]
+        [Termination ""Milan1905 won by resignation""]
             
-            1.e4 e5 2.Nf3 Nf6 3.Nc3 Nc6 4.Bb5 Bc5 5.Bxc6 bxc6 6.Nxe5 Bxf2+ 7.Kxf2 O-O
-            8.d4 d5 9.exd5 cxd5 10.Nc6 Ng4+ 11.Kg1 Qf6 12.Qf1 Qxc6 13.h3 Nf6 14.Bg5
-            Qb6 15.Bxf6 Qxf6 16.Qxf6 gxf6 17.Nxd5 Rb8 18.Nxf6+ Kh8 19.b3 Rb4 20.c3 Bb7
-            21.cxb4 1-0");
+        1.e4 e5 2.Nf3 Nf6 3.Nc3 Nc6 4.Bb5 Bc5 5.Bxc6 bxc6 6.Nxe5 Bxf2+ 7.Kxf2 O-O
+        8.d4 d5 9.exd5 cxd5 10.Nc6 Ng4+ 11.Kg1 Qf6 12.Qf1 Qxc6 13.h3 Nf6 14.Bg5
+        Qb6 15.Bxf6 Qxf6 16.Qxf6 gxf6 17.Nxd5 Rb8 18.Nxf6+ Kh8 19.b3 Rb4 20.c3 Bb7
+        21.cxb4 1-0");
 
         ChessBoard.LoadFromPgn(
         @"[Event ""Live Chess""]
@@ -283,4 +309,10 @@ public class ChessPgnConversionsBenchmark
     //  |        Method |     Mean |     Error |    StdDev |     Gen 0 | Allocated |
     //  |-------------- |---------:|----------:|----------:|----------:|----------:|
     //  | PgnConvertion | 7.918 ms | 0.2930 ms | 0.8641 ms | 2562.5000 |      5 MB |
+    //
+    //  1/06/2022 => HOLLY SHIT THAT ONE IS GOOOOD
+    //  |        Method |     Mean |     Error |    StdDev |    Gen 0 | Allocated |
+    //  |-------------- |---------:|----------:|----------:|---------:|----------:|
+    //  | PgnConvertion | 2.176 ms | 0.1057 ms | 0.3101 ms | 761.7188 |      2 MB |
+
 }

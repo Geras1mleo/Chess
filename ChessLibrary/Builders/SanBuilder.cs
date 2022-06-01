@@ -216,7 +216,7 @@ internal static class SanBuilder
         for (short i = 0; i < 8; i++)
         {
             for (short j = 0; j < 8; j++)
-            { // todo patterns
+            { 
                 if (board.pieces[i, j] is not null
                  && board.pieces[i, j].Color == piece.Color
                  && board.pieces[i, j].Type == piece.Type)

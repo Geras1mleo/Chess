@@ -31,94 +31,6 @@ public partial class ChessBoard
         return IsValidMove(move, this, false, true);
     }
 
-    /// <summary>
-    /// Returns all moves that the piece on given position can perform
-    /// </summary>
-    /// <param name="position">Position of piece</param>
-    /// <param name="allowAmbiguousCastle">Whether Castle move will be e1-g1 AND also e1-h1 which is in fact the same O-O</param>
-    /// <param name="generateSan">Whether SAN notation needs to be generated. For higher productivity => set to false</param>
-    /// <returns>All available moves for given piece</returns>
-    public Move[] Moves(Position position, bool allowAmbiguousCastle = false, bool generateSan = true)
-    {
-        if (pieces[position.Y, position.X] is null)
-            throw new ChessPieceNotFoundException(this, new Move(position, position));
-
-        var moves = new List<Move>();
-
-        for (short i = 0; i < 8; i++)
-        {
-            for (short j = 0; j < 8; j++)
-            {
-                // if original pos == new pos
-                if (position.Y == i && position.X == j) continue;
-
-                Move move = new(position, new Position { Y = i, X = j }) { Piece = pieces[position.Y, position.X] };
-
-                if (IsValidMove(move, this, false, true))
-                {
-                    // Ambiguous castle
-                    if (!allowAmbiguousCastle && move.Parameter is MoveCastle)
-                    {
-                        if (move.NewPosition.X % 7 == 0) // Dropping king on position of rook
-                            continue;
-                    }
-
-                    // If promotion => 4 different moves for each promotion type
-                    if (move.Parameter is MovePromotion promotion)
-                    {
-                        moves.Add(new Move(move, PromotionType.ToQueen));
-                        moves.Add(new Move(move, PromotionType.ToRook));
-                        moves.Add(new Move(move, PromotionType.ToBishop));
-                        moves.Add(new Move(move, PromotionType.ToKnight));
-                    }
-                    else
-                        moves.Add(move);
-
-                    if (generateSan)
-                        ParseToSan(move);
-                }
-            }
-        }
-
-        return moves.ToArray();
-    }
-
-    /// <summary>
-    /// Generates all moves that the player whose turn it is can make
-    /// </summary>
-    /// <param name="allowAmbiguousCastle">Whether Castle move will be e1-g1 AND also e1-h1 which is in fact the same O-O</param>
-    /// <param name="generateSan">San notation needs to be generated</param>
-    /// <returns>All generated moves</returns>
-    public Move[] Moves(bool allowAmbiguousCastle = false, bool generateSan = true)
-    {
-        var moves = new ConcurrentBag<Move>();
-        var tasks = new List<Task>();
-
-        for (short i = 0; i < 8; i++)
-        {
-            for (short j = 0; j < 8; j++)
-            {
-                if (pieces[i, j] is null)
-                    continue;
-
-                short x = j;
-                short y = i;
-
-                tasks.Add(Task.Run(() =>
-                {
-                    foreach (var move in Moves(new Position { Y = y, X = x }, allowAmbiguousCastle, generateSan))
-                    {
-                        moves.Add(move);
-                    }
-                }));
-            }
-        }
-
-        Task.WaitAll(tasks.ToArray());
-
-        return moves.ToArray();
-    }
-
     private static bool IsCheckmate(PieceColor side, ChessBoard board)
     {
         return IsKingChecked(side, board) && !PlayerHasMoves(side, board);
@@ -152,7 +64,7 @@ public partial class ChessBoard
             throw new ArgumentNullException(nameof(move));
 
         if (board.pieces[move.OriginalPosition.Y, move.OriginalPosition.X] is null)
-            throw new ChessPieceNotFoundException(board, move);
+            throw new ChessPieceNotFoundException(board, move.OriginalPosition);
 
         if (checkTurn && board.pieces[move.OriginalPosition.Y, move.OriginalPosition.X].Color != board.Turn) return false;
 
@@ -409,7 +321,9 @@ public partial class ChessBoard
             var stepV = v != 0 ? Math.Abs(v) / v : 0;
 
             // A bit too difficult for loop to explain
-            for (int i = move.OriginalPosition.Y + stepV, j = move.OriginalPosition.X + stepH; Math.Abs(i - move.NewPosition.Y - (j - move.NewPosition.X)) >= 0; i += stepV, j += stepH)
+            for (int i = move.OriginalPosition.Y + stepV, j = move.OriginalPosition.X + stepH;
+                Math.Abs(i - move.NewPosition.Y - (j - move.NewPosition.X)) >= 0;
+                i += stepV, j += stepH)
             {
                 if (pieces[i, j] is not null || (i == move.NewPosition.Y && j == move.NewPosition.X))
                 {
