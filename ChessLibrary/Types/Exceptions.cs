@@ -35,10 +35,10 @@ public class ChessInvalidMoveException : ChessException
 
 public class ChessPieceNotFoundException : ChessException
 {
-    public Move Move { get; }
-    public ChessPieceNotFoundException(ChessBoard board, Move move)
-        : this(board, $"Piece on given original position: {move.OriginalPosition} has been not found in current chess board", move) { }
-    public ChessPieceNotFoundException(ChessBoard board, string message, Move move) : base(board, message) => Move = move;
+    public Position Position { get; }
+    public ChessPieceNotFoundException(ChessBoard board, Position position)
+        : this(board, $"Piece on given position: {position} has been not found in current chess board", position) { }
+    public ChessPieceNotFoundException(ChessBoard board, string message, Position position) : base(board, message) => Position = position;
 }
 
 public class ChessSanNotFoundException : ChessException
