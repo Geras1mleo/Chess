@@ -237,6 +237,10 @@ Here you can see all the tests that have been used to test and improve chess lib
 ## [Benchmarks](/ChessBenchmarks/Benchmarks.cs)
 Here you can see the evolution of performance of chess library
 
+## Like the project?
+
+Give it a :star: Star!
+
 ## Found a bug?
 
 Drop to <a href="https://github.com/Geras1mleo/Chess/issues">Issues</a><br/>

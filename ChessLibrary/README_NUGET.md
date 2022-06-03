@@ -4,28 +4,29 @@ Chess logic made with C# and &hearts; by Geras1mleo
 
 ## Chess lib includes:
 
-- Chess board with 2-dimentional array of `Pieces`
-- Generation, Validation and Execution of `Moves` on Chess board
-- Logic to `Convert`:
-  - `Move` into `SAN` and back into Move object
-  - `Chess Board`into `FEN` and back into ChessBoard object
-  - `Chess Game` into `PGN` and back into ChessBoard object
-- Event Handlers:
-  -  `OnInvalidMoveKingChecked` - Raises when trying to execute move that places own king in check
-  -  `OnWhiteKingCheckedChanged`/`OnBlackKingCheckedChanged` with state (checked or not) and its position
-  -  `OnPromotePawn` with PromotionEventArgs.PromotionResult (default: PromotionToQueen)
-  -  `OnEndGame` with according end game info (`Win`/`Loss`/`Draw`)
-  -  `OnCaptured` with captured piece and all recently captured pieces (White/Black)
-- `End Game` Declaration: `Draw` or `Resign` of one of sides
-- `Navigation` between executed moves:
-  - `First`/`Last`
-  - `Next`/`Previous`
-  - Also: `board.MoveIndex` property to navigate direct to specific move
-- `Cancelation` of last executed move
+- **ChessBoard** with 2-dimentional array of **Pieces**
+- Generation, Validation and Execution of **Moves** on chess board
+- **Parse**:
+  - **Move object** into [SAN](https://www.chessprogramming.org/Algebraic_Chess_Notation#Standard_Algebraic_Notation_.28SAN.29) and back into Move object
+- **Load** and play further:
+  - **Chess _Board_** from [FEN](https://www.chessprogramming.org/Forsyth-Edwards_Notation) and back to *FEN-string*
+  - **Chess _Game_** from [PGN](https://en.wikipedia.org/wiki/Portable_Game_Notation) and back to *PGN-string*
+- **Event handlers** are raised:
+  -  *OnInvalidMoveKingChecked* - when trying to execute move that places own king in **check**
+  -  *On(White/Black)KingCheckedChanged* - with **state** (checked or not) and its **position**
+  -  *OnPromotePawn* - with *PromotionEventArgs.PromotionResult* (default: **PromotionToQueen**)
+  -  *OnEndGame* - with according end game info (**Won Side**/**Draw**)
+  -  *OnCaptured* - with captured piece and all recently captured pieces (**White**/**Black**)
+- **End Game** Declaration: **Draw** or **Resign** of one of sides
+- **Navigation** between executed moves:
+  - **First**/**Last**
+  - **Next**/**Previous**
+  - Also: **board.MoveIndex** property to navigate directly to specific move
+- **Cancelation** of last executed move
 
 # Usage!
 
-Example simple console chess game:
+Example simple **console** chess game:
 
 ```csharp
 using Chess;
@@ -58,7 +59,7 @@ Console.WriteLine(board.ToPgn());
 // 1. e4 f5 2. f4 g5 3. Qh5# 1-0
 ```
 
-Example random chess game:
+Example **random** chess game:
 
 ```csharp
 while (!board.IsEndGame)
@@ -75,7 +76,7 @@ Console.WriteLine(board.ToPgn());
 
 ## Track Pieces
 
-Track pieces on position using indexers:
+Track pieces on position using **indexers**:
 
 ```csharp
 board["c2"]... 		  	// => White Pawn
@@ -86,7 +87,7 @@ board[0, 0]...			// => White Rook
 board[new Position(4, 7)]... 	// => Black King
 ```
 
-Track captured pieces:
+Track **captured pieces**:
 
 ```csharp
 board.CapturedWhite... // => White pieces that has been captured by black player
@@ -94,7 +95,7 @@ board.CapturedBlack... // => Black pieces that has been captured by white player
 // Properties above work just fine when board has been loaded from FEN
 ```
 
-Track kings and their state (Checked/Unchecked):
+Track **kings** and their state (Checked/Unchecked):
 
 ```csharp
 board.WhiteKing... // => White king position on chess board (Calculated property)
@@ -106,7 +107,7 @@ board.BlackKingChecked... // => State of Black king (Referred property)
 
 ## Move Pieces
 
-Move pieces using SAN/LAN:
+Move pieces using **SAN/LAN**:
 
 ```csharp
 board.Move("e4");	// => Good
@@ -122,7 +123,7 @@ board.Move("e8=K");	// => Bad
 board.Move("0-0");	// => Bad
 ```
 
-Move pieces using Move object and corresponding positions:
+Move pieces using **Move object** and corresponding positions:
 
 ```csharp
 board.Move(new Move("b1", "c3"));
@@ -131,22 +132,25 @@ board.Move(new Move("b1", "c3"));
 Ambiguity:
 
 ```csharp
-board.LoadPgn("1. e4 e5 2. Ne2 f6");
-board.ToAscii();
-//   ┌────────────────────────┐
-// 8 │ r  n  b  q  k  b  n  r │
-// 7 │ p  p  p  p  .  .  p  p │
-// 6 │ .  .  .  .  .  p  .  . │
-// 5 │ .  .  .  .  p  .  .  . │
-// 4 │ .  .  .  .  P  .  .  . │
-// 3 │ .  .  .  .  .  .  .  . │
-// 2 │ P  P  P  P  N  P  P  P │
-// 1 │ R  N  B  Q  K  B  .  R │
-//   └────────────────────────┘
-//     a  b  c  d  e  f  g  h  
+if(ChessBoard.TryLoadFromPgn("1. e4 e5 2. Ne2 f6", out var board))
+{
+  board.LoadPgn();
+  board.ToAscii();
+  //   ┌────────────────────────┐
+  // 8 │ r  n  b  q  k  b  n  r │
+  // 7 │ p  p  p  p  .  .  p  p │
+  // 6 │ .  .  .  .  .  p  .  . │
+  // 5 │ .  .  .  .  p  .  .  . │
+  // 4 │ .  .  .  .  P  .  .  . │
+  // 3 │ .  .  .  .  .  .  .  . │
+  // 2 │ P  P  P  P  N  P  P  P │
+  // 1 │ R  N  B  Q  K  B  .  R │
+  //   └────────────────────────┘
+  //     a  b  c  d  e  f  g  h  
 
-board.Move("Nc3"); 	// => Throws exception: ChessSanTooAmbiguousException. Both knights can move to c3
-board.Move("Nc4"); 	// => Throws exception: ChessSanNotFoundException. None of knights can move to c3
+  board.Move("Nc3"); 	// => Throws exception: ChessSanTooAmbiguousException. Both knights can move to c3
+  board.Move("Nc4"); 	// => Throws exception: ChessSanNotFoundException. None of knights can move to c3
+}
 ```
 
 ## Load Chess game/board
@@ -176,7 +180,7 @@ board.LoadFen("rnb1kbnr/pppppppp/8/8/8/8/5q2/7K w kq - 0 1");
 board.EndGame... // => { EndgameType = Stalemate, WonSide = null }
 ```
 
-Load full chess game from PGN:
+Load full chess game from **PGN**:
 
 ```csharp
 board.LoadPgn(
@@ -199,14 +203,14 @@ board.ToAscii();
 //     a  b  c  d  e  f  g  h  
 ```
 
-Alternative moves and comments are getting (temporary) skipped
-In further versions:
-Navigate between alternative branches
-Saving and adding of comments to each move
+Alternative moves and comments are (temporarily) skipped<br/>
+In further versions:<br/>
+Navigate between alternative branches, also load branches from PGN<br/>
+Adding comments to each move<br/>
 
 ## End Game
 
-Declare Draw/Resign:
+Declare **Draw/Resign**:
 
 ```csharp
 board.Draw();
@@ -218,8 +222,15 @@ board.Resign(PieceColor.Black);
 board.EndGame... // => { EndgameType = Resigned, WonSide = White }
 ```
 
+## [Unit Tests](https://github.com/Geras1mleo/Chess/blob/master/ChessUnitTests/UnitTests.cs)
+Here you can see all the tests that have been used to test and improve chess library
+
+## [Benchmarks](https://github.com/Geras1mleo/Chess/blob/master/ChessBenchmarks/Benchmarks.cs)
+Here you can see the evolution of performance of chess library
+
 ## Found a bug?
 
-Drop to [Issues](https://github.com/Geras1mleo/Chess/issues)
-Or to: sviatoslav.harasymchuk@gmail.com
+Drop to [Issues](https://github.com/Geras1mleo/Chess/issues)<br/>
+Or: sviatoslav.harasymchuk@gmail.com<br/>
+<br/>
 Thanks in advance!
