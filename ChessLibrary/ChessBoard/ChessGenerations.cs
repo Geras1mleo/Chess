@@ -180,7 +180,7 @@ public partial class ChessBoard
             var piece = board[new Position() { X = 0, Y = piecePosition.Y }];
 
             if (board[1, piecePosition.Y] is null && board[2, piecePosition.Y] is null && board[3, piecePosition.Y] is null)
-                if (piece?.Type == PieceType.Rook && piece.Color == board[piecePosition].Color) // todo null
+                if (piece?.Type == PieceType.Rook && piece.Color == board[piecePosition].Color)
                 {
                     positions.Add(new Position() { X = 0, Y = piecePosition.Y });
                     positions.Add(new Position() { X = 2, Y = piecePosition.Y });
