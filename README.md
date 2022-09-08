@@ -143,7 +143,6 @@ board.Move(new Move("b1", "c3"));
 ```csharp
 if(ChessBoard.TryLoadFromPgn("1. e4 e5 2. Ne2 f6", out var board))
 {
-  board.LoadPgn();
   board.ToAscii();
   //   ┌────────────────────────┐
   // 8 │ r  n  b  q  k  b  n  r │
