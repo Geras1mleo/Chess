@@ -97,6 +97,19 @@ public class UnitChessTests
     }
 
     [Fact]
+    public void TestParseToSan()
+    {
+        var board = new ChessBoard();
+        var move = new Move("e2", "e4");
+        Assert.True(board.IsValidMove(move));
+
+        string? san;
+        Assert.True(board.TryParseToSan(move, out san));
+        Assert.NotNull(san);
+        Assert.Equal("e4", san);
+    }
+
+    [Fact]
     public void TestCapturedPieces()
     {
         var board = new ChessBoard();
