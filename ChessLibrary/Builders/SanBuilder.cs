@@ -204,6 +204,7 @@ internal static class SanBuilder
         else if (move.IsMate) builder.Append('$');
 
         move.San = builder.ToString();
+        san = builder.ToString();
 
         return (true, null);
     }
