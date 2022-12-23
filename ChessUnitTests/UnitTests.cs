@@ -1,5 +1,6 @@
 using Chess;
 using System;
+using System.Linq;
 using Xunit;
 
 namespace ChessUnitTests;
@@ -439,7 +440,38 @@ public class UnitChessTests
 
         return numOfMoves;
     }
+
+    [Fact]
+    private void TestPromotion_Queen_And_Rook_Check_King()
+    {
+        var board = ChessBoard.LoadFromFen("k7/7P/8/8/8/8/8/K7 w - - 0 1");
+        var moves = board.Moves(new Position(7, 6));
+        
+        Assert.True(moves.Where(
+                    move => (move.Parameter as MovePromotion)!.PromotionType == PromotionType.ToQueen
+                         || (move.Parameter as MovePromotion)!.PromotionType == PromotionType.ToRook).All(move => move.IsCheck));
+
+        Assert.True(moves.Where(
+                    move => (move.Parameter as MovePromotion)!.PromotionType == PromotionType.ToBishop
+                         || (move.Parameter as MovePromotion)!.PromotionType == PromotionType.ToKnight).All(move => !move.IsCheck));
+    }
+
+    [Fact]
+    private void TestPromotion_Knight_Mates_King()
+    {
+        var board = ChessBoard.LoadFromFen("R7/4rkrP/4ppp1/8/8/8/8/K7 w - - 0 1");
+        var moves = board.Moves(new Position(7, 6));
+
+        Assert.True(moves.Where(
+                    move => (move.Parameter as MovePromotion)!.PromotionType == PromotionType.ToKnight).All(move => move.IsCheck && move.IsMate));
+
+        Assert.True(moves.Where(
+                    move => (move.Parameter as MovePromotion)!.PromotionType == PromotionType.ToBishop
+                         || (move.Parameter as MovePromotion)!.PromotionType == PromotionType.ToRook
+                         || (move.Parameter as MovePromotion)!.PromotionType == PromotionType.ToQueen).All(move => !move.IsCheck && !move.IsMate));
+    }
 }
+
 public class UnitLoadingsTests
 {
     [Fact]

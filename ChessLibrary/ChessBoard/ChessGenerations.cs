@@ -32,32 +32,63 @@ public partial class ChessBoard
         {
             move = new(piecePosition, positions[i]) { Piece = pieces[piecePosition.Y, piecePosition.X] };
 
-            if (IsValidMove(move, this, false, true))
+            if (!IsValidMove(move, this, false, true))
             {
-                // Ambiguous castle
-                if (!allowAmbiguousCastle && move.Parameter is MoveCastle)
-                {
-                    if (move.NewPosition.X % 7 == 0) // Dropping king on position of rook
-                        continue;
-                }
+                continue;
+            }
 
-                // If promotion => 4 different moves for each promotion type
-                if (move.Parameter is MovePromotion promotion)
-                {
-                    moves.Add(new Move(move, PromotionType.ToQueen));
-                    moves.Add(new Move(move, PromotionType.ToRook));
-                    moves.Add(new Move(move, PromotionType.ToBishop));
-                    moves.Add(new Move(move, PromotionType.ToKnight));
-                }
-                else
-                    moves.Add(move);
+            // Ambiguous castle
+            if (!allowAmbiguousCastle && move.Parameter is MoveCastle)
+            {
+                if (move.NewPosition.X % 7 == 0) // Dropping king on position of rook 
+                    continue;
+            }
+
+            // If promotion => 4 different moves for each promotion type
+            if (move.Parameter is MovePromotion promotion)
+            {
+                AddPromotionMoves(moves, move, generateSan);
+            }
+            else
+            {
+                moves.Add(move);
 
                 if (generateSan)
+                {
                     ParseToSan(move);
+                }
             }
         }
 
         return moves.ToArray();
+    }
+
+    private void AddPromotionMoves(List<Move> moves, Move move, bool generateSan)
+    {
+        // IsCheck and IsMate depends on promotion type so we have to check again for each promotion type
+
+        var promotions = new PromotionType[]
+        {
+            PromotionType.ToQueen,
+            PromotionType.ToRook,
+            PromotionType.ToBishop,
+            PromotionType.ToKnight
+        };
+
+        foreach (var promotion in promotions)
+        {
+            var newMove = new Move(move, promotion);
+
+            newMove.IsCheck = IsKingCheckedValidation(newMove, move.Piece.Color.OppositeColor(), this);
+            newMove.IsMate = !PlayerHasMovesValidation(newMove, move.Piece.Color.OppositeColor(), this);
+
+            moves.Add(newMove);
+
+            if (generateSan)
+            {
+                ParseToSan(newMove);
+            }
+        }
     }
 
     /// <summary>
@@ -83,7 +114,8 @@ public partial class ChessBoard
 
                 tasks.Add(Task.Run(() =>
                 {
-                    foreach (var move in Moves(new Position { Y = y, X = x }, allowAmbiguousCastle, generateSan))
+                    var generatedMoves = Moves(new Position { Y = y, X = x }, allowAmbiguousCastle, generateSan);
+                    foreach (var move in generatedMoves)
                     {
                         moves.Add(move);
                     }

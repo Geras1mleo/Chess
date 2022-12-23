@@ -10,7 +10,7 @@ public class ChessMoveBenchmark
     public void MoveUsingMoveObject()
     {
         var board = new ChessBoard();
-
+        
         board.Move(new Move("e2", "e4"));
         board.Move(new Move("e7", "e5"));
         board.Move(new Move("g1", "e2"));
