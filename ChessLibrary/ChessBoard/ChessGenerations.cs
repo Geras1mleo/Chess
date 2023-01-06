@@ -30,7 +30,7 @@ public partial class ChessBoard
 
         for (int i = 0; i < positions.Length; i++)
         {
-            move = new(piecePosition, positions[i]) { Piece = pieces[piecePosition.Y, piecePosition.X] };
+            move = new(piecePosition, positions[i]);
 
             if (!IsValidMove(move, this, false, true))
             {

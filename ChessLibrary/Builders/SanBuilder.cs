@@ -182,14 +182,6 @@ internal static class SanBuilder
             builder.Append('x');
         }
 
-        if (move.Parameter is MoveEnPassant enPassant)
-        {
-            builder.Append(move.OriginalPosition.File().ToString() + 'x');
-
-            // Not required (LAN)
-            // builder.Append(" " + enPassant.ShortStr);
-        }
-
         builder.Append(move.NewPosition);
 
         if (move.Parameter is MovePromotion)

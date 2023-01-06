@@ -446,14 +446,14 @@ public class UnitChessTests
     {
         var board = ChessBoard.LoadFromFen("k7/7P/8/8/8/8/8/K7 w - - 0 1");
         var moves = board.Moves(new Position(7, 6));
-        
-        Assert.True(moves.Where(
-                    move => (move.Parameter as MovePromotion)!.PromotionType == PromotionType.ToQueen
-                         || (move.Parameter as MovePromotion)!.PromotionType == PromotionType.ToRook).All(move => move.IsCheck));
 
         Assert.True(moves.Where(
-                    move => (move.Parameter as MovePromotion)!.PromotionType == PromotionType.ToBishop
-                         || (move.Parameter as MovePromotion)!.PromotionType == PromotionType.ToKnight).All(move => !move.IsCheck));
+                    move => (move.Parameter as MovePromotion).PromotionType == PromotionType.ToQueen
+                         || (move.Parameter as MovePromotion).PromotionType == PromotionType.ToRook).All(move => move.IsCheck));
+
+        Assert.True(moves.Where(
+                    move => (move.Parameter as MovePromotion).PromotionType == PromotionType.ToBishop
+                         || (move.Parameter as MovePromotion).PromotionType == PromotionType.ToKnight).All(move => !move.IsCheck));
     }
 
     [Fact]
@@ -469,6 +469,15 @@ public class UnitChessTests
                     move => (move.Parameter as MovePromotion)!.PromotionType == PromotionType.ToBishop
                          || (move.Parameter as MovePromotion)!.PromotionType == PromotionType.ToRook
                          || (move.Parameter as MovePromotion)!.PromotionType == PromotionType.ToQueen).All(move => !move.IsCheck && !move.IsMate));
+    }
+
+    [Fact]
+    private void MoveReturnedFromBoardMoves_Should_Be_Valid()
+    {
+        var board = ChessBoard.LoadFromFen("4k3/8/8/3Pp3/8/8/8/4K3 w - e6 0 2");
+        var moves = board.Moves(new Position(3, 4)).Where(m => m.Parameter is MoveEnPassant);
+
+        Assert.True(board.Move(moves.First()));
     }
 }
 
