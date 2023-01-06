@@ -35,7 +35,7 @@
 		<OutputType>Library</OutputType>
 		<RootNamespace>Chess</RootNamespace>
 		<Authors>Geras1mleo</Authors>
-		<Copyright>Copyright (c) 2022 Geras1mleo</Copyright>
+		<Copyright>Copyright (c) 2023 Geras1mleo</Copyright>
 		<PackageProjectUrl></PackageProjectUrl>
 		<PackageReadmeFile>README_NUGET.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/Geras1mleo/Chess</RepositoryUrl>
@@ -45,6 +45,6 @@
 		<PackageId>Gera.Chess</PackageId>
 		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
 		<RepositoryType>git</RepositoryType>
-		<Version>1.0.2</Version>
+		<Version>1.0.3</Version>
 	</PropertyGroup>
 </Project>
