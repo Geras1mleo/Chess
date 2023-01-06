@@ -424,7 +424,7 @@ public class UnitChessTests
         Assert.Equal(threeCount, numOfMoves);
     }
 
-    private int CountMoves(ChessBoard board, int depth)
+    public int CountMoves(ChessBoard board, int depth)
     {
         if (depth == 0)
             return 1;
@@ -442,7 +442,7 @@ public class UnitChessTests
     }
 
     [Fact]
-    private void TestPromotion_Queen_And_Rook_Check_King()
+    public void TestPromotion_Queen_And_Rook_Check_King()
     {
         var board = ChessBoard.LoadFromFen("k7/7P/8/8/8/8/8/K7 w - - 0 1");
         var moves = board.Moves(new Position(7, 6));
@@ -457,7 +457,7 @@ public class UnitChessTests
     }
 
     [Fact]
-    private void TestPromotion_Knight_Mates_King()
+    public void TestPromotion_Knight_Mates_King()
     {
         var board = ChessBoard.LoadFromFen("R7/4rkrP/4ppp1/8/8/8/8/K7 w - - 0 1");
         var moves = board.Moves(new Position(7, 6));
@@ -472,12 +472,21 @@ public class UnitChessTests
     }
 
     [Fact]
-    private void MoveReturnedFromBoardMoves_Should_Be_Valid()
+    public void MoveReturnedFromBoardMoves_Should_Be_Valid()
     {
         var board = ChessBoard.LoadFromFen("4k3/8/8/3Pp3/8/8/8/4K3 w - e6 0 2");
         var moves = board.Moves(new Position(3, 4)).Where(m => m.Parameter is MoveEnPassant);
 
         Assert.True(board.Move(moves.First()));
+    }
+
+    [Fact]
+    public void ToFen_Should_IncludeEnPassant()
+    {
+        string fen = "rnbqkbnr/ppppp1pp/8/8/4P1pP/8/PPPP1P2/RNBQKBNR b KQkq h3 0 4";
+        var board = ChessBoard.LoadFromFen(fen);
+
+        Assert.Equal(fen, board.ToFen());
     }
 }
 

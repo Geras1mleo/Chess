@@ -169,7 +169,7 @@ public partial class ChessBoard
         else if (move.OriginalPosition != move.NewPosition)
         {
             fboard.executedMoves.Add(move);
-            fboard.DropPieceToNewPosition(new(move.ToString()));
+            fboard.DropPieceToNewPosition(new(move.ToString())); // todo optimize
         }
 
         return IsKingChecked(side, fboard);
@@ -504,22 +504,14 @@ public partial class ChessBoard
 
     private static bool IsValidEnPassant(Move move, ChessBoard board, short v, short h)
     {
-        if (Math.Abs(v) == 1 && Math.Abs(h) == 1)
+        if (Math.Abs(v) == 1 && Math.Abs(h) == 1) // Capture attempt
         {
             var piece = board.pieces[move.NewPosition.Y - v, move.NewPosition.X];
 
             // if on given new (position.y => one back) is a pawn with opposite color
             if (piece is not null && piece.Color != move.Piece.Color && piece.Type == PieceType.Pawn)
             {
-                bool valid = false;
-
-                if (board.moveIndex >= 0)
-                    valid = LastMoveEnPassantPosition(board) == move.NewPosition;
-
-                else if (board.LoadedFromFen)
-                    valid = board.FenBuilder.EnPassant == move.NewPosition;
-
-                return valid;
+                return LastMoveEnPassantPosition(board) == move.NewPosition;
             }
         }
         return false;
@@ -532,14 +524,19 @@ public partial class ChessBoard
     {
         Position pos = new();
 
-        var lastMove = board.DisplayedMoves.LastOrDefault();
-
-        if (lastMove is not null && lastMove.Piece.Type == PieceType.Pawn)
+        if (board.moveIndex >= 0) // If there are moves made on board
         {
-            if (Math.Abs(lastMove.NewPosition.Y - lastMove.OriginalPosition.Y) == 2)
+            var lastMove = board.DisplayedMoves.Last();
+
+            if (lastMove.Piece.Type == PieceType.Pawn
+             && Math.Abs(lastMove.NewPosition.Y - lastMove.OriginalPosition.Y) == 2) // If last move is a pawn moving 2 squares forward
             {
                 pos = new() { X = lastMove.NewPosition.X, Y = (short)((lastMove.NewPosition.Y + lastMove.OriginalPosition.Y) / 2) };
             }
+        }
+        else if (board.LoadedFromFen)
+        {
+            pos = board.FenBuilder.EnPassant;
         }
 
         return pos;
