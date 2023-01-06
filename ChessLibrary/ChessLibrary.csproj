@@ -40,7 +40,7 @@
 		<PackageReadmeFile>README_NUGET.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/Geras1mleo/Chess</RepositoryUrl>
 		<PackageTags>chess;chessboard;chess-game;chess-position;standard-algebraic-notation;chess-move;forsyth-edwards-notation;chess-validator;chess-variations</PackageTags>
-		<PackageReleaseNotes>Moves generation improved. TryLoad Fen/Pgn and TryParseSan added</PackageReleaseNotes>
+		<PackageReleaseNotes>Bugs fixes</PackageReleaseNotes>
 		<PackageIcon>knight.png</PackageIcon>
 		<PackageId>Gera.Chess</PackageId>
 		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
