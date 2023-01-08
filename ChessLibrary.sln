@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessLibrary", "ChessLibrary\ChessLibrary.csproj", "{D8C63FAC-50CB-4C46-AF15-2BA8A883A439}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessUnitTests", "ChessUnitTests\ChessUnitTests.csproj", "{BA19CE33-B741-40AA-85B1-2E2044BE8F57}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessUnitTests", "Chess.Tests\ChessUnitTests.csproj", "{BA19CE33-B741-40AA-85B1-2E2044BE8F57}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessBenchmarks", "ChessBenchmarks\ChessBenchmarks.csproj", "{03B214BA-A88E-4DCC-B64E-361629C0DA83}"
 EndProject
