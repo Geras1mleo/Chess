@@ -20,4 +20,20 @@ internal static class Extensions
         first = list.Count > 0 ? list[0] : default; // or throw
         second = list.Count > 1 ? list[1] : default; // or throw
     }
+
+    internal static List<Piece> PiecesList(this Piece?[,] pieces)
+    {
+        var list = new List<Piece>();
+
+        for(int i = 0; i < pieces.GetLength(0); i++)
+        {
+            for(int j = 0; j < pieces.GetLength(1); j++)
+            {
+                if(pieces[i,j] is not null)
+                    list.Add(pieces[i,j]);
+            }
+        }
+
+        return list;
+    }
 }

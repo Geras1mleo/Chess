@@ -212,7 +212,7 @@ public partial class ChessBoard
         return PlayerHasMoves(side, fboard);
     }
 
-    private static bool PlayerHasMoves(PieceColor side, ChessBoard board)
+    internal static bool PlayerHasMoves(PieceColor side, ChessBoard board)
     {
         for (short i = 0; i < 8; i++)
         {

@@ -496,36 +496,7 @@ public partial class ChessBoard
     /// </summary>
     internal void HandleEndGame()
     {
-        if (moveIndex >= 0)
-        {
-            if (executedMoves[moveIndex].IsMate)
-                if (executedMoves[moveIndex].IsCheck)
-                    EndGame = new EndGameInfo(EndgameType.Checkmate, Turn.OppositeColor());
-                else
-                    EndGame = new EndGameInfo(EndgameType.Stalemate, null);
-        }
-        else
-        {
-            if (LoadedFromFen)
-            {
-                var mw = !PlayerHasMoves(PieceColor.White, this);
-                var mb = !PlayerHasMoves(PieceColor.Black, this);
-
-                if (mw && WhiteKingChecked)
-                    EndGame = new EndGameInfo(EndgameType.Checkmate, PieceColor.Black);
-
-                else if (mb && BlackKingChecked)
-                    EndGame = new EndGameInfo(EndgameType.Checkmate, PieceColor.White);
-
-                else if (mw || mb)
-                    EndGame = new EndGameInfo(EndgameType.Stalemate, null);
-            }
-        }
-
-        // Todo:
-        // InsufficientMaterial
-        // Move50Rule
-        // Repetition
+        EndGame = new EndGameProvider(this).GetEndGameInfo();
     }
 
     private void SetChessBeginSituation()
