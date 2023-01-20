@@ -18,16 +18,10 @@ internal class InsufficientMaterialRule : EndGameRule
     internal override bool IsEndGame()
     {
         var pieces = board.pieces.PiecesList();
-        var isEndGame = false;
 
-        if (IsFirstLevelDraw(pieces))
-            isEndGame = true;
-
-        if (!isEndGame && IsSecondLevelDraw(pieces))
-            isEndGame = true;
-
-        if (!isEndGame && IsThirdLevelDraw(pieces))
-            isEndGame = true;
+        bool isEndGame = IsFirstLevelDraw(pieces)
+                      || IsSecondLevelDraw(pieces)
+                      || IsThirdLevelDraw(pieces);
 
         return isEndGame;
     }

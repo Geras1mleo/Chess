@@ -71,10 +71,10 @@ public partial class ChessBoard
 
     internal int GetHalfMovesCount()
     {
-        int index = DisplayedMoves.FindLastIndex(m => m.CapturedPiece is not null || m.Piece.Type == PieceType.Pawn);
+        int index = LastIrreversibleMoveIndex;
 
         if (LoadedFromFen && index < 0)
-            return FenBuilder.HalfMoves + moveIndex + 1;
+            return FenBuilder!.HalfMoves + moveIndex + 1;
 
         if (index >= 0)
             return moveIndex - index;

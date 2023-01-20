@@ -112,27 +112,29 @@ internal class FenBoardBuilder
             }
         }
 
-        var wcap = new List<Piece>();
-        var bcap = new List<Piece>();
+        var whiteCaptured = new List<Piece>();
+        var blackCaptured = new List<Piece>();
 
-        var fpieces = builder.pieces.Cast<Piece>().Where(p => p is not null);
+        var fpieces = builder.pieces.PiecesList().Where(p => p is not null);
 
         // Calculating missing pieces on according begin pieces in fen
         // Math.Clamp() for get max/min taken figures (2 queens possible)
-        wcap.AddRange(Enumerable.Range(0, Math.Clamp(8 - fpieces.Where(p => p.Type == PieceType.Pawn && p.Color == PieceColor.White).Count(), 0, 8)).Select(_ => new Piece(PieceColor.White, PieceType.Pawn)));
-        wcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Rook && p.Color == PieceColor.White).Count(), 0, 2)).Select(_ => new Piece(PieceColor.White, PieceType.Rook)));
-        wcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Bishop && p.Color == PieceColor.White).Count(), 0, 2)).Select(_ => new Piece(PieceColor.White, PieceType.Bishop)));
-        wcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Knight && p.Color == PieceColor.White).Count(), 0, 2)).Select(_ => new Piece(PieceColor.White, PieceType.Knight)));
-        wcap.AddRange(Enumerable.Range(0, Math.Clamp(1 - fpieces.Where(p => p.Type == PieceType.Queen && p.Color == PieceColor.White).Count(), 0, 1)).Select(_ => new Piece(PieceColor.White, PieceType.Queen)));
+        whiteCaptured.AddRange(Enumerable.Range(0, Math.Clamp(8 - fpieces.Where(p => p.Type == PieceType.Pawn && p.Color == PieceColor.White).Count(), 0, 8)).Select(_ => new Piece(PieceColor.White, PieceType.Pawn)));
+        whiteCaptured.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Rook && p.Color == PieceColor.White).Count(), 0, 2)).Select(_ => new Piece(PieceColor.White, PieceType.Rook)));
+        whiteCaptured.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Bishop && p.Color == PieceColor.White).Count(), 0, 2)).Select(_ => new Piece(PieceColor.White, PieceType.Bishop)));
+        whiteCaptured.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Knight && p.Color == PieceColor.White).Count(), 0, 2)).Select(_ => new Piece(PieceColor.White, PieceType.Knight)));
+        whiteCaptured.AddRange(Enumerable.Range(0, Math.Clamp(1 - fpieces.Where(p => p.Type == PieceType.Queen && p.Color == PieceColor.White).Count(), 0, 1)).Select(_ => new Piece(PieceColor.White, PieceType.Queen)));
 
-        bcap.AddRange(Enumerable.Range(0, Math.Clamp(8 - fpieces.Where(p => p.Type == PieceType.Pawn && p.Color == PieceColor.Black).Count(), 0, 8)).Select(_ => new Piece(PieceColor.Black, PieceType.Pawn)));
-        bcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Rook && p.Color == PieceColor.Black).Count(), 0, 2)).Select(_ => new Piece(PieceColor.Black, PieceType.Rook)));
-        bcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Bishop && p.Color == PieceColor.Black).Count(), 0, 2)).Select(_ => new Piece(PieceColor.Black, PieceType.Bishop)));
-        bcap.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Knight && p.Color == PieceColor.Black).Count(), 0, 2)).Select(_ => new Piece(PieceColor.Black, PieceType.Knight)));
-        bcap.AddRange(Enumerable.Range(0, Math.Clamp(1 - fpieces.Where(p => p.Type == PieceType.Queen && p.Color == PieceColor.Black).Count(), 0, 1)).Select(_ => new Piece(PieceColor.Black, PieceType.Queen)));
+        blackCaptured.AddRange(Enumerable.Range(0, Math.Clamp(8 - fpieces.Where(p => p.Type == PieceType.Pawn && p.Color == PieceColor.Black).Count(), 0, 8)).Select(_ => new Piece(PieceColor.Black, PieceType.Pawn)));
+        blackCaptured.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Rook && p.Color == PieceColor.Black).Count(), 0, 2)).Select(_ => new Piece(PieceColor.Black, PieceType.Rook)));
+        blackCaptured.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Bishop && p.Color == PieceColor.Black).Count(), 0, 2)).Select(_ => new Piece(PieceColor.Black, PieceType.Bishop)));
+        blackCaptured.AddRange(Enumerable.Range(0, Math.Clamp(2 - fpieces.Where(p => p.Type == PieceType.Knight && p.Color == PieceColor.Black).Count(), 0, 2)).Select(_ => new Piece(PieceColor.Black, PieceType.Knight)));
+        blackCaptured.AddRange(Enumerable.Range(0, Math.Clamp(1 - fpieces.Where(p => p.Type == PieceType.Queen && p.Color == PieceColor.Black).Count(), 0, 1)).Select(_ => new Piece(PieceColor.Black, PieceType.Queen)));
 
-        builder.WhiteCaptured = wcap.ToArray();
-        builder.BlackCaptured = bcap.ToArray();
+        // TODO
+
+        builder.WhiteCaptured = whiteCaptured.ToArray();
+        builder.BlackCaptured = blackCaptured.ToArray();
 
         return (true, null);
     }

@@ -471,7 +471,7 @@ public partial class ChessBoard
                     valid = board.FenBuilder.CastleBQ;
             }
 
-            if (board.moveIndex >= 0 && valid)
+            if (valid && board.moveIndex >= 0)
                 valid = ValidByMoves();
         }
         else
@@ -481,12 +481,12 @@ public partial class ChessBoard
 
         bool ValidByMoves()
         {
-            Position kingpos = new(side == PieceColor.White ? "e1" : "e8");
+            Position kingpos = new(4, (short)(side == PieceColor.White ? 0 : 7)); // "e1" : "e8"
 
             var rookpos = castleType switch
             {
-                CastleType.King => new Position(side == PieceColor.White ? "h1" : "h8"),
-                CastleType.Queen => new Position(side == PieceColor.White ? "a1" : "a8"),
+                CastleType.King => new Position(7, (short)(side == PieceColor.White ? 0 : 7)), // "h1" : "h8"
+                CastleType.Queen => new Position(0, (short)(side == PieceColor.White ? 0 : 7)), // "a1" : "a8"
                 _ => throw new ChessArgumentException(board, "Invalid Castle type parameter"),
             };
 

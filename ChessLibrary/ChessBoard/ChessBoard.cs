@@ -123,13 +123,15 @@ public partial class ChessBoard
     {
         get
         {
-            var cap = new List<Piece>();
+            var captured = new List<Piece>();
 
-            if (LoadedFromFen) cap.AddRange(FenBuilder.WhiteCaptured);
+            if (LoadedFromFen)
+                captured.AddRange(FenBuilder!.WhiteCaptured);
 
-            cap.AddRange(DisplayedMoves.Where(m => m.CapturedPiece?.Color == PieceColor.White).Select(m => new Piece(m.CapturedPiece.Color, m.CapturedPiece.Type)));
+            captured.AddRange(DisplayedMoves.Where(m => m.CapturedPiece?.Color == PieceColor.White)
+                                            .Select(m => new Piece(m.CapturedPiece.Color, m.CapturedPiece.Type)));
 
-            return cap.ToArray();
+            return captured.ToArray();
         }
     }
 
@@ -140,13 +142,15 @@ public partial class ChessBoard
     {
         get
         {
-            var cap = new List<Piece>();
+            var captured = new List<Piece>();
 
-            if (LoadedFromFen) cap.AddRange(FenBuilder.BlackCaptured);
+            if (LoadedFromFen)
+                captured.AddRange(FenBuilder!.BlackCaptured);
 
-            cap.AddRange(DisplayedMoves.Where(m => m.CapturedPiece?.Color == PieceColor.Black).Select(m => new Piece(m.CapturedPiece.Color, m.CapturedPiece.Type)));
+            captured.AddRange(DisplayedMoves.Where(m => m.CapturedPiece?.Color == PieceColor.Black)
+                                            .Select(m => new Piece(m.CapturedPiece.Color, m.CapturedPiece.Type)));
 
-            return cap.ToArray();
+            return captured.ToArray();
         }
     }
 
@@ -223,7 +227,7 @@ public partial class ChessBoard
                 index--;
             }
 
-            return moveFound? index + 1 : index;
+            return moveFound ? index + 1 : index;
         }
     }
 
@@ -494,24 +498,18 @@ public partial class ChessBoard
         WhiteKingChecked = false;
         BlackKingChecked = false;
 
-        if (moveIndex >= 0)
+        if (moveIndex >= 0 && executedMoves[moveIndex].IsCheck)
         {
-            if (executedMoves[moveIndex].IsCheck)
-            {
-                if (executedMoves[moveIndex].Piece.Color == PieceColor.White)
-                    BlackKingChecked = true;
+            if (executedMoves[moveIndex].Piece.Color == PieceColor.White)
+                BlackKingChecked = true;
 
-                else if (executedMoves[moveIndex].Piece.Color == PieceColor.Black)
-                    WhiteKingChecked = true;
-            }
+            else if (executedMoves[moveIndex].Piece.Color == PieceColor.Black)
+                WhiteKingChecked = true;
         }
-        else
+        else if (LoadedFromFen)
         {
-            if (LoadedFromFen)
-            {
-                WhiteKingChecked = IsKingChecked(PieceColor.White, this);
-                BlackKingChecked = IsKingChecked(PieceColor.Black, this);
-            }
+            WhiteKingChecked = IsKingChecked(PieceColor.White, this);
+            BlackKingChecked = IsKingChecked(PieceColor.Black, this);
         }
     }
 
