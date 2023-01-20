@@ -124,5 +124,25 @@ public class EndGameTests
 
         Assert.False(board.IsEndGame);
     }
+
+    [Fact]
+    public void EndGame_Repetition_EnPassant_Possible_Repetition_Is_Ignored()
+    {
+        var board = ChessBoard.LoadFromFen("4k2r/8/8/3Pp3/8/8/8/R3K3 w - e6 0 2");
+
+        board.Move("Rb1");
+        board.Move("Rg8");
+
+        board.Move("Ra1");
+        board.Move("Rh8");
+
+        board.Move("Rb1");
+        board.Move("Rg8");
+
+        board.Move("Ra1");
+        board.Move("Rh8");
+
+        Assert.False(board.IsEndGame);
+    }
 }
 
