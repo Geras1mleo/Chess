@@ -200,7 +200,32 @@ public partial class ChessBoard
     /// </summary>
     public bool IsLastMoveDisplayed => moveIndex == executedMoves.Count - 1;
 
-    private List<Move> DisplayedMoves => executedMoves.GetRange(0, moveIndex + 1);
+    internal List<Move> DisplayedMoves => executedMoves.GetRange(0, moveIndex + 1);
+
+    /// <summary>
+    /// https://www.chessprogramming.org/Irreversible_Moves
+    /// </summary>
+    public int LastIrreversibleMoveIndex
+    {
+        get
+        {
+            int index = moveIndex;
+            bool moveFound = false;
+
+            while (index >= 0 && !moveFound)
+            {
+                if (executedMoves[index].CapturedPiece is not null
+                 || executedMoves[index].Piece.Type == PieceType.Pawn)
+                {
+                    moveFound = true;
+                }
+
+                index--;
+            }
+
+            return moveFound? index + 1 : index;
+        }
+    }
 
     /// <summary>
     /// Creates new chess board with default pieces positions
@@ -215,7 +240,7 @@ public partial class ChessBoard
     /// <summary>
     /// To execute operations and to not corrupt the main chess object
     /// </summary>
-    private ChessBoard(Piece?[,] pieces, List<Move> moves)
+    internal ChessBoard(Piece?[,] pieces, List<Move> moves)
     {
         executedMoves = new List<Move>(moves);
         this.pieces = (Piece[,])pieces.Clone();
