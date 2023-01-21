@@ -23,6 +23,10 @@ internal class Regexes
 
     internal const string FenPattern = @"^(((?:[rnbqkpRNBQKP1-8]+\/){7})[rnbqkpRNBQKP1-8]+) ([b|w]) (-|[K|Q|k|q]{1,4}) (-|[a-h][36]) (\d+ \d+)$";
 
+    internal const string FenContainsOneWhiteKingPattern = "^[^ K]*K[^ K]* ";
+
+    internal const string FenContainsOneBlackKingPattern = "^[^ k]*k[^ k]* ";
+
     internal const string PiecePattern = "^[wb][bknpqr]$";
 
     internal const string FenPiecePattern = "^([bknpqr]|[BKNPQR])$";
@@ -42,6 +46,10 @@ internal class Regexes
     internal readonly static Regex regexComments = new(CommentsPattern, RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromMilliseconds(250));
 
     internal readonly static Regex regexFen = new(FenPattern, RegexOptions.Compiled, TimeSpan.FromMilliseconds(250));
+
+    internal readonly static Regex regexFenContainsOneWhiteKing = new(FenContainsOneWhiteKingPattern, RegexOptions.Compiled, TimeSpan.FromMilliseconds(250));
+
+    internal readonly static Regex regexFenContainsOneBlackKing = new(FenContainsOneBlackKingPattern, RegexOptions.Compiled, TimeSpan.FromMilliseconds(250));
 
     internal readonly static Regex regexPiece = new(PiecePattern, RegexOptions.Compiled, TimeSpan.FromMilliseconds(250));
 

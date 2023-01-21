@@ -57,6 +57,9 @@ internal class FenBoardBuilder
         if (matches.Count == 0)
             return (false, new ChessArgumentException(null, "FEN board string should match pattern: " + Regexes.FenPattern));
 
+        if (!Regexes.regexFenContainsOneWhiteKing.IsMatch(fen) || !Regexes.regexFenContainsOneBlackKing.IsMatch(fen))
+            return (false, new ChessArgumentException(null, "Chess board should have exact 1 white king and exact 1 black king"));
+
         builder = new FenBoardBuilder();
 
         foreach (var group in matches[0].Groups.Values)

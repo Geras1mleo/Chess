@@ -10,7 +10,7 @@ public class ChessMoveBenchmark
     public void MoveUsingMoveObject()
     {
         var board = new ChessBoard();
-        
+
         board.Move(new Move("e2", "e4"));
         board.Move(new Move("e7", "e5"));
         board.Move(new Move("g1", "e2"));
@@ -233,6 +233,22 @@ public class ChessFenConversionsBenchmark
     //  |        Method |     Mean |    Error |   StdDev |    Gen 0 | Allocated |
     //  |-------------- |---------:|---------:|---------:|---------:|----------:|
     //  | FenConvertion | 481.1 us | 21.65 us | 63.85 us | 208.0078 |    426 KB |
+
+    //  21/01/2023
+    //      => before kings constraint in fen import
+    //  |        Method |     Mean |   Error |  StdDev |  Gen 0 | Allocated |
+    //  |-------------- |---------:|--------:|--------:|-------:|----------:|
+    //  | FenConvertion | 426.9 us | 8.12 us | 8.69 us | 4.8828 |    427 KB |
+    //
+    //      => constraint using regex
+    //  |        Method |     Mean |   Error |  StdDev |  Gen 0 | Allocated |
+    //  |-------------- |---------:|--------:|--------:|-------:|----------:|
+    //  | FenConvertion | 430.6 us | 6.55 us | 5.81 us | 4.8828 |    427 KB |
+    //
+    //      => constraint using piecesList extension method
+    //  |        Method |     Mean |   Error |  StdDev |  Gen 0 | Allocated |
+    //  |-------------- |---------:|--------:|--------:|-------:|----------:|
+    //  | FenConvertion | 432.0 us | 8.29 us | 7.76 us | 4.8828 |    430 KB |
 }
 
 [MemoryDiagnoser]
