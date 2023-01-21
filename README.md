@@ -79,8 +79,6 @@ while (!board.IsEndGame)
 
 Console.WriteLine(board.ToAscii());
 Console.WriteLine(board.ToPgn());
-
-// Todo: End game by Insufficient Material
 ```
 
 ## Track Pieces
@@ -230,7 +228,7 @@ board.Resign(PieceColor.Black);
 board.EndGame... // => { EndgameType = Resigned, WonSide = White }
 ```
 
-## [Unit Tests](/ChessUnitTests/UnitTests.cs)
+## [Unit Tests](/Chess.Tests/MoveTests.cs)
 Here you can see all the tests that have been used to test and improve chess library
 
 ## [Benchmarks](/ChessBenchmarks/Benchmarks.cs)
@@ -242,7 +240,7 @@ Give it a :star: Star!
 
 ## Found a bug?
 
-Drop to <a href="https://github.com/Geras1mleo/Chess/issues">Issues</a><br/>
+Drop to [Issues](https://github.com/Geras1mleo/Chess/issues)<br/> 
 Or: sviatoslav.harasymchuk@gmail.com<br/>
 <br/>
 Thanks in advance!

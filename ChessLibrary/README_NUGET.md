@@ -70,8 +70,6 @@ while (!board.IsEndGame)
 
 Console.WriteLine(board.ToAscii());
 Console.WriteLine(board.ToPgn());
-
-// Todo: End game Insufficient Material
 ```
 
 ## Track Pieces
@@ -129,12 +127,11 @@ Move pieces using **Move object** and corresponding positions:
 board.Move(new Move("b1", "c3"));
 ```
 
-Ambiguity:
+**Ambiguity**:
 
 ```csharp
 if(ChessBoard.TryLoadFromPgn("1. e4 e5 2. Ne2 f6", out var board))
 {
-  board.LoadPgn();
   board.ToAscii();
   //   ┌────────────────────────┐
   // 8 │ r  n  b  q  k  b  n  r │
@@ -155,10 +152,10 @@ if(ChessBoard.TryLoadFromPgn("1. e4 e5 2. Ne2 f6", out var board))
 
 ## Load Chess game/board
 
-Load chess board Variant: From Position (FEN):
+Load chess board Variant: **From Position** (using FEN):
 
 ```csharp
-board.LoadFen("1nbqkb1r/pppp1ppp/2N5/4p3/3P4/8/PPP1PPPP/RN2KB1R w KQk - 0 1");
+board = ChessBoard.LoadFromFen("1nbqkb1r/pppp1ppp/2N5/4p3/3P4/8/PPP1PPPP/RN2KB1R w KQk - 0 1");
 board.ToAscii();
 //   ┌────────────────────────┐
 // 8 │ .  n  b  q  k  b  .  r │
@@ -183,7 +180,7 @@ board.EndGame... // => { EndgameType = Stalemate, WonSide = null }
 Load full chess game from **PGN**:
 
 ```csharp
-board.LoadPgn(
+board = ChessBoard.LoadFromPgn(
 @"[Variant ""From Position""]
 [FEN ""rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1""]
             
@@ -222,7 +219,7 @@ board.Resign(PieceColor.Black);
 board.EndGame... // => { EndgameType = Resigned, WonSide = White }
 ```
 
-## [Unit Tests](https://github.com/Geras1mleo/Chess/blob/master/ChessUnitTests/UnitTests.cs)
+## [Unit Tests](https://github.com/Geras1mleo/Chess/blob/master/Chess.Tests/MoveTests.cs)
 Here you can see all the tests that have been used to test and improve chess library
 
 ## [Benchmarks](https://github.com/Geras1mleo/Chess/blob/master/ChessBenchmarks/Benchmarks.cs)
