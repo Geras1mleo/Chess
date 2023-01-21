@@ -40,11 +40,11 @@
 		<PackageReadmeFile>README_NUGET.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/Geras1mleo/Chess</RepositoryUrl>
 		<PackageTags>chess;chessboard;chess-game;chess-position;standard-algebraic-notation;chess-move;forsyth-edwards-notation;chess-validator;chess-variations</PackageTags>
-		<PackageReleaseNotes>Bugs fixes</PackageReleaseNotes>
+                <PackageReleaseNotes>Endgame/Draw recognition added: InsufficientMaterial rule, Threefold repetition rule and Fiftymove rule. Use AutoEndgameRules property to configure needed rules</PackageReleaseNotes>
 		<PackageIcon>knight.png</PackageIcon>
 		<PackageId>Gera.Chess</PackageId>
 		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
 		<RepositoryType>git</RepositoryType>
-		<Version>1.0.3</Version>
+		<Version>1.0.4</Version>
 	</PropertyGroup>
 </Project>
