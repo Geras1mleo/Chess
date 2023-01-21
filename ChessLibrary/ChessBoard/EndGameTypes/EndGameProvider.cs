@@ -22,15 +22,13 @@ internal class EndGameProvider
     {
         EndGameInfo? endgameInfo = null;
 
-        if (board.moveIndex >= 0)
+        if (board.moveIndex >= 0
+         && board.executedMoves[board.moveIndex].IsMate)
         {
-            if (board.executedMoves[board.moveIndex].IsMate)
-            {
-                if (board.executedMoves[board.moveIndex].IsCheck)
-                    endgameInfo = new EndGameInfo(EndgameType.Checkmate, board.Turn.OppositeColor());
-                else
-                    endgameInfo = new EndGameInfo(EndgameType.Stalemate, null);
-            }
+            if (board.executedMoves[board.moveIndex].IsCheck)
+                endgameInfo = new EndGameInfo(EndgameType.Checkmate, board.Turn.OppositeColor());
+            else
+                endgameInfo = new EndGameInfo(EndgameType.Stalemate, null);
         }
         else if (board.LoadedFromFen)
         {
@@ -49,24 +47,28 @@ internal class EndGameProvider
 
         if (endgameInfo is null)
         {
-            endgameInfo = ResolveDrawRules();
+            endgameInfo = ResolveDrawRules(board.AutoEndgameRules);
         }
 
         return endgameInfo;
     }
 
-    private EndGameInfo? ResolveDrawRules()
+    private EndGameInfo? ResolveDrawRules(AutoEndgameRules autoEndgameRules)
     {
         EndGameInfo? endgameInfo = null;
 
-        var rules = new EndGameRule[]
-        {
-            new InsufficientMaterialRule(board),
-            new FiftyMoveRule(board),
-            new RepetitionRule(board)
-        };
+        var rules = new List<EndGameRule>();
 
-        for(int i = 0; i < rules.Length && endgameInfo is null; i++)
+        if ((autoEndgameRules & AutoEndgameRules.InsufficientMaterial) == AutoEndgameRules.InsufficientMaterial)
+            rules.Add(new InsufficientMaterialRule(board));
+
+        if ((autoEndgameRules & AutoEndgameRules.Repetition) == AutoEndgameRules.Repetition)
+            rules.Add(new RepetitionRule(board));
+
+        if ((autoEndgameRules & AutoEndgameRules.FiftyMoveRule) == AutoEndgameRules.FiftyMoveRule)
+            rules.Add(new FiftyMoveRule(board));
+
+        for (int i = 0; i < rules.Count && endgameInfo is null; i++)
         {
             if (rules[i].IsEndGame())
             {

@@ -198,6 +198,7 @@ public partial class ChessBoard
                 throw new IndexOutOfRangeException("Move not found");
         }
     }
+
     /// <summary>
     /// Whether last move is displayed on this chess board<br/>
     /// False after Previous() / First() / MoveIndex = ...
@@ -230,6 +231,13 @@ public partial class ChessBoard
             return moveFound ? index + 1 : index;
         }
     }
+
+    private AutoEndgameRules autoEndgameRules = AutoEndgameRules.None;
+
+    /// <summary>
+    /// This property keeps track of auto-draw (endgame) rules that will be used to check for endgame
+    /// </summary>
+    public AutoEndgameRules AutoEndgameRules { get => autoEndgameRules; set => autoEndgameRules = value; }
 
     /// <summary>
     /// Creates new chess board with default pieces positions
