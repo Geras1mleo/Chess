@@ -9,7 +9,9 @@
 
 namespace Chess;
 
-// https://en.wikipedia.org/wiki/Draw_(chess)
+/// <summary>
+/// https://www.chessprogramming.org/Draw
+/// </summary>
 internal abstract class EndGameRule
 {
     protected ChessBoard board;

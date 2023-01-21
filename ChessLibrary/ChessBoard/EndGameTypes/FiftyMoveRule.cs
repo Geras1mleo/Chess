@@ -9,7 +9,9 @@
 
 namespace Chess;
 
-// https://www.chessprogramming.org/Fifty-move_Rule
+/// <summary>
+/// https://www.chessprogramming.org/Fifty-move_Rule
+/// </summary>
 internal class FiftyMoveRule : EndGameRule
 {
     private const int MAX_HALF_MOVE_CLOCK = 100;

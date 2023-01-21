@@ -9,7 +9,9 @@
 
 namespace Chess;
 
-// https://www.chessprogramming.org/Material#InsufficientMaterial
+/// <summary>
+/// https://www.chessprogramming.org/Material#InsufficientMaterial
+/// </summary>
 internal class InsufficientMaterialRule : EndGameRule
 {
     internal override EndgameType Type => EndgameType.InsufficientMaterial;

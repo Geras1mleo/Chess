@@ -9,6 +9,9 @@
 
 namespace Chess;
 
+/// <summary>
+/// https://www.chessprogramming.org/Repetitions
+/// </summary>
 internal class RepetitionRule : EndGameRule
 {
     private const int MINIMUM_MOVES_COUNT = 8; // at least 8 moves required to get threefold repetition

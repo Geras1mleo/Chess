@@ -199,7 +199,7 @@ public partial class ChessBoard
         }
     }
     /// <summary>
-    /// Is last move displayed on this chess board<br/>
+    /// Whether last move is displayed on this chess board<br/>
     /// False after Previous() / First() / MoveIndex = ...
     /// </summary>
     public bool IsLastMoveDisplayed => moveIndex == executedMoves.Count - 1;
