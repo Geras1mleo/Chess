@@ -71,6 +71,10 @@ Console.WriteLine(board.ToPgn());
 Example **random** chess game:
 
 ```csharp
+using Chess;
+
+var board = new ChessBoard() { AutoEndgameRules = AutoEndgameRules.All };
+
 while (!board.IsEndGame)
 {
     var moves = board.Moves();
@@ -79,6 +83,7 @@ while (!board.IsEndGame)
 
 Console.WriteLine(board.ToAscii());
 Console.WriteLine(board.ToPgn());
+
 ```
 
 ## Track Pieces
@@ -86,8 +91,8 @@ Console.WriteLine(board.ToPgn());
 Track pieces on position using **indexers**:
 
 ```csharp
-board["c2"]... 		  	// => White Pawn
-board['g', 8]... 		// => Black Bishop
+board["c2"]...			// => White Pawn
+board['g',8]...			// => Black Bishop
 
 // Counting from 0
 board[0, 0]...			// => White Rook
