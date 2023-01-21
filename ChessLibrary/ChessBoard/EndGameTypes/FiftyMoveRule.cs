@@ -1,4 +1,4 @@
-// *****************************************************
+﻿// *****************************************************
 // *                                                   *
 // * O Lord, Thank you for your goodness in our lives. *
 // *     Please bless this code to our compilers.      *
@@ -9,11 +9,11 @@
 
 namespace Chess;
 
-internal class Move50Rule : EndGameRule
+internal class FiftyMoveRule : EndGameRule
 {
-    public Move50Rule(ChessBoard board) : base(board) { }
+    public FiftyMoveRule(ChessBoard board) : base(board) { }
 
-    internal override EndgameType Type => EndgameType.Move50Rule;
+    internal override EndgameType Type => EndgameType.FiftyMoveRule;
 
     internal override bool IsEndGame()
     {

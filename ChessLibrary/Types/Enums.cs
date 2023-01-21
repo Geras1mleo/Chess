@@ -19,7 +19,7 @@ public enum EndgameType : byte
     Stalemate,
     DrawDeclared,
     InsufficientMaterial,
-    Move50Rule,
+    FiftyMoveRule,
     Repetition,
 }
 

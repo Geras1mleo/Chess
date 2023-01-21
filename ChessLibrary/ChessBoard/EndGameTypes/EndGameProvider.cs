@@ -1,4 +1,4 @@
-// *****************************************************
+﻿// *****************************************************
 // *                                                   *
 // * O Lord, Thank you for your goodness in our lives. *
 // *     Please bless this code to our compilers.      *
@@ -62,7 +62,7 @@ internal class EndGameProvider
         var rules = new EndGameRule[]
         {
             new InsufficientMaterialRule(board),
-            new Move50Rule(board),
+            new FiftyMoveRule(board),
             new RepetitionRule(board)
         };
 
