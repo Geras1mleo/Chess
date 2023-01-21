@@ -9,6 +9,7 @@
 
 namespace Chess;
 
+// https://www.chessprogramming.org/Material#InsufficientMaterial
 internal class InsufficientMaterialRule : EndGameRule
 {
     internal override EndgameType Type => EndgameType.InsufficientMaterial;
@@ -49,14 +50,22 @@ internal class InsufficientMaterialRule : EndGameRule
     {
         var isDraw = false;
 
-        if (pieces.Count == 4
-         && pieces.Where(p => p.Type == PieceType.Bishop).Count() == 2
-         && pieces.Where(p => p.Type == PieceType.King).Count() == 2)
+        if (pieces.Count == 4)
         {
-            var firstBishop = pieces.First(p => p.Type == PieceType.Bishop);
-            var lastBishop = pieces.Last(p => p.Type == PieceType.Bishop);
+            if (pieces.All(p => p.Type == PieceType.King || p.Type == PieceType.Bishop))
+            {
+                var firstPiece = pieces.First(p => p.Type == PieceType.Bishop);
+                var lastPiece = pieces.Last(p => p.Type == PieceType.Bishop);
 
-            isDraw = firstBishop.Color != lastBishop.Color && BishopsAreOnSameColor();
+                isDraw = firstPiece.Color != lastPiece.Color && BishopsAreOnSameColor();
+            }
+            else if (pieces.All(p => p.Type == PieceType.King || p.Type == PieceType.Knight))
+            {
+                var firstPiece = pieces.First(p => p.Type == PieceType.Knight);
+                var lastPiece = pieces.Last(p => p.Type == PieceType.Knight);
+
+                isDraw = firstPiece.Color == lastPiece.Color;
+            }
         }
 
         return isDraw;

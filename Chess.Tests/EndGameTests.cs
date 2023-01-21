@@ -5,16 +5,24 @@ namespace ChessUnitTests;
 
 public class EndGameTests
 {
+    [Fact]
+    public void EndGame_InsufficientMaterial_Basic()
+    {
+        var board = ChessBoard.LoadFromFen("4k3/8/8/8/8/8/8/4K3 b - - 0 1");
+
+        Assert.Equal(EndgameType.InsufficientMaterial, board.EndGame.EndgameType);
+    }
+
     [Theory]
     [InlineData("8/8/8/8/4Pk2/8/8/4K3 b - - 0 1")] // Level 1
     [InlineData("8/8/1b6/8/4Pk2/8/8/4K3 b - - 0 1")] // Level 2
     [InlineData("8/8/8/8/1B1bPk2/8/8/4K3 b - - 0 1")] // Level 3
+    [InlineData("8/8/8/8/1n1nPk2/8/8/4K3 b - - 0 1")] // Level 3
     public void EndGame_InsufficientMaterial(string fen)
     {
         var board = ChessBoard.LoadFromFen(fen);
         board.Move("Kxe4");
 
-        Assert.True(board.IsEndGame);
         Assert.Equal(EndgameType.InsufficientMaterial, board.EndGame.EndgameType);
     }
 
@@ -23,13 +31,13 @@ public class EndGameTests
     [InlineData("8/8/8/8/1Bb1Pk2/8/8/4K3 b - - 0 1")]
     [InlineData("8/8/6r1/8/1B2Pk2/8/8/4K3 b - - 0 1")]
     [InlineData("8/8/8/8/1B2Pk2/2B5/8/4K3 b - - 0 1")]
+    [InlineData("8/8/8/8/1n1NPk2/8/8/4K3 b - - 0 1")]
     public void EndGame_InsufficientMaterial_Ignored(string fen)
     {
         var board = ChessBoard.LoadFromFen(fen);
         board.Move("Kxe4");
 
         Assert.False(board.IsEndGame);
-        Assert.Null(board.EndGame);
     }
 
     [Theory] // Anna Ushenina vs Olga Girya
