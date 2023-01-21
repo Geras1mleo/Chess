@@ -23,7 +23,7 @@ public class EndGameTests
     [InlineData("8/8/8/8/1Bb1Pk2/8/8/4K3 b - - 0 1")]
     [InlineData("8/8/6r1/8/1B2Pk2/8/8/4K3 b - - 0 1")]
     [InlineData("8/8/8/8/1B2Pk2/2B5/8/4K3 b - - 0 1")]
-    public void EndGame_InsufficientMaterial_NotTriggered(string fen)
+    public void EndGame_InsufficientMaterial_Ignored(string fen)
     {
         var board = ChessBoard.LoadFromFen(fen);
         board.Move("Kxe4");
@@ -32,115 +32,79 @@ public class EndGameTests
         Assert.Null(board.EndGame);
     }
 
-    [Fact]
-    public void EndGame_Move50Rule()
+    [Theory] // Anna Ushenina vs Olga Girya
+    [InlineData("8/8/1N6/5B2/8/4K3/8/2k5 w - - 97 121", "Na4", "Kd1", "Nb2+")]
+    [InlineData("8/8/8/5B2/2N5/3K4/8/3k4 b - - 104 124")]
+    public void EndGame_FiftyMoveRule(string fen, params string[] moves)
     {
-        // todo
+        var board = ChessBoard.LoadFromFen(fen);
+
+        foreach (var move in moves)
+            board.Move(move);
+
+        Assert.Equal(EndgameType.FiftyMoveRule, board.EndGame.EndgameType);
     }
 
-    [Fact]
-    public void EndGame_Repetition()
+    [Theory]
+    [InlineData("4k2r/8/3b4/8/8/5B2/8/R3K3 w Qk - 0 1", "Be4", "Be5", "Bf3", "Bd6", "Be4", "Be5", "Bf3", "Bd6")]
+    [InlineData("8/pp3p1k/2p2q1p/3r1P2/5R2/7P/P1P1QP2/7K b - - 2 30", "Qe5", "Qh5", "Qf6", "Qe2", "Re5", "Qd3", "Rd5", "Qe2")] // Fischer vs Petrosian
+    public void EndGame_Repetition(string fen, params string[] moves)
     {
-        var board = ChessBoard.LoadFromFen("4k2r/8/3b4/8/8/5B2/8/R3K3 w Qk - 0 1");
+        var board = ChessBoard.LoadFromFen(fen);
 
-        board.Move("Be4");
-        board.Move("Be5");
-
-        board.Move("Bf3");
-        board.Move("Bd6");
-
-        board.Move("Be4");
-        board.Move("Be5");
-
-        board.Move("Bf3");
-        board.Move("Bd6");
+        foreach (var move in moves)
+            board.Move(move);
 
         Assert.Equal(EndgameType.Repetition, board.EndGame.EndgameType);
     }
 
     [Fact]
-    public void EndGame_Repetition_Fischer_vs_Petrosian()
-    {
-        var board = ChessBoard.LoadFromFen("8/pp3p1k/2p2q1p/3r1P2/5R2/7P/P1P1QP2/7K b - - 2 30");
-
-        board.Move("Qe5");
-
-        board.Move("Qh5");
-        board.Move("Qf6");
-
-        board.Move("Qe2");
-        board.Move("Re5");
-
-        board.Move("Qd3");
-        board.Move("Rd5");
-
-        board.Move("Qe2");
-
-        Assert.Equal(EndgameType.Repetition, board.EndGame.EndgameType);
-    }
-
-    [Fact]
-    public void EndGame_Repetition_CastleRightsChanged_With_Repetition()
+    public void EndGame_Repetition_CastleRightsChanged()
     {
         var board = ChessBoard.LoadFromFen("4k2r/8/3b4/8/8/5B2/8/R3K3 w Qk - 0 1");
 
         // Here both kings lose castle rights
-        board.Move("Rb1");
-        board.Move("Rg8");
+        var moves1 = new[] { "Rb1", "Rg8" };
 
         // From here repetition begins
-        board.Move("Ra1");
-        board.Move("Rh8");
+        var moves2 = new[] { "Ra1", "Rh8", "Rb1", "Rg8", "Ra1", "Rh8", "Rb1", "Rg8" };
 
-        board.Move("Rb1");
-        board.Move("Rg8");
+        foreach (var move in moves1)
+            board.Move(move);
 
-        board.Move("Ra1");
-        board.Move("Rh8");
-
-        board.Move("Rb1");
-        board.Move("Rg8");
+        foreach (var move in moves2)
+            board.Move(move);
 
         Assert.Equal(EndgameType.Repetition, board.EndGame.EndgameType);
     }
 
     [Fact]
-    public void EndGame_Repetition_CastleRightsChanged_No_Repetition()
+    public void EndGame_Repetition_Ignored_Due_CastleRightsChanged()
     {
         var board = ChessBoard.LoadFromFen("4k2r/8/3b4/8/8/5B2/8/R3K3 w Qk - 0 1");
 
-        board.Move("Be4");
-        board.Move("Be5");
-
-        board.Move("Bf3");
-        board.Move("Bd6");
+        var moves1 = new[] { "Be4", "Be5", "Bf3", "Bd6" };
 
         // Here both kings lose castle rights
-        board.Move("Rb1");
-        board.Move("Rg8");
+        var moves2 = new[] { "Rb1", "Rg8", "Ra1", "Rh8" };
 
-        board.Move("Ra1");
-        board.Move("Rh8");
+        foreach (var move in moves1)
+            board.Move(move);
+
+        foreach (var move in moves2)
+            board.Move(move);
 
         Assert.False(board.IsEndGame);
     }
 
     [Fact]
-    public void EndGame_Repetition_EnPassant_Possible_Repetition_Is_Ignored()
+    public void EndGame_Repetition_Ignored_Due_EnPassant()
     {
         var board = ChessBoard.LoadFromFen("4k2r/8/8/3Pp3/8/8/8/R3K3 w - e6 0 2");
+        var moves = new[] { "Rb1", "Rg8", "Ra1", "Rh8", "Rb1", "Rg8", "Ra1", "Rh8" };
 
-        board.Move("Rb1");
-        board.Move("Rg8");
-
-        board.Move("Ra1");
-        board.Move("Rh8");
-
-        board.Move("Rb1");
-        board.Move("Rg8");
-
-        board.Move("Ra1");
-        board.Move("Rh8");
+        foreach (var move in moves)
+            board.Move(move);
 
         Assert.False(board.IsEndGame);
     }
