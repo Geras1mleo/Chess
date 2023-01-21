@@ -145,6 +145,25 @@ public class Move
         San = source.San;
     }
 
+    internal Move(Move source)
+    {
+        if (source.Piece is not null)
+            Piece = new Piece(source.Piece);
+
+        OriginalPosition = new Position(source.OriginalPosition.X, source.OriginalPosition.Y); // todo test
+        NewPosition = new Position(source.NewPosition.X, source.NewPosition.Y);
+
+        if (source.CapturedPiece is not null)
+            CapturedPiece = new Piece(source.CapturedPiece);
+
+        if (source.Parameter is not null)
+            Parameter = IMoveParameter.FromString(source.Parameter.ShortStr);
+
+        IsCheck = source.IsCheck;
+        IsMate = source.IsMate;
+        San = source.San;
+    }
+
     /// <summary>
     /// Needed to Generate move from SAN in ChessConversions
     /// </summary>

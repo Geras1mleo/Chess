@@ -49,6 +49,12 @@ public class Piece
         Type = PieceType.FromChar(piece[1]);
     }
 
+    internal Piece(Piece piece)
+    {
+        Color = PieceColor.FromValue(piece.Color.Value);
+        Type = PieceType.FromValue(piece.Type.Value);
+    }
+
     /// <summary>
     /// Initializes new Piece by given color and type as FEN:<br/>
     /// 'Q' => White Queen<br/>

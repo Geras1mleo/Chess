@@ -169,7 +169,7 @@ public partial class ChessBoard
         else if (move.OriginalPosition != move.NewPosition)
         {
             fboard.executedMoves.Add(move);
-            fboard.DropPieceToNewPosition(new(move.ToString())); // todo optimize
+            fboard.DropPieceToNewPosition(new Move(move));
         }
 
         return IsKingChecked(side, fboard);
@@ -207,7 +207,7 @@ public partial class ChessBoard
         if (move.OriginalPosition != move.NewPosition)
         {
             fboard.executedMoves.Add(move);
-            fboard.DropPieceToNewPosition(new(move.ToString()));
+            fboard.DropPieceToNewPosition(new Move(move));
         }
         return PlayerHasMoves(side, fboard);
     }
