@@ -4,7 +4,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<Description>Chess logic made with C# and ♥ by Geras1mleo</Description>
+                <Description>Chess logic made with C# and ♥ by Geras1mleo. SAN and FEN parsing/generation, moves validation, legal positions generations, auto endgame detection (insufficient material, threefold repetition, fifty move rule) and much more!</Description>
 	</PropertyGroup>
 
 	<ItemGroup>
