@@ -70,7 +70,7 @@ public class Move
     }
 
     /// <summary>
-    /// Initalizes new Move from long move notation
+    /// Initializes new Move from long move notation
     /// </summary>
     /// <param name="move">
     /// Move as long string<br/>
@@ -150,7 +150,7 @@ public class Move
         if (source.Piece is not null)
             Piece = new Piece(source.Piece);
 
-        OriginalPosition = new Position(source.OriginalPosition.X, source.OriginalPosition.Y); // todo test
+        OriginalPosition = new Position(source.OriginalPosition.X, source.OriginalPosition.Y);
         NewPosition = new Position(source.NewPosition.X, source.NewPosition.Y);
 
         if (source.CapturedPiece is not null)
