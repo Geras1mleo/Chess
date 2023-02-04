@@ -22,30 +22,24 @@ internal class InsufficientMaterialRule : EndGameRule
     {
         var pieces = board.pieces.PiecesList();
 
-        bool isEndGame = IsFirstLevelDraw(pieces)
-                      || IsSecondLevelDraw(pieces)
-                      || IsThirdLevelDraw(pieces);
-
-        return isEndGame;
+        return IsFirstLevelDraw(pieces)
+            || IsSecondLevelDraw(pieces)
+            || IsThirdLevelDraw(pieces);
     }
 
     private bool IsFirstLevelDraw(List<Piece> pieces)
     {
-        return pieces.Where(p => p.Type != PieceType.King).Count() < 1;
+        return pieces.All(p => p.Type == PieceType.King);
     }
 
     private bool IsSecondLevelDraw(List<Piece> pieces)
     {
-        var isDraw = false;
-        var hasStrongPieces = pieces.Where(p => p.Type == PieceType.Pawn
-                                             || p.Type == PieceType.Queen
-                                             || p.Type == PieceType.Rook).Count() > 0;
+        var hasStrongPieces = pieces.Count(p => p.Type == PieceType.Pawn
+                                                || p.Type == PieceType.Queen
+                                                || p.Type == PieceType.Rook) > 0;
 
         // The only piece remaining will be Bishop or Knight, what results in draw
-        if (!hasStrongPieces && pieces.Where(p => p.Type != PieceType.King).Count() == 1)
-            isDraw = true;
-
-        return isDraw;
+        return !hasStrongPieces && pieces.Count(p => p.Type != PieceType.King) == 1;;
     }
 
     private bool IsThirdLevelDraw(List<Piece> pieces)
