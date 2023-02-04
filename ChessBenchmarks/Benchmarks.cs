@@ -146,6 +146,7 @@ public class ChessGenerateMovesBenchmark
     //  |  MovesSanTrue | 360.5 us | 16.82 us | 47.43 us | 359.3 us |    2 |
 }
 
+[MemoryDiagnoser]
 public class ChessIsValidMoveBenchmark
 {
     [Benchmark]
@@ -258,7 +259,7 @@ public class ChessPgnConversionsBenchmark
     public void PgnConvertion()
     {
         ChessBoard.LoadFromPgn(
-        @"[Event ""Live Chess""]
+            @"[Event ""Live Chess""]
         [Site ""Chess.com""]
         [Date ""2022.01.11""]
         [Round ""?""]
@@ -278,7 +279,7 @@ public class ChessPgnConversionsBenchmark
         21.cxb4 1-0");
 
         ChessBoard.LoadFromPgn(
-        @"[Event ""Live Chess""]
+            @"[Event ""Live Chess""]
         [Site ""Chess.com""]
         [Date ""2022.01.03""]
         [Round ""?""]
@@ -330,5 +331,37 @@ public class ChessPgnConversionsBenchmark
     //  |        Method |     Mean |     Error |    StdDev |    Gen 0 | Allocated |
     //  |-------------- |---------:|----------:|----------:|---------:|----------:|
     //  | PgnConvertion | 2.176 ms | 0.1057 ms | 0.3101 ms | 761.7188 |      2 MB |
+}
 
+[MemoryDiagnoser]
+public class ChessOverallBenchmark
+{
+    [Benchmark]
+    public void SampleGame()
+    {
+        var board = ChessBoard.LoadFromPgn(@"
+        [White ""AG1612""]
+        [Black ""GrafLermontov""]
+        [Variant ""From Position""]
+        [FEN ""r2k3r/ppp1bpp1/2p1b3/4PnNp/5B2/2N4P/PPP2PP1/R4RK1 b - - 1 12""]
+        12... Ke8 13. Rad1 Rh6 14. Nce4 Bd5 15. b3 Rg6 16. c4 Be6", AutoEndgameRules.All);
+
+        var moves = new[] { "Nxe6", "fxe6", "Kh2", "Rd8", "g3", "Nd4", "Rd3", "c5", "Rfd1", "Nf3+", "Kg2", "Rxd3" };
+
+        foreach (var move in moves)
+        {
+            var generatedMoves = board.Moves();
+            var succeed = board.Move(move);
+        }
+
+        board.Resign(PieceColor.White);
+
+        var pgn = board.ToPgn();
+        var fen = board.ToFen();
+    }
+    
+    // 4/02/2022
+    // |     Method |     Mean |     Error |    StdDev |   Gen 0 |   Gen 1 | Allocated |
+    // |----------- |---------:|----------:|----------:|--------:|--------:|----------:|
+    // | SampleGame | 4.711 ms | 0.0670 ms | 0.0594 ms | 93.7500 | 31.2500 |      5 MB |
 }
