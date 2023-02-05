@@ -17,6 +17,7 @@ internal class FenBoardBuilder
     /// "Begin Situation"
     /// </summary>
     internal Piece?[,] Pieces => (Piece?[,])pieces.Clone();
+
     internal PieceColor Turn { get; private set; }
 
     internal bool CastleWK { get; private set; }
@@ -30,6 +31,7 @@ internal class FenBoardBuilder
     /// Count since the last pawn advance or piece capture
     /// </summary>
     internal int HalfMoves { get; private set; }
+
     /// <summary>
     /// Black moves Count
     /// </summary>
@@ -77,6 +79,7 @@ internal class FenBoardBuilder
                             x = 0;
                             continue;
                         }
+
                         if (x < 8)
                             if (char.IsLetter(group.Value[i]))
                             {
@@ -86,6 +89,7 @@ internal class FenBoardBuilder
                             else if (char.IsDigit(group.Value[i]))
                                 x += int.Parse(group.Value[i].ToString());
                     }
+
                     break;
                 case "3":
                     builder.Turn = PieceColor.FromChar(group.Value[0]);
@@ -102,6 +106,7 @@ internal class FenBoardBuilder
                         if (group.Value.Contains('q'))
                             builder.CastleBQ = true;
                     }
+
                     break;
                 case "5":
                     if (group.Value == "-")
@@ -124,46 +129,47 @@ internal class FenBoardBuilder
     {
         var whiteCaptured = new List<Piece>();
         var blackCaptured = new List<Piece>();
-        var counts = new Dictionary<PieceType, int> { { PieceType.Pawn, 8 }, { PieceType.Rook, 2 }, { PieceType.Bishop, 2 }, { PieceType.Knight, 2 }, { PieceType.Queen, 1 } };
+        var counts = (white: new Dictionary<PieceType, int>
+                { { PieceType.Pawn, 0 }, { PieceType.Rook, 0 }, { PieceType.Bishop, 0 }, { PieceType.Knight, 0 }, { PieceType.Queen, 0 }, {PieceType.King , 0} },
+            black: new Dictionary<PieceType, int>
+                { { PieceType.Pawn, 0 }, { PieceType.Rook, 0 }, { PieceType.Bishop, 0 }, { PieceType.Knight, 0 }, { PieceType.Queen, 0 }, {PieceType.King , 0} });
 
         foreach (var piece in builder.pieces!.PiecesSpan())
         {
-            if (counts.ContainsKey(piece.Type))
+            if (piece.Color == PieceColor.White)
             {
-                counts[piece.Type]--;
+                counts.white[piece.Type]++;
+            }
+            else
+            {
+                counts.black[piece.Type]++;
             }
         }
 
-        for (var i = 0; i < counts[PieceType.Pawn]; i++)
-        {
-            whiteCaptured.Add(new Piece(PieceColor.White, PieceType.Pawn));
-            blackCaptured.Add(new Piece(PieceColor.Black, PieceType.Pawn));
-        }
-        for (var i = 0; i < counts[PieceType.Rook]; i++)
-        {
-            whiteCaptured.Add(new Piece(PieceColor.White, PieceType.Rook));
-            blackCaptured.Add(new Piece(PieceColor.Black, PieceType.Rook));
-        }
-        for (var i = 0; i < counts[PieceType.Bishop]; i++)
-        {
-            whiteCaptured.Add(new Piece(PieceColor.White, PieceType.Bishop));
-            blackCaptured.Add(new Piece(PieceColor.Black, PieceType.Bishop));
-        }
-        for (var i = 0; i < counts[PieceType.Knight]; i++)
-        {
-            whiteCaptured.Add(new Piece(PieceColor.White, PieceType.Knight));
-            blackCaptured.Add(new Piece(PieceColor.Black, PieceType.Knight));
-        }
-        for (var i = 0; i < counts[PieceType.Queen]; i++)
-        {
-            whiteCaptured.Add(new Piece(PieceColor.White, PieceType.Queen));
-            blackCaptured.Add(new Piece(PieceColor.Black, PieceType.Queen));
-        }
-        
+        AddPiecesToList(whiteCaptured, PieceColor.White, PieceType.Pawn, counts.white[PieceType.Pawn], 8);
+        AddPiecesToList(whiteCaptured, PieceColor.White, PieceType.Rook, counts.white[PieceType.Rook], 2);
+        AddPiecesToList(whiteCaptured, PieceColor.White, PieceType.Bishop, counts.white[PieceType.Bishop], 2);
+        AddPiecesToList(whiteCaptured, PieceColor.White, PieceType.Knight, counts.white[PieceType.Knight], 2);
+        AddPiecesToList(whiteCaptured, PieceColor.White, PieceType.Queen, counts.white[PieceType.Queen], 1);
+
+        AddPiecesToList(blackCaptured, PieceColor.Black, PieceType.Pawn, counts.black[PieceType.Pawn], 8);
+        AddPiecesToList(blackCaptured, PieceColor.Black, PieceType.Rook, counts.black[PieceType.Rook], 2);
+        AddPiecesToList(blackCaptured, PieceColor.Black, PieceType.Bishop, counts.black[PieceType.Bishop], 2);
+        AddPiecesToList(blackCaptured, PieceColor.Black, PieceType.Knight, counts.black[PieceType.Knight], 2);
+        AddPiecesToList(blackCaptured, PieceColor.Black, PieceType.Queen, counts.black[PieceType.Queen], 1);
+
         builder.WhiteCaptured = whiteCaptured.ToArray();
         builder.BlackCaptured = blackCaptured.ToArray();
     }
-    
+
+    private static void AddPiecesToList(List<Piece> captured, PieceColor color, PieceType type, int actualCount, int targetCount)
+    {
+        for (int i = actualCount; i < targetCount; i++)
+        {
+            captured.Add(new Piece(color, type));
+        }
+    }
+
     internal static FenBoardBuilder Load(ChessBoard board)
     {
         return new FenBoardBuilder(board.pieces)
@@ -197,9 +203,11 @@ internal class FenBoardBuilder
                         piecesBuilder.Append(emptyCount);
                         emptyCount = 0;
                     }
+
                     piecesBuilder.Append(pieces[i, j].ToFenChar());
                 }
             }
+
             if (emptyCount > 0)
                 piecesBuilder.Append(emptyCount);
             if (i - 1 >= 0)
