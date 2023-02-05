@@ -25,15 +25,48 @@ internal static class Extensions
     {
         var list = new List<Piece>();
 
-        for(int i = 0; i < pieces.GetLength(0); i++)
+        for (int i = 0; i < pieces.GetLength(0); i++)
         {
-            for(int j = 0; j < pieces.GetLength(1); j++)
+            for (int j = 0; j < pieces.GetLength(1); j++)
             {
-                if(pieces[i,j] is not null)
-                    list.Add(pieces[i,j]);
+                if (pieces[i, j] is not null)
+                    list.Add(pieces[i, j]);
             }
         }
 
         return list;
+    }
+
+    public static Span<Piece> PiecesSpan(this Piece[,] pieces)
+    {
+        var piecesLength1 = pieces.GetLength(0);
+        var piecesLength2 = pieces.GetLength(1);
+
+        int nonNullCount = 0;
+        for (int i = 0; i < piecesLength1; i++)
+        {
+            for (int j = 0; j < piecesLength2; j++)
+            {
+                if (pieces[i, j] != null)
+                {
+                    nonNullCount++;
+                }
+            }
+        }
+
+        var piecesFlat = new Piece[nonNullCount];
+        int index = 0;
+        for (int i = 0; i < piecesLength1 && index < piecesFlat.Length; i++)
+        {
+            for (int j = 0; j < piecesLength2 && index < piecesFlat.Length; j++)
+            {
+                if (pieces[i, j] != null)
+                {
+                    piecesFlat[index++] = pieces[i, j];
+                }
+            }
+        }
+
+        return new Span<Piece>(piecesFlat);
     }
 }
