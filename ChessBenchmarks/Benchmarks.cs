@@ -256,7 +256,7 @@ public class ChessFenConversionsBenchmark
 public class ChessPgnConversionsBenchmark
 {
     [Benchmark]
-    public void PgnConvertion()
+    public void PgnConversion()
     {
         ChessBoard.LoadFromPgn(
             @"[Event ""Live Chess""]
@@ -308,29 +308,29 @@ public class ChessPgnConversionsBenchmark
     //  20/02/2022 => before optimizations
     //  |        Method |     Mean |     Error |    StdDev |     Gen 0 | Allocated |
     //  |-------------- |---------:|----------:|----------:|----------:|----------:|
-    //  | PgnConvertion | 8.115 ms | 0.3013 ms | 0.8836 ms | 2179.6875 |      4 MB |
+    //  | PgnConversion | 8.115 ms | 0.3013 ms | 0.8836 ms | 2179.6875 |      4 MB |
     //
     //  20/02/2022 => after optimizations Regex cached and compiled
     //  |        Method |     Mean |     Error |   StdDev |     Gen 0 | Allocated |
     //  |-------------- |---------:|----------:|---------:|----------:|----------:|
-    //  | PgnConvertion | 6.876 ms | 0.3544 ms | 1.045 ms | 2179.6875 |      4 MB |
+    //  | PgnConversion | 6.876 ms | 0.3544 ms | 1.045 ms | 2179.6875 |      4 MB |
     // 
     //  20/02/2022 => after optimizations San with StringBuilder
     //  |        Method |     Mean |     Error |    StdDev |     Gen 0 | Allocated |
     //  |-------------- |---------:|----------:|----------:|----------:|----------:|
-    //  | PgnConvertion | 7.360 ms | 0.2578 ms | 0.7601 ms | 2195.3125 |      4 MB |
+    //  | PgnConversion | 7.360 ms | 0.2578 ms | 0.7601 ms | 2195.3125 |      4 MB |
     // 
     //  Conclusion: still too much memory usage
     //
     //  27/02/2022 => 
     //  |        Method |     Mean |     Error |    StdDev |     Gen 0 | Allocated |
     //  |-------------- |---------:|----------:|----------:|----------:|----------:|
-    //  | PgnConvertion | 7.918 ms | 0.2930 ms | 0.8641 ms | 2562.5000 |      5 MB |
+    //  | PgnConversion | 7.918 ms | 0.2930 ms | 0.8641 ms | 2562.5000 |      5 MB |
     //
     //  1/06/2022 => HOLLY SHIT THAT ONE IS GOOOOD
     //  |        Method |     Mean |     Error |    StdDev |    Gen 0 | Allocated |
     //  |-------------- |---------:|----------:|----------:|---------:|----------:|
-    //  | PgnConvertion | 2.176 ms | 0.1057 ms | 0.3101 ms | 761.7188 |      2 MB |
+    //  | PgnConversion | 2.176 ms | 0.1057 ms | 0.3101 ms | 761.7188 |      2 MB |
 }
 
 [MemoryDiagnoser]
@@ -359,9 +359,14 @@ public class ChessOverallBenchmark
         var pgn = board.ToPgn();
         var fen = board.ToFen();
     }
-    
+
     // 4/02/2022
     // |     Method |     Mean |     Error |    StdDev |   Gen 0 |   Gen 1 | Allocated |
     // |----------- |---------:|----------:|----------:|--------:|--------:|----------:|
     // | SampleGame | 4.711 ms | 0.0670 ms | 0.0594 ms | 93.7500 | 31.2500 |      5 MB |
+    //
+    // 4/02/2022 => after some changes
+    // |     Method |     Mean |     Error |    StdDev |   Gen 0 |   Gen 1 | Allocated |
+    // |----------- |---------:|----------:|----------:|--------:|--------:|----------:|
+    // | SampleGame | 4.906 ms | 0.0906 ms | 0.0847 ms | 93.7500 | 31.2500 |      5 MB |
 }
