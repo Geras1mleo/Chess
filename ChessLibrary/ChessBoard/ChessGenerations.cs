@@ -316,9 +316,10 @@ public partial class ChessBoard
 
             while (x >= 0 && x < 8 && y >= 0 && y < 8)
             {
-                if (board[x, y] is not null && board[x, y].Color != board[piecePosition].Color)
+                if (board[x, y] is not null)
                 {
-                    positions.Add(new Position() { X = x, Y = y });
+                    if (board[x, y]!.Color != board[piecePosition]!.Color)
+                        positions.Add(new Position() { X = x, Y = y });
                     break;
                 }
 
