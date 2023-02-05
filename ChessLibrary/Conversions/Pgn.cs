@@ -25,10 +25,11 @@ public partial class ChessBoard
     /// </summary>
     /// <param name="pgn">PGN string to load</param>
     /// <param name="board">Result with loaded board</param>
+    /// <param name="autoEndgameRules">Automatic draw/endgame rules that will be used to check for endgame</param>
     /// <returns>Whether load is succeeded</returns>
-    public static bool TryLoadFromPgn(string pgn, [NotNullWhen(true)] out ChessBoard? board)
+    public static bool TryLoadFromPgn(string pgn, [NotNullWhen(true)] out ChessBoard? board, AutoEndgameRules autoEndgameRules = AutoEndgameRules.None)
     {
-        return PgnBuilder.TryLoad(pgn, out board).succeeded;
+        return PgnBuilder.TryLoad(pgn, out board, autoEndgameRules).succeeded;
     }
 
     /// <summary>
@@ -44,14 +45,15 @@ public partial class ChessBoard
     /// 1. e4 e5 2. Nf3 Nf6 3...
     /// </summary>
     /// <param name="pgn">PGN string to load</param>
+    /// <param name="autoEndgameRules">Automatic draw/endgame rules that will be used to check for endgame</param>
     /// <returns>ChessBoard with according positions</returns>
     /// <exception cref="ChessArgumentException">Given FEN string didn't match the Regex pattern (if PGN contains FEN in header)</exception>
     /// <exception cref="ChessArgumentException">Given San-notated move didn't match the Regex pattern</exception>
     /// <exception cref="ChessSanNotFoundException">Given San-notated move is not valid for current board positions</exception>
     /// <exception cref="ChessSanTooAmbiguousException">Given San-notated move is too ambiguous between multiple moves</exception>
-    public static ChessBoard LoadFromPgn(string pgn)
+    public static ChessBoard LoadFromPgn(string pgn, AutoEndgameRules autoEndgameRules = AutoEndgameRules.None)
     {
-        var (succeeded, exception) = PgnBuilder.TryLoad(pgn, out var board);
+        var (succeeded, exception) = PgnBuilder.TryLoad(pgn, out var board, autoEndgameRules);
 
         if (!succeeded && exception is not null)
             throw exception;

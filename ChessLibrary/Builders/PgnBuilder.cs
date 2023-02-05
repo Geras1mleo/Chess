@@ -11,9 +11,12 @@ namespace Chess;
 
 internal static class PgnBuilder
 {
-    public static (bool succeeded, ChessException? exception) TryLoad(string pgn, out ChessBoard? board)
+    public static (bool succeeded, ChessException? exception) TryLoad(string pgn, out ChessBoard? board, AutoEndgameRules autoEndgameRules)
     {
-        board = new();
+        board = new ChessBoard()
+        {
+            AutoEndgameRules = autoEndgameRules
+        };
 
         var headersMatches = Regexes.regexHeaders.Matches(pgn);
 
@@ -26,7 +29,7 @@ internal static class PgnBuilder
                 // Groups[1] = Black
                 // Groups[2] = Geras1mleo
                 board.headers.Add(headersMatches[i].Groups[1].Value,
-                                  headersMatches[i].Groups[2].Value);
+                    headersMatches[i].Groups[2].Value);
             }
         }
 
