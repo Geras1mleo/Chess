@@ -24,13 +24,11 @@ public partial class ChessBoard
             throw new ChessPieceNotFoundException(this, piecePosition);
 
         var moves = new List<Move>();
-        Move move;
-
         var positions = GeneratePositions(piecePosition, this);
 
-        for (int i = 0; i < positions.Length; i++)
+        foreach (var position in positions)
         {
-            move = new(piecePosition, positions[i]);
+            Move move = new(piecePosition, position);
 
             if (!IsValidMove(move, this, false, true))
             {
@@ -65,8 +63,7 @@ public partial class ChessBoard
 
     private void AddPromotionMoves(List<Move> moves, Move move, bool generateSan)
     {
-        // IsCheck and IsMate depends on promotion type so we have to check again for each promotion type
-
+        // IsCheck and IsMate depends on promotion type so we have to reset those properties for each promotion type
         var promotions = new PromotionType[]
         {
             PromotionType.ToQueen,
@@ -106,25 +103,24 @@ public partial class ChessBoard
         {
             for (short j = 0; j < 8; j++)
             {
-                if (pieces[i, j] is null)
-                    continue;
-
-                short x = j;
-                short y = i;
-
-                tasks.Add(Task.Run(() =>
+                if (pieces[i, j] is not null)
                 {
-                    var generatedMoves = Moves(new Position { Y = y, X = x }, allowAmbiguousCastle, generateSan);
-                    foreach (var move in generatedMoves)
+                    short x = j;
+                    short y = i;
+
+                    tasks.Add(Task.Run(() =>
                     {
-                        moves.Add(move);
-                    }
-                }));
+                        var generatedMoves = Moves(new Position { Y = y, X = x }, allowAmbiguousCastle, generateSan);
+                        foreach (var move in generatedMoves)
+                        {
+                            moves.Add(move);
+                        }
+                    }));
+                }
             }
         }
 
         Task.WaitAll(tasks.ToArray());
-
         return moves.ToArray();
     }
 
@@ -174,36 +170,11 @@ public partial class ChessBoard
 
     private static void GenerateKingPositions(Position piecePosition, ChessBoard board, List<Position> positions)
     {
-        if (piecePosition.Y + 1 < 8)
-        {
-            positions.Add(new Position() { X = piecePosition.X, Y = (short)(piecePosition.Y + 1) });
-
-            if (piecePosition.X + 1 < 8)
-                positions.Add(new Position() { X = (short)(piecePosition.X + 1), Y = (short)(piecePosition.Y + 1) });
-
-            if (piecePosition.X - 1 > -1)
-                positions.Add(new Position() { X = (short)(piecePosition.X - 1), Y = (short)(piecePosition.Y + 1) });
-        }
-        if (piecePosition.Y - 1 > -1)
-        {
-            positions.Add(new Position() { X = piecePosition.X, Y = (short)(piecePosition.Y - 1) });
-
-            if (piecePosition.X + 1 < 8)
-                positions.Add(new Position() { X = (short)(piecePosition.X + 1), Y = (short)(piecePosition.Y - 1) });
-
-            if (piecePosition.X - 1 > -1)
-                positions.Add(new Position() { X = (short)(piecePosition.X - 1), Y = (short)(piecePosition.Y - 1) });
-        }
-        if (piecePosition.X + 1 < 8)
-        {
-            positions.Add(new Position() { X = (short)(piecePosition.X + 1), Y = piecePosition.Y });
-        }
-        if (piecePosition.X - 1 > -1)
-        {
-            positions.Add(new Position() { X = (short)(piecePosition.X - 1), Y = piecePosition.Y });
-        }
-
-        positions.RemoveAll(p => !(board[p] is null || board[p].Color != board[piecePosition].Color));
+        for (short x = (short)Math.Max(0, piecePosition.X - 1); x <= Math.Min(7, piecePosition.X + 1); x++)
+        for (short y = (short)Math.Max(0, piecePosition.Y - 1); y <= Math.Min(7, piecePosition.Y + 1); y++)
+            if (x != piecePosition.X || y != piecePosition.Y)
+                if (board[x, y] == null || board[x, y].Color != board[piecePosition].Color)
+                    positions.Add(new Position(x, y));
 
         if (piecePosition.Y % 7 == 0 && piecePosition.X == 4)
         {
@@ -231,174 +202,131 @@ public partial class ChessBoard
 
     private static void GenerateKnightPositions(Position piecePosition, ChessBoard board, List<Position> positions)
     {
-        if (piecePosition.X + 2 < 8)
+        short x = piecePosition.X;
+        short y = piecePosition.Y;
+        Position[] possiblePositions =
         {
-            if (piecePosition.Y + 1 < 8)
-                positions.Add(new Position() { X = (short)(piecePosition.X + 2), Y = (short)(piecePosition.Y + 1) });
+            new((short)(x + 2), (short)(y + 1)),
+            new((short)(x + 2), (short)(y - 1)),
+            new((short)(x - 2), (short)(y + 1)),
+            new((short)(x - 2), (short)(y - 1)),
+            new((short)(x + 1), (short)(y + 2)),
+            new((short)(x + 1), (short)(y - 2)),
+            new((short)(x - 1), (short)(y + 2)),
+            new((short)(x - 1), (short)(y - 2))
+        };
 
-            if (piecePosition.Y - 1 > -1)
-                positions.Add(new Position() { X = (short)(piecePosition.X + 2), Y = (short)(piecePosition.Y - 1) });
-        }
-        if (piecePosition.X - 2 > -1)
+        foreach (var pos in possiblePositions)
         {
-            if (piecePosition.Y + 1 < 8)
-                positions.Add(new Position() { X = (short)(piecePosition.X - 2), Y = (short)(piecePosition.Y + 1) });
-
-            if (piecePosition.Y - 1 > -1)
-                positions.Add(new Position() { X = (short)(piecePosition.X - 2), Y = (short)(piecePosition.Y - 1) });
+            if (pos.X >= 0 && pos.X < 8 && pos.Y >= 0 && pos.Y < 8)
+            {
+                if (board[pos] is null || board[pos].Color != board[piecePosition].Color)
+                {
+                    positions.Add(pos);
+                }
+            }
         }
-        if (piecePosition.X + 1 < 8)
-        {
-            if (piecePosition.Y + 2 < 8)
-                positions.Add(new Position() { X = (short)(piecePosition.X + 1), Y = (short)(piecePosition.Y + 2) });
-
-            if (piecePosition.Y - 2 > -1)
-                positions.Add(new Position() { X = (short)(piecePosition.X + 1), Y = (short)(piecePosition.Y - 2) });
-        }
-        if (piecePosition.X - 1 > -1)
-        {
-            if (piecePosition.Y + 2 < 8)
-                positions.Add(new Position() { X = (short)(piecePosition.X - 1), Y = (short)(piecePosition.Y + 2) });
-
-            if (piecePosition.Y - 2 > -1)
-                positions.Add(new Position() { X = (short)(piecePosition.X - 1), Y = (short)(piecePosition.Y - 2) });
-        }
-
-        positions.RemoveAll(p => !(board[p] is null || board[p].Color != board[piecePosition].Color));
     }
+
 
     private static void GeneratePawnPositions(Position piecePosition, ChessBoard board, List<Position> positions)
     {
         short step = (short)(board[piecePosition].Color == PieceColor.White ? 1 : -1);
 
-        if (board[piecePosition.X, (short)(piecePosition.Y + step)] is null)
-            positions.Add(new Position() { X = piecePosition.X, Y = (short)(piecePosition.Y + step) });
+        var x = piecePosition.X;
+        var y = piecePosition.Y;
 
-        if (piecePosition.X + 1 < 8)
-            if (board[(short)(piecePosition.X + 1), (short)(piecePosition.Y + step)] is not null
-             && board[(short)(piecePosition.X + 1), (short)(piecePosition.Y + step)].Color != board[piecePosition].Color)
-                positions.Add(new Position() { X = (short)(piecePosition.X + 1), Y = (short)(piecePosition.Y + step) });
+        short nextY = (short)(y + step);
 
-            else if (IsValidEnPassant(new Move(piecePosition, new Position() { Y = (short)(piecePosition.Y + step), X = (short)(piecePosition.X + 1) }) { Piece = board[piecePosition] }, board, step, 1))
-                positions.Add(new Position() { X = (short)(piecePosition.X + 1), Y = (short)(piecePosition.Y + step) });
+        if (board[x, nextY] is null)
+            positions.Add(new Position() { X = x, Y = nextY });
 
-        if (piecePosition.X - 1 > -1)
-            if (board[(short)(piecePosition.X - 1), (short)(piecePosition.Y + step)] is not null
-             && board[(short)(piecePosition.X - 1), (short)(piecePosition.Y + step)].Color != board[piecePosition].Color)
-                positions.Add(new Position() { X = (short)(piecePosition.X - 1), Y = (short)(piecePosition.Y + step) });
+        short rightX = (short)(x + 1);
+        if (rightX < 8)
+        {
+            if (board[rightX, nextY] is not null && board[rightX, nextY].Color != board[piecePosition].Color)
+                positions.Add(new Position() { X = rightX, Y = nextY });
 
-            else if (IsValidEnPassant(new Move(piecePosition, new Position() { Y = (short)(piecePosition.Y + step), X = (short)(piecePosition.X - 1) }) { Piece = board[piecePosition] }, board, step, -1))
-                positions.Add(new Position() { X = (short)(piecePosition.X - 1), Y = (short)(piecePosition.Y + step) });
+            else if (IsValidEnPassant(new Move(piecePosition, new Position() { Y = nextY, X = rightX }) { Piece = board[piecePosition] }, board, step, 1))
+                positions.Add(new Position() { X = rightX, Y = nextY });
+        }
 
+        short leftX = (short)(x - 1);
+        if (leftX > -1)
+        {
+            if (board[leftX, nextY] is not null && board[leftX, nextY].Color != board[piecePosition].Color)
+                positions.Add(new Position() { X = leftX, Y = nextY });
+
+            else if (IsValidEnPassant(new Move(piecePosition, new Position() { Y = nextY, X = leftX }) { Piece = board[piecePosition] }, board, step, -1))
+                positions.Add(new Position() { X = leftX, Y = nextY });
+        }
 
         // 2 forward
-        if (((piecePosition.Y == 1 && board[piecePosition].Color == PieceColor.White) || (piecePosition.Y == 6 && board[piecePosition].Color == PieceColor.Black))
-            && board[piecePosition.X, (short)(piecePosition.Y + step)] is null
-            && board[piecePosition.X, (short)(piecePosition.Y + (step * 2))] is null)
-            positions.Add(new Position() { X = piecePosition.X, Y = (short)(piecePosition.Y + (step * 2)) });
+        if ((y == 1 && board[piecePosition].Color == PieceColor.White || y == 6 && board[piecePosition].Color == PieceColor.Black)
+            && board[x, nextY] is null
+            && board[x, (short)(y + step * 2)] is null)
+            positions.Add(new Position() { X = x, Y = (short)(y + step * 2) });
     }
+
+    // Directions for which the bishop can move
+    private static readonly List<(short x, short y)> BishopDirections = new() { (1, 1), (1, -1), (-1, 1), (-1, -1) };
 
     private static void GenerateBishopPositions(Position piecePosition, ChessBoard board, List<Position> positions)
     {
-        for (short i = (short)(piecePosition.Y + 1), j = (short)(piecePosition.X + 1); i < 8 && j < 8; i++, j++)
+        // Iterate through each direction
+        foreach (var direction in BishopDirections)
         {
-            if (board[j, i] is not null)
+            // Start at the current piece position and move in the current direction
+            var currentPosition = (x: (short)(piecePosition.X + direction.x), y: (short)(piecePosition.Y + direction.y));
+
+            // Loop until the end of the board is reached or a piece is encountered
+            while (currentPosition.x >= 0 && currentPosition.x < 8 && currentPosition.y >= 0 && currentPosition.y < 8)
             {
-                if (board[j, i].Color != board[piecePosition].Color)
-                    positions.Add(new Position() { X = j, Y = i });
+                // Check if the current position has a piece
+                var currentPiece = board[currentPosition.x, currentPosition.y];
+                if (currentPiece != null)
+                {
+                    // If the current piece is not of the same color as the original piece, add it to the list of positions
+                    if (currentPiece.Color != board[piecePosition].Color)
+                        positions.Add(new Position() { X = currentPosition.x, Y = currentPosition.y });
 
-                break;
+                    // Break out of the loop
+                    break;
+                }
+
+                // Add the current position to the list of positions
+                positions.Add(new Position() { X = currentPosition.x, Y = currentPosition.y });
+
+                // Move to the next position in the current direction
+                currentPosition.x += direction.x;
+                currentPosition.y += direction.y;
             }
-
-            positions.Add(new Position() { X = j, Y = i });
-        }
-        for (short i = (short)(piecePosition.Y - 1), j = (short)(piecePosition.X + 1); i > -1 && j < 8; i--, j++)
-        {
-            if (board[j, i] is not null)
-            {
-                if (board[j, i].Color != board[piecePosition].Color)
-                    positions.Add(new Position() { X = j, Y = i });
-
-                break;
-            }
-
-            positions.Add(new Position() { X = j, Y = i });
-        }
-        for (short i = (short)(piecePosition.Y + 1), j = (short)(piecePosition.X - 1); i < 8 && j > -1; i++, j--)
-        {
-            if (board[j, i] is not null)
-            {
-                if (board[j, i].Color != board[piecePosition].Color)
-                    positions.Add(new Position() { X = j, Y = i });
-
-                break;
-            }
-
-            positions.Add(new Position() { X = j, Y = i });
-        }
-        for (short i = (short)(piecePosition.Y - 1), j = (short)(piecePosition.X - 1); i > -1 && j > -1; i--, j--)
-        {
-            if (board[j, i] is not null)
-            {
-                if (board[j, i].Color != board[piecePosition].Color)
-                    positions.Add(new Position() { X = j, Y = i });
-
-                break;
-            }
-
-            positions.Add(new Position() { X = j, Y = i });
         }
     }
 
+    // Directions for which the rook can move
+    private static readonly List<(short x, short y)> RookDirections = new() { (0, 1), (1, 0), (0, -1), (-1, 0) };
+
     private static void GenerateRookPositions(Position piecePosition, ChessBoard board, List<Position> positions)
     {
-        for (short i = (short)(piecePosition.X + 1); i < 8; i++)
+        foreach (var direction in RookDirections)
         {
-            if (board[i, piecePosition.Y] is not null)
+            short x = (short)(piecePosition.X + direction.x);
+            short y = (short)(piecePosition.Y + direction.y);
+
+            while (x >= 0 && x < 8 && y >= 0 && y < 8)
             {
-                if (board[i, piecePosition.Y].Color != board[piecePosition].Color)
-                    positions.Add(new Position() { X = i, Y = piecePosition.Y });
+                if (board[x, y] is not null && board[x, y].Color != board[piecePosition].Color)
+                {
+                    positions.Add(new Position() { X = x, Y = y });
+                    break;
+                }
 
-                break;
+                positions.Add(new Position() { X = x, Y = y });
+
+                x += direction.x;
+                y += direction.y;
             }
-
-            positions.Add(new Position() { X = i, Y = piecePosition.Y });
-        }
-        for (short i = (short)(piecePosition.Y + 1); i < 8; i++)
-        {
-            if (board[piecePosition.X, i] is not null)
-            {
-                if (board[piecePosition.X, i].Color != board[piecePosition].Color)
-                    positions.Add(new Position() { X = piecePosition.X, Y = i });
-
-                break;
-            }
-
-            positions.Add(new Position() { X = piecePosition.X, Y = i });
-        }
-        for (short i = (short)(piecePosition.X - 1); i > -1; i--)
-        {
-            if (board[i, piecePosition.Y] is not null)
-            {
-                if (board[i, piecePosition.Y].Color != board[piecePosition].Color)
-                    positions.Add(new Position() { X = i, Y = piecePosition.Y });
-
-                break;
-            }
-
-            positions.Add(new Position() { X = i, Y = piecePosition.Y });
-        }
-        for (short i = (short)(piecePosition.Y - 1); i > -1; i--)
-        {
-            if (board[piecePosition.X, i] is not null)
-            {
-                if (board[piecePosition.X, i].Color != board[piecePosition].Color)
-                    positions.Add(new Position() { X = piecePosition.X, Y = i });
-
-                break;
-            }
-
-            positions.Add(new Position() { X = piecePosition.X, Y = i });
         }
     }
 }
