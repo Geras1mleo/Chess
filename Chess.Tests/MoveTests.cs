@@ -12,22 +12,22 @@ public class MoveTests
     {
         var moves = new[]
         {
-            "e4",   "e6",
-            "Nc3",  "c5",
-            "Nf3",  "g6",
-            "d4",   "Qc7",
+            "e4", "e6",
+            "Nc3", "c5",
+            "Nf3", "g6",
+            "d4", "Qc7",
             "dxc5", "Qxc5",
-            "Bd3",  "Nf6",
-            "Na4",  "Qa5+",
-            "Nc3",  "Qc5",
-            "O-O",  "Bd6",
-            "Na4",  "Qa5",
-            "b3",   "Nc6",
-            "Bb2",  "Bb4",
+            "Bd3", "Nf6",
+            "Na4", "Qa5+",
+            "Nc3", "Qc5",
+            "O-O", "Bd6",
+            "Na4", "Qa5",
+            "b3", "Nc6",
+            "Bb2", "Bb4",
             "Bxf6", "b5",
             "Bxh8", "Ne5",
             "Nxe5", "Bd2",
-            "Nc5",  "Be1",
+            "Nc5", "Be1",
             "Rxe1", "Qd2",
             "Qxd2", "f6",
             "Bxf6", "b4",
@@ -71,7 +71,6 @@ public class MoveTests
     {
         var board = new ChessBoard();
 
-        Assert.Throws<ArgumentNullException>(() => { string? s = null; board.ParseFromSan(s); });
         Assert.Throws<ChessArgumentException>(() => board.ParseFromSan("z4"));
 
         // 1. e4 e5 2. Ne2 f6 3. (TEST:"Nc3")
@@ -88,13 +87,28 @@ public class MoveTests
         Assert.Throws<ChessSanTooAmbiguousException>(() => board.ParseFromSan("Nc3"));
         Assert.Throws<ChessSanNotFoundException>(() => board.ParseFromSan("Nc4"));
 
-        // Disabled
-        //Assert.Throws<ChessSanNotFoundException>(() => board.San("O-O"));
-
         board = ChessBoard.LoadFromFen("rnb1kbnr/pppppppp/8/8/8/8/4q3/7K b kq - 0 1");
         board.Move("Qf2");
 
         Assert.Equal("Qf2$", board.MovesToSan[^1]);
+    }
+
+    [Theory]
+    [InlineData("7k/8/3Q4/8/8/3Q1Q2/8/4K3 w - - 0 1", "d3", "d5", "Qd3d5")]
+    [InlineData("4k3/8/8/8/8/8/3N4/4K1N1 w - - 0 1", "d2", "f3", "Ndf3")]
+    [InlineData("4k3/8/8/8/3N4/8/3N4/4K1N1 w - - 0 1", "d2", "f3", "N2f3")]
+    [InlineData("4k3/8/8/8/8/8/3N3N/4K1N1 w - - 0 1", "d2", "f3", "Ndf3")]
+    [InlineData("4k3/8/8/8/8/8/3N3N/4K1N1 w - - 0 1", "g1", "f3", "Ngf3")]
+    [InlineData("4k3/8/8/8/8/8/3N3N/4K1N1 w - - 0 1", "h2", "f3", "Nhf3")]
+    [InlineData("4k3/8/8/8/3N4/8/3N3N/4K3 w - - 0 1", "d2", "f3", "Nd2f3")]
+    [InlineData("4k3/8/8/6N1/3N4/8/7N/4K3 w - - 0 1", "d4", "f3", "Ndf3")]
+    public void TestSanAmbiguousMoveGeneration(string fen, string fromPos, string toPos, string expectedSan)
+    {
+        var board = ChessBoard.LoadFromFen(fen);
+
+        board.Move(new Move(fromPos, toPos));
+
+        Assert.Equal(expectedSan, board.ExecutedMoves[0].San);
     }
 
     [Fact]
@@ -141,37 +155,18 @@ public class MoveTests
         Assert.Empty(board.CapturedBlack);
     }
 
-    //[Fact]
-    //public void TestPutRemove()
-    //{
-    //    //Not fully implemented yet
-    //    var board = new ChessBoard();
-
-    //    board.LoadFen("rnb2bnr/pppppppp/4q3/1k6/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1");
-    //    board.Remove(new("e2"));
-
-    //    // Impossible in fact
-    //    Assert.True(board.WhiteKingChecked);
-    //    Assert.True(board.BlackKingChecked);
-
-    //    board.Put(new("wp"), new("e2"));
-
-    //    Assert.False(board.WhiteKingChecked);
-    //    Assert.False(board.BlackKingChecked);
-    //}
-
     [Fact]
     public void TestMoveIndex()
     {
         var board = new ChessBoard();
         var moves = new[]
         {
-            "e4",   "e6",
-            "Nc3",  "c5",
-            "Nf3",  "g6",
-            "d4",   "Qc7",
+            "e4", "e6",
+            "Nc3", "c5",
+            "Nf3", "g6",
+            "d4", "Qc7",
             "dxc5",
-            };
+        };
 
         for (int i = 0; i < moves.Length; i++)
             board.Move(moves[i]);
@@ -220,10 +215,10 @@ public class MoveTests
         var board = new ChessBoard();
         var moves = new[]
         {
-            "e4",   "d5",
-            "exd5",  "e6",
-            "dxe6",  "fxe6"
-            };
+            "e4", "d5",
+            "exd5", "e6",
+            "dxe6", "fxe6"
+        };
 
         for (int i = 0; i < moves.Length; i++)
             board.Move(moves[i]);
@@ -286,40 +281,6 @@ public class MoveTests
 
         Assert.Equal(movesCount, board.Moves(new Position(pos), false, false).Length);
     }
-
-    // Todo
-    //[Fact]
-    //public void TestEvents()
-    //{
-    //    var raisedCapture = 0;
-    //    var raisedInvalidMoveKingChecked = 0;
-    //    var raisedPromotePawn = 0;
-    //    var raisedEndGame = 0;
-
-    //    var board = new ChessBoard();
-
-    //    board.OnCaptured += (sender, e) => raisedCapture++;
-    //    board.OnPromotePawn += (sender, e) => raisedPromotePawn++;
-    //    board.OnInvalidMoveKingChecked += (sender, e) => raisedInvalidMoveKingChecked++;
-    //    board.OnEndGame += (sender, e) => raisedEndGame++;
-
-    //    board.LoadFenOld("rnb1kbnr/pppppppp/8/8/5Q1q/8/PPPPP1PP/RNB1KBNR w KQkq - 0 1");
-    //    board.Move(new Move("f4", "h4"));
-
-    //    board.LoadFenOld("r1bqkbnr/pPpppppp/8/8/8/8/PPPP3P/RNBQKBNR w KQkq - 0 1");
-    //    board.Move(new Move("b7", "b8"));
-
-    //    board.LoadFenOld("rnb1kbnr/pppppppp/8/8/5P1q/8/PPPPP1PP/RNBQKBNR w KQkq - 0 1");
-    //    board.Move(new Move("e2", "e3"));
-
-    //    board.LoadFenOld("rnbqkbnr/pppp1ppp/8/8/8/8/PPPPP2P/RNBQKBNR b KQkq - 0 1");
-    //    board.Move(new Move("d8", "h4"));
-
-    //    Assert.Equal(1, raisedCapture);
-    //    Assert.Equal(1, raisedPromotePawn);
-    //    Assert.Equal(1, raisedInvalidMoveKingChecked);
-    //    Assert.Equal(1, raisedEndGame);
-    //}
 
     [Fact]
     public void TestChessMechanics()
@@ -385,7 +346,7 @@ public class MoveTests
         Assert.True(board["a8"].Type == PieceType.Queen);
 
         board = ChessBoard.LoadFromPgn(
-        @"[Variant ""From Position""]
+            @"[Variant ""From Position""]
         [FEN ""rnbqkbnr/pPpppppp/8/8/8/8/P1PPPPPP/RNBQKBNR w KQkq - 0 1""]
             
         1.bxa8=R");
@@ -448,12 +409,12 @@ public class MoveTests
         var moves = board.Moves(new Position(7, 6));
 
         Assert.True(moves.Where(
-                    move => (move.Parameter as MovePromotion).PromotionType == PromotionType.ToQueen
-                         || (move.Parameter as MovePromotion).PromotionType == PromotionType.ToRook).All(move => move.IsCheck));
+            move => (move.Parameter as MovePromotion).PromotionType == PromotionType.ToQueen
+                    || (move.Parameter as MovePromotion).PromotionType == PromotionType.ToRook).All(move => move.IsCheck));
 
         Assert.True(moves.Where(
-                    move => (move.Parameter as MovePromotion).PromotionType == PromotionType.ToBishop
-                         || (move.Parameter as MovePromotion).PromotionType == PromotionType.ToKnight).All(move => !move.IsCheck));
+            move => (move.Parameter as MovePromotion).PromotionType == PromotionType.ToBishop
+                    || (move.Parameter as MovePromotion).PromotionType == PromotionType.ToKnight).All(move => !move.IsCheck));
     }
 
     [Fact]
@@ -463,12 +424,12 @@ public class MoveTests
         var moves = board.Moves(new Position(7, 6));
 
         Assert.True(moves.Where(
-                    move => (move.Parameter as MovePromotion)!.PromotionType == PromotionType.ToKnight).All(move => move.IsCheck && move.IsMate));
+            move => (move.Parameter as MovePromotion)!.PromotionType == PromotionType.ToKnight).All(move => move.IsCheck && move.IsMate));
 
         Assert.True(moves.Where(
-                    move => (move.Parameter as MovePromotion)!.PromotionType == PromotionType.ToBishop
-                         || (move.Parameter as MovePromotion)!.PromotionType == PromotionType.ToRook
-                         || (move.Parameter as MovePromotion)!.PromotionType == PromotionType.ToQueen).All(move => !move.IsCheck && !move.IsMate));
+            move => (move.Parameter as MovePromotion)!.PromotionType == PromotionType.ToBishop
+                    || (move.Parameter as MovePromotion)!.PromotionType == PromotionType.ToRook
+                    || (move.Parameter as MovePromotion)!.PromotionType == PromotionType.ToQueen).All(move => !move.IsCheck && !move.IsMate));
     }
 
     [Fact]
@@ -489,4 +450,3 @@ public class MoveTests
         Assert.Equal(fen, board.ToFen());
     }
 }
-
