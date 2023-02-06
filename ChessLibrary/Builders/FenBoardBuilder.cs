@@ -48,6 +48,7 @@ internal class FenBoardBuilder
     private FenBoardBuilder()
     {
         pieces = new Piece[8, 8];
+        EnPassant = new Position();
     }
 
     internal static (bool succeeded, ChessException? exception) TryLoad(string fen, out FenBoardBuilder? builder)
@@ -69,27 +70,7 @@ internal class FenBoardBuilder
             switch (group.Name)
             {
                 case "1":
-                    // Set pieces to given positions
-                    int x = 0, y = 7;
-                    for (int i = 0; i < group.Length; i++)
-                    {
-                        if (group.Value[i] == '/')
-                        {
-                            y--;
-                            x = 0;
-                            continue;
-                        }
-
-                        if (x < 8)
-                            if (char.IsLetter(group.Value[i]))
-                            {
-                                builder.pieces[y, x] = new Piece(group.Value[i]);
-                                x++;
-                            }
-                            else if (char.IsDigit(group.Value[i]))
-                                x += int.Parse(group.Value[i].ToString());
-                    }
-
+                    PlacePiecesOnBoard(builder, group.Value.AsSpan());
                     break;
                 case "3":
                     builder.Turn = PieceColor.FromChar(group.Value[0]);
@@ -109,13 +90,14 @@ internal class FenBoardBuilder
 
                     break;
                 case "5":
-                    if (group.Value == "-")
-                        builder.EnPassant = new();
-                    else
+                    if (group.Value != "-")
+                    {
                         builder.EnPassant = new Position(group.Value);
+                    }
+
                     break;
                 case "6":
-                    (builder.HalfMoves, builder.FullMoves) = group.Value.Split(' ').Select(s => int.Parse(s)).ToArray();
+                    (builder.HalfMoves, builder.FullMoves) = group.Value.Split(' ').Select(int.Parse).ToArray();
                     break;
             }
         }
@@ -123,6 +105,31 @@ internal class FenBoardBuilder
         AddCapturedPieces(builder);
 
         return (true, null);
+    }
+
+    private static void PlacePiecesOnBoard(FenBoardBuilder builder, ReadOnlySpan<char> piecesSpan)
+    {
+        int x = 0, y = 7;
+        foreach (var fenChar in piecesSpan)
+        {
+            if (fenChar == '/')
+            {
+                y--;
+                x = 0;
+            }
+            else if (x < 8)
+            {
+                if (char.IsLetter(fenChar))
+                {
+                    builder.pieces[y, x] = new Piece(fenChar);
+                    x++;
+                }
+                else if (char.IsDigit(fenChar))
+                {
+                    x += fenChar - '0';
+                }
+            }
+        }
     }
 
     private static void AddCapturedPieces(FenBoardBuilder builder)
