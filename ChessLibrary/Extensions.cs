@@ -69,4 +69,14 @@ internal static class Extensions
 
         return new Span<Piece>(piecesFlat);
     }
+
+
+    public static int InsertSpanFromIndex(this Span<char> span, int index, ReadOnlySpan<char> source)
+    {
+        for (int i = 0; i < source.Length; i++)
+        {
+            span[index++] = source[i];
+        }
+        return index;
+    }
 }
