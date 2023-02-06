@@ -395,12 +395,12 @@ public class ChessFenBuilderBenchmark
         _board2.ToFen();
     }
 
-    [Benchmark]
-    public void ToFenUsingSpan()
-    {
-        // _board.ToFenUsingSpan();
-        // _board2.ToFenUsingSpan();
-    }
+    // [Benchmark]
+    // public void ToFenUsingSpan()
+    // {
+    //     _board.ToFenUsingSpan();
+    //     _board2.ToFenUsingSpan();
+    // }
 
     // |                  Method |     Mean |     Error |    StdDev |  Gen 0 | Allocated |
     // |------------------------ |---------:|----------:|----------:|-------:|----------:|
