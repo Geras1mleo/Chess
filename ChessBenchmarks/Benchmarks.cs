@@ -375,3 +375,35 @@ public class ChessOverallBenchmark
     // |----------- |---------:|----------:|----------:|--------:|--------:|----------:|
     // | SampleGame | 4.200 ms | 0.0590 ms | 0.0523 ms | 85.9375 | 23.4375 |      5 MB |
 }
+
+[MemoryDiagnoser]
+public class ChessFenBuilderBenchmark
+{
+    private readonly ChessBoard _board;
+    private readonly ChessBoard _board2;
+
+    public ChessFenBuilderBenchmark()
+    {
+        _board = ChessBoard.LoadFromFen("r1q1k1r1/p1p1p1p1/b1n1n1b1/1p1p1p1p/P1P1P1P1/B1N1N1B1/1P1P1P1P/R1Q1K1R1 w KQkq g3 100 100");
+        _board2 = ChessBoard.LoadFromFen("8/pp3p1k/2p2q1p/3r1P2/5R2/7P/P1P1QP2/7K b - - 2 30");
+    }
+
+    [Benchmark]
+    public void ToFenUsingStringBuilder()
+    {
+        _board.ToFen();
+        _board2.ToFen();
+    }
+
+    [Benchmark]
+    public void ToFenUsingSpan()
+    {
+        // _board.ToFenUsingSpan();
+        // _board2.ToFenUsingSpan();
+    }
+
+    // |                  Method |     Mean |     Error |    StdDev |  Gen 0 | Allocated |
+    // |------------------------ |---------:|----------:|----------:|-------:|----------:|
+    // | ToFenUsingStringBuilder | 3.844 us | 0.0050 us | 0.0039 us | 0.0229 |      2 KB |
+    // |          ToFenUsingSpan | 2.489 us | 0.0065 us | 0.0058 us | 0.0114 |      1 KB |
+}
