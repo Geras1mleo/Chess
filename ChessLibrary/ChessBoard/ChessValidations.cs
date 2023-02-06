@@ -220,23 +220,18 @@ public partial class ChessBoard
             {
                 if (board.pieces[i, j]?.Color == side)
                 {
-                    var position = new Position { Y = i, X = j };
+                    var fromPosition = new Position { Y = i, X = j };
 
-                    for (short k = 0; k < 8; k++)
+                    foreach (var position in GeneratePositions(fromPosition, board))
                     {
-                        for (short l = 0; l < 8; l++)
-                        {
-                            if (position.X == l && position.Y == k) continue;
-
-                            var move = new Move(position, new Position { Y = k, X = l }) { Piece = board.pieces[i, j] };
-
-                            if (IsValidMove(move, board) && !IsKingCheckedValidation(move, side, board))
-                                return true;
-                        }
+                        var move = new Move(fromPosition, position) { Piece = board.pieces[i, j]! };
+                        if (!IsKingCheckedValidation(move, side, board))
+                            return true;
                     }
                 }
             }
         }
+
         return false;
     }
 
