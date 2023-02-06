@@ -72,6 +72,12 @@ public class ChessMoveBenchmark
     //  |-------------------- |---------:|--------:|--------:|-----:|
     //  | MoveUsingMoveObject | 117.5 us | 3.30 us | 9.72 us |    1 |
     //  |        MoveUsingSan | 152.0 us | 3.15 us | 8.98 us |    2 |
+    //  
+    //  6/02/2023 => Spans are so good... 
+    //  |              Method |     Mean |    Error |   StdDev | Rank |
+    //  |-------------------- |---------:|---------:|---------:|-----:|
+    //  | MoveUsingMoveObject | 47.77 us | 0.687 us | 0.609 us |    1 |
+    //  |        MoveUsingSan | 77.72 us | 1.236 us | 0.965 us |    2 |
 }
 
 [RankColumn]
@@ -144,6 +150,12 @@ public class ChessGenerateMovesBenchmark
     //  |-------------- |---------:|---------:|---------:|---------:|-----:|
     //  | MovesSanFalse | 308.5 us | 11.98 us | 33.39 us | 298.5 us |    1 |
     //  |  MovesSanTrue | 360.5 us | 16.82 us | 47.43 us | 359.3 us |    2 |
+    //
+    //  6/02/2023 => x2 faster
+    //  |        Method |     Mean |   Error |  StdDev | Rank |
+    //  |-------------- |---------:|--------:|--------:|-----:|
+    //  | MovesSanFalse | 151.3 us | 2.79 us | 3.73 us |    1 |
+    //  |  MovesSanTrue | 169.1 us | 3.29 us | 4.28 us |    2 |
 }
 
 [MemoryDiagnoser]
@@ -195,13 +207,18 @@ public class ChessIsValidMoveBenchmark
     //  |      Method |     Mean |    Error |   StdDev |
     //  |------------ |---------:|---------:|---------:|
     //  | IsValidMove | 69.73 us | 1.385 us | 3.210 us |
+    //  
+    //  6/02/2023 => x2.3 faster
+    //  |      Method |     Mean |    Error |   StdDev |  Gen 0 | Allocated |
+    //  |------------ |---------:|---------:|---------:|-------:|----------:|
+    //  | IsValidMove | 30.25 us | 0.422 us | 0.374 us | 0.3967 |     31 KB |
 }
 
 [MemoryDiagnoser]
 public class ChessFenConversionsBenchmark
 {
     [Benchmark]
-    public void FenConvertion()
+    public void FenConversion()
     {
         ChessBoard.LoadFromFen("1nbqkbn1/pppppppp/NpNpNpNp/pBpBpBpB/bPbPbPbP/PnPnPnPn/PPPPPPPP/1NBQKBN1 w - - 0 1");
         ChessBoard.LoadFromFen("rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
@@ -213,43 +230,48 @@ public class ChessFenConversionsBenchmark
     //  20/02/2022 => before optimizations
     //  |        Method |     Mean |    Error |   StdDev |    Gen 0 | Allocated |
     //  |-------------- |---------:|---------:|---------:|---------:|----------:|
-    //  | FenConvertion | 656.7 us | 29.29 us | 86.37 us | 168.9453 |    346 KB |
+    //  | FenConversion | 656.7 us | 29.29 us | 86.37 us | 168.9453 |    346 KB |
     //
     //  20/02/2022 => after optimizations Regex cached and compiled
     //  |        Method |     Mean |    Error |   StdDev |    Gen 0 | Allocated |
     //  |-------------- |---------:|---------:|---------:|---------:|----------:|
-    //  | FenConvertion | 416.8 us | 11.61 us | 33.69 us | 169.4336 |    346 KB |
+    //  | FenConversion | 416.8 us | 11.61 us | 33.69 us | 169.4336 |    346 KB |
     // 
     //  20/02/2022 =>
     //  |        Method |     Mean |    Error |   StdDev |    Gen 0 | Allocated |
     //  |-------------- |---------:|---------:|---------:|---------:|----------:|
-    //  | FenConvertion | 504.8 us | 35.08 us | 99.52 us | 203.1250 |    415 KB |
+    //  | FenConversion | 504.8 us | 35.08 us | 99.52 us | 203.1250 |    415 KB |
     //
     //  27/02/2022 => 
     //  |        Method |     Mean |   Error |  StdDev |    Gen 0 | Allocated |
     //  |-------------- |---------:|--------:|--------:|---------:|----------:|
-    //  | FenConvertion | 467.4 us | 8.25 us | 8.10 us | 202.1484 |    414 KB |
+    //  | FenConversion | 467.4 us | 8.25 us | 8.10 us | 202.1484 |    414 KB |
     //
     //  1/06/2022 => not a huge difference
     //  |        Method |     Mean |    Error |   StdDev |    Gen 0 | Allocated |
     //  |-------------- |---------:|---------:|---------:|---------:|----------:|
-    //  | FenConvertion | 481.1 us | 21.65 us | 63.85 us | 208.0078 |    426 KB |
-
+    //  | FenConversion | 481.1 us | 21.65 us | 63.85 us | 208.0078 |    426 KB |
+    //
     //  21/01/2023
     //      => before kings constraint in fen import
     //  |        Method |     Mean |   Error |  StdDev |  Gen 0 | Allocated |
     //  |-------------- |---------:|--------:|--------:|-------:|----------:|
-    //  | FenConvertion | 426.9 us | 8.12 us | 8.69 us | 4.8828 |    427 KB |
+    //  | FenConversion | 426.9 us | 8.12 us | 8.69 us | 4.8828 |    427 KB |
     //
     //      => constraint using regex
     //  |        Method |     Mean |   Error |  StdDev |  Gen 0 | Allocated |
     //  |-------------- |---------:|--------:|--------:|-------:|----------:|
-    //  | FenConvertion | 430.6 us | 6.55 us | 5.81 us | 4.8828 |    427 KB |
+    //  | FenConversion | 430.6 us | 6.55 us | 5.81 us | 4.8828 |    427 KB |
     //
     //      => constraint using piecesList extension method
     //  |        Method |     Mean |   Error |  StdDev |  Gen 0 | Allocated |
     //  |-------------- |---------:|--------:|--------:|-------:|----------:|
-    //  | FenConvertion | 432.0 us | 8.29 us | 7.76 us | 4.8828 |    430 KB |
+    //  | FenConversion | 432.0 us | 8.29 us | 7.76 us | 4.8828 |    430 KB |
+    //
+    //  6/02/2023 => x3 faster and 4x less memory allocated
+    //  |        Method |     Mean |   Error |  StdDev |  Gen 0 | Allocated |
+    //  |-------------- |---------:|--------:|--------:|-------:|----------:|
+    //  | FenConversion | 129.0 us | 1.05 us | 0.99 us | 1.4648 |    108 KB |
 }
 
 [MemoryDiagnoser]
@@ -331,6 +353,11 @@ public class ChessPgnConversionsBenchmark
     //  |        Method |     Mean |     Error |    StdDev |    Gen 0 | Allocated |
     //  |-------------- |---------:|----------:|----------:|---------:|----------:|
     //  | PgnConversion | 2.176 ms | 0.1057 ms | 0.3101 ms | 761.7188 |      2 MB |
+    //
+    //  6/02/2023 => almost x2 faster AND less allocations!!
+    //  |        Method |     Mean |     Error |    StdDev |   Gen 0 | Allocated |
+    //  |-------------- |---------:|----------:|----------:|--------:|----------:|
+    //  | PgnConversion | 1.256 ms | 0.0159 ms | 0.0149 ms | 13.6719 |      1 MB |
 }
 
 [MemoryDiagnoser]
@@ -374,6 +401,11 @@ public class ChessOverallBenchmark
     // |     Method |     Mean |     Error |    StdDev |   Gen 0 |   Gen 1 | Allocated |
     // |----------- |---------:|----------:|----------:|--------:|--------:|----------:|
     // | SampleGame | 4.200 ms | 0.0590 ms | 0.0523 ms | 85.9375 | 23.4375 |      5 MB |
+    //
+    //  6/02/2023 => slightly worse but not critical 
+    //  |     Method |     Mean |     Error |    StdDev |   Gen 0 |   Gen 1 | Allocated |
+    //  |----------- |---------:|----------:|----------:|--------:|--------:|----------:|
+    //  | SampleGame | 4.270 ms | 0.0631 ms | 0.0527 ms | 78.1250 | 23.4375 |      5 MB |
 }
 
 [MemoryDiagnoser]
@@ -389,7 +421,7 @@ public class ChessFenBuilderBenchmark
     }
 
     [Benchmark]
-    public void ToFenUsingStringBuilder()
+    public void ToFenUsingSpan()
     {
         _board.ToFen();
         _board2.ToFen();
@@ -402,8 +434,14 @@ public class ChessFenBuilderBenchmark
     //     _board2.ToFenUsingSpan();
     // }
 
+    //  6/02/2023
     // |                  Method |     Mean |     Error |    StdDev |  Gen 0 | Allocated |
     // |------------------------ |---------:|----------:|----------:|-------:|----------:|
     // | ToFenUsingStringBuilder | 3.844 us | 0.0050 us | 0.0039 us | 0.0229 |      2 KB |
     // |          ToFenUsingSpan | 2.489 us | 0.0065 us | 0.0058 us | 0.0114 |      1 KB |
+    //
+    //  6/02/2023 => after spans
+    //  |         Method |     Mean |     Error |    StdDev |  Gen 0 | Allocated |
+    //  |--------------- |---------:|----------:|----------:|-------:|----------:|
+    //  | ToFenUsingSpan | 2.667 us | 0.0220 us | 0.0206 us | 0.0153 |      1 KB |
 }

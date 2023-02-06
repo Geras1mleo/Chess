@@ -8,5 +8,4 @@ BenchmarkRunner.Run<ChessIsValidMoveBenchmark>();
 BenchmarkRunner.Run<ChessFenConversionsBenchmark>();
 BenchmarkRunner.Run<ChessPgnConversionsBenchmark>();
 BenchmarkRunner.Run<ChessOverallBenchmark>();
-
-Console.ReadLine();
+BenchmarkRunner.Run<ChessFenBuilderBenchmark>();
