@@ -360,13 +360,18 @@ public class ChessOverallBenchmark
         var fen = board.ToFen();
     }
 
-    // 4/02/2022
+    // 4/02/2023
     // |     Method |     Mean |     Error |    StdDev |   Gen 0 |   Gen 1 | Allocated |
     // |----------- |---------:|----------:|----------:|--------:|--------:|----------:|
     // | SampleGame | 4.711 ms | 0.0670 ms | 0.0594 ms | 93.7500 | 31.2500 |      5 MB |
     //
-    // 4/02/2022 => after some changes
+    // 4/02/2023 => after some changes
     // |     Method |     Mean |     Error |    StdDev |   Gen 0 |   Gen 1 | Allocated |
     // |----------- |---------:|----------:|----------:|--------:|--------:|----------:|
     // | SampleGame | 4.906 ms | 0.0906 ms | 0.0847 ms | 93.7500 | 31.2500 |      5 MB |
+    //
+    // 5/02/2023 => looks good
+    // |     Method |     Mean |     Error |    StdDev |   Gen 0 |   Gen 1 | Allocated |
+    // |----------- |---------:|----------:|----------:|--------:|--------:|----------:|
+    // | SampleGame | 4.200 ms | 0.0590 ms | 0.0523 ms | 85.9375 | 23.4375 |      5 MB |
 }
