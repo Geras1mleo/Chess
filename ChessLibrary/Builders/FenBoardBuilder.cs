@@ -187,54 +187,79 @@ internal class FenBoardBuilder
 
     public override string ToString()
     {
-        StringBuilder piecesBuilder = new();
+        return string.Join(' ',
+            GetPiecePlacement(),
+            GetActiveColor(),
+            GetCastlingAvailability(),
+            GetEnPassantTargetSquare(),
+            HalfMoves.ToString(),
+            FullMoves.ToString());
+    }
 
-        for (int i = 7; i >= 0; i--)
+    private string GetPiecePlacement()
+    {
+        Span<char> span = stackalloc char[71]; // Max lenght is 71
+        int index = 0;
+
+        int i = 7;
+        while (i >= 0 && index < span.Length)
         {
-            int emptyCount = 0;
-            for (int j = 0; j < 8; j++)
+            int emptySquaresCount = 0;
+
+            for (int j = 0; j < 8 && index < span.Length; j++)
             {
                 if (pieces[i, j] is null)
-                    emptyCount++;
+                    emptySquaresCount++;
                 else
                 {
-                    if (emptyCount > 0)
+                    if (emptySquaresCount > 0)
                     {
-                        piecesBuilder.Append(emptyCount);
-                        emptyCount = 0;
+                        span[index++] = (char)('0' + emptySquaresCount);
+                        emptySquaresCount = 0;
                     }
 
-                    piecesBuilder.Append(pieces[i, j].ToFenChar());
+                    span[index++] = pieces[i, j]!.ToFenChar();
                 }
             }
 
-            if (emptyCount > 0)
-                piecesBuilder.Append(emptyCount);
+            if (emptySquaresCount > 0)
+                span[index++] = (char)('0' + emptySquaresCount);
+
             if (i - 1 >= 0)
-                piecesBuilder.Append('/');
+                span[index++] = '/';
+
+            i--;
         }
 
-        StringBuilder castlesBuilder = new();
+        return new string(span.Slice(0, index));
+    }
 
-        if (CastleWK)
-            castlesBuilder.Append('K');
-        if (CastleWQ)
-            castlesBuilder.Append('Q');
-        if (CastleBK)
-            castlesBuilder.Append('k');
-        if (CastleBQ)
-            castlesBuilder.Append('q');
+    private string GetActiveColor()
+    {
+        return Turn.AsChar.ToString();
+    }
 
-        if (castlesBuilder.Length == 0)
-            castlesBuilder.Append('-');
+    private string GetCastlingAvailability()
+    {
+        Span<char> span = stackalloc char[4]; // Max lenght is 4
+        int index = 0;
 
-        string enPasBuilder;
+        if (CastleWK) span[index++] = 'K';
+        if (CastleWQ) span[index++] = 'Q';
+        if (CastleBK) span[index++] = 'k';
+        if (CastleBQ) span[index++] = 'q';
 
+        // Castling not available
+        if (index == 0) span[index++] = '-';
+
+        return new string(span.Slice(0, index));
+    }
+
+    private string GetEnPassantTargetSquare()
+    {
         if (EnPassant.HasValue)
-            enPasBuilder = EnPassant.ToString();
-        else
-            enPasBuilder = "-";
+            return EnPassant.ToString();
 
-        return string.Join(' ', piecesBuilder, Turn.AsChar, castlesBuilder, enPasBuilder, HalfMoves, FullMoves);
+        return "-";
     }
 }
