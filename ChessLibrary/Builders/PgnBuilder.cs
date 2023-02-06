@@ -18,23 +18,7 @@ internal static class PgnBuilder
             AutoEndgameRules = autoEndgameRules
         };
 
-        var headersMatches = Regexes.RegexHeaders.Matches(pgn);
-
-        if (headersMatches.Count > 0)
-        {
-            // Extracting headers
-            for (int i = 0; i < headersMatches.Count; i++)
-            {
-                // [Black "Geras1mleo"]
-                // Groups[1] = Black
-                // Groups[2] = Geras1mleo
-                board.headers.Add(headersMatches[i].Groups[1].Value,
-                    headersMatches[i].Groups[2].Value);
-            }
-        }
-
-        // San move can occur in header ex. in nickname of player => remove headers from string
-        pgn = Regexes.RegexHeaders.Replace(pgn, "");
+        pgn = ExtractPgnHeaders(pgn, board);
 
         // Loading fen if exist
         if (board.headers.TryGetValue("FEN", out var fen))
@@ -53,16 +37,15 @@ internal static class PgnBuilder
             board.HandleEndGame();
 
             if (board.IsEndGame)
+            {
                 return (true, null);
+            }
         }
 
-        // Remove all alternatives
-        pgn = Regexes.RegexAlternatives.Replace(pgn, "");
+        pgn = Regexes.RegexAlternatives.Replace(pgn, ""); // Remove all alternative branches
+        pgn = Regexes.RegexComments.Replace(pgn, ""); // Remove all comments
 
-        // Remove all comments
-        pgn = Regexes.RegexComments.Replace(pgn, "");
-
-        // Todo Save Alternative moves(bracnhes) and Comments for moves
+        // Todo Save Alternative moves(branches) and comments for moves
 
         var movesMatches = Regexes.RegexSanMoves.Matches(pgn);
 
@@ -84,7 +67,6 @@ internal static class PgnBuilder
             board.moveIndex = board.executedMoves.Count - 1;
         }
 
-
         board.HandleKingChecked();
         board.HandleEndGame();
 
@@ -102,6 +84,27 @@ internal static class PgnBuilder
         }
 
         return (true, null);
+    }
+
+    private static string ExtractPgnHeaders(string pgn, ChessBoard board)
+    {
+        var headersMatches = Regexes.RegexHeaders.Matches(pgn);
+
+        if (headersMatches.Count > 0)
+        {
+            // Extracting headers
+            for (int i = 0; i < headersMatches.Count; i++)
+            {
+                // [Black "Geras1mleo"]
+                // Groups[1] = Black
+                // Groups[2] = Geras1mleo
+                board.headers.Add(headersMatches[i].Groups[1].Value,
+                    headersMatches[i].Groups[2].Value);
+            }
+        }
+
+        // San move can occur in header ex. in nickname of player => remove headers from string
+        return Regexes.RegexHeaders.Replace(pgn, "");
     }
 
     public static string BoardToPgn(ChessBoard board)
