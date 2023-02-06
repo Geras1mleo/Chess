@@ -13,7 +13,7 @@ internal static class Regexes
 {
     internal const string SanOneMovePattern = @"(^([PNBRQK])?([a-h])?([1-8])?(x|X|-)?([a-h][1-8])(=[NBRQ]| ?e\.p\.)?|^O-O(-O)?)(\+|\#|\$)?$";
 
-    internal const string SanMovesPattern = @"([PNBRQK]?[a-h]?[1-8]?[xX-]?[a-h][1-8](=[NBRQ]| ?e\.p\.)?|O-O(?:-O)?)[+#$]?";
+    internal const string SanMovesPattern = @"(?:[PNBRQK]?[a-h]?[1-8]?[xX-]?[a-h][1-8](?:=[NBRQ]| ?e\.p\.)?|O-O(?:-O)?)[+#$]?";
 
     internal const string HeadersPattern = @"\[([^ ]+) ""([^""]*)""\]";
 
