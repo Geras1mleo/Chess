@@ -48,7 +48,7 @@ public struct Position
     {
         position = position.ToLower();
 
-        if (!Regexes.regexPosition.IsMatch(position))
+        if (!Regexes.RegexPosition.IsMatch(position))
             throw new ChessArgumentException(null, "Table position should match pattern: " + Regexes.PositionPattern);
 
         X = FromFile(position[0]);

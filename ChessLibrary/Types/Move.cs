@@ -83,7 +83,7 @@ public class Move
     {
         move = move.ToLower();
 
-        var matches = Regexes.regexMove.Matches(move.ToLower());
+        var matches = Regexes.RegexMove.Matches(move.ToLower());
 
         if (matches.Count < 1)
             throw new ChessArgumentException(null, "Move should match pattern: " + Regexes.MovePattern);

@@ -18,7 +18,7 @@ internal static class PgnBuilder
             AutoEndgameRules = autoEndgameRules
         };
 
-        var headersMatches = Regexes.regexHeaders.Matches(pgn);
+        var headersMatches = Regexes.RegexHeaders.Matches(pgn);
 
         if (headersMatches.Count > 0)
         {
@@ -34,7 +34,7 @@ internal static class PgnBuilder
         }
 
         // San move can occur in header ex. in nickname of player => remove headers from string
-        pgn = Regexes.regexHeaders.Replace(pgn, "");
+        pgn = Regexes.RegexHeaders.Replace(pgn, "");
 
         // Loading fen if exist
         if (board.headers.TryGetValue("FEN", out var fen))
@@ -57,14 +57,14 @@ internal static class PgnBuilder
         }
 
         // Remove all alternatives
-        pgn = Regexes.regexAlternatives.Replace(pgn, "");
+        pgn = Regexes.RegexAlternatives.Replace(pgn, "");
 
         // Remove all comments
-        pgn = Regexes.regexComments.Replace(pgn, "");
+        pgn = Regexes.RegexComments.Replace(pgn, "");
 
         // Todo Save Alternative moves(bracnhes) and Comments for moves
 
-        var movesMatches = Regexes.regexSanMoves.Matches(pgn);
+        var movesMatches = Regexes.RegexSanMoves.Matches(pgn);
 
         // Execute all found moves
         for (int i = 0; i < movesMatches.Count; i++)

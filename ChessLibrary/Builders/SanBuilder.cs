@@ -15,7 +15,7 @@ internal static class SanBuilder
     {
         move = null;
 
-        var matches = Regexes.regexSanOneMove.Matches(san);
+        var matches = Regexes.RegexSanOneMove.Matches(san);
 
         if (matches.Count == 0)
             return (false, new ChessArgumentException(board, "SAN move string should match pattern: " + Regexes.SanMovesPattern));
@@ -50,9 +50,6 @@ internal static class SanBuilder
                             else if (group.Value == "O-O-O")
                                 moveOut.NewPosition = new("a8");
                         }
-                        // not realy needed
-                        //if (!IsValidMove(new Move(originalPos, moveOut.NewPosition)))
-                        //    throw new ChessSanNotFoundException(this, move);
                     }
                     break;
                 case "2":

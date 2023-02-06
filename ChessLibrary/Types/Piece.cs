@@ -42,7 +42,7 @@ public class Piece
     /// </summary>
     public Piece(string piece)
     {
-        if (!Regexes.regexPiece.IsMatch(piece))
+        if (!Regexes.RegexPiece.IsMatch(piece))
             throw new ChessArgumentException(null, "Piece should match pattern: " + Regexes.PiecePattern);
 
         Color = PieceColor.FromChar(piece[0]);
@@ -59,11 +59,11 @@ public class Piece
     /// Initializes new Piece by given color and type as FEN:<br/>
     /// 'Q' => White Queen<br/>
     /// 'q' => Black Queen<br/>
-    /// See: piece.ToFENChar()<br/>
+    /// See: piece.ToFenChar()<br/>
     /// </summary>
     public Piece(char fenChar)
     {
-        if (!Regexes.regexFenPiece.IsMatch(fenChar.ToString()))
+        if (!Regexes.RegexFenPiece.IsMatch(fenChar.ToString()))
             throw new ChessArgumentException(null, "FEN piece character should match pattern: " + Regexes.FenPiecePattern);
 
         Type = PieceType.FromChar(fenChar);

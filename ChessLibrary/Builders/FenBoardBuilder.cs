@@ -54,12 +54,12 @@ internal class FenBoardBuilder
     {
         builder = null;
 
-        var matches = Regexes.regexFen.Matches(fen);
+        var matches = Regexes.RegexFen.Matches(fen);
 
         if (matches.Count == 0)
             return (false, new ChessArgumentException(null, "FEN board string should match pattern: " + Regexes.FenPattern));
 
-        if (!Regexes.regexFenContainsOneWhiteKing.IsMatch(fen) || !Regexes.regexFenContainsOneBlackKing.IsMatch(fen))
+        if (!Regexes.RegexFenContainsOneWhiteKing.IsMatch(fen) || !Regexes.RegexFenContainsOneBlackKing.IsMatch(fen))
             return (false, new ChessArgumentException(null, "Chess board should have exact 1 white king and exact 1 black king"));
 
         builder = new FenBoardBuilder();
