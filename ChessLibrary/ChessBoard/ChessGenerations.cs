@@ -45,7 +45,7 @@ public partial class ChessBoard
             // If promotion => 4 different moves for each promotion type
             if (move.Parameter is MovePromotion promotion)
             {
-                AddPromotionMoves(moves, move, generateSan);
+                AddPromotionMoves(moves, move, generateSan, promotion.PromotionType);
             }
             else
             {
@@ -61,17 +61,22 @@ public partial class ChessBoard
         return moves.ToArray();
     }
 
-    private void AddPromotionMoves(List<Move> moves, Move move, bool generateSan)
+    private void AddPromotionMoves(List<Move> moves, Move move, bool generateSan, PromotionType skipPromotion)
     {
+        if (skipPromotion == PromotionType.Default) skipPromotion = PromotionType.ToQueen;
+        
+        moves.Add(new Move(move, skipPromotion));
+
         // IsCheck and IsMate depends on promotion type so we have to reset those properties for each promotion type
-        var promotions = new PromotionType[]
+        var promotions = new List<PromotionType>
         {
             PromotionType.ToQueen,
             PromotionType.ToRook,
             PromotionType.ToBishop,
             PromotionType.ToKnight
         };
-
+        promotions.Remove(skipPromotion);
+        
         foreach (var promotion in promotions)
         {
             var newMove = new Move(move, promotion);
