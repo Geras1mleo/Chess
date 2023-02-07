@@ -4,13 +4,15 @@
 <h1 align="center">Gera Chess Library</h1>
 <div>
 	<p align="center">
-	  Program chess like a pro with C# and &hearts; by Geras1mleo
+	  Develop your chess app with C# lib and &hearts; from Geras1mleo
 	</p>
 </div>
 
-<b>Download from <a href="https://www.nuget.org/packages/Gera.Chess/"><img height="15px" src="https://www.nuget.org/favicon.ico"> NuGet</a></b>
+![GitHub top language](https://img.shields.io/github/languages/top/geras1mleo/chess?color=blueviolet&label=C%23%20.NET%206.0&style=for-the-badge) ![GitHub last commit](https://img.shields.io/github/last-commit/geras1mleo/chess?label=Last%20commit&logo=git&style=for-the-badge) [![Nuget](https://img.shields.io/nuget/dt/gera.chess?logo=nuget&style=for-the-badge&label=Downloads&logoColor=blue)](https://www.nuget.org/packages/Gera.Chess/)
 
-Take your C# chess app to the next level with the Gera Chess Library! This chess logic library is made with **C# net6.0** and &hearts; by Geras1mleo and is available on [NuGet](https://www.nuget.org/packages/Gera.Chess/), so you can start using it right away.
+[![Nuget](https://img.shields.io/nuget/v/gera.chess?logo=nuget&style=for-the-badge)](https://www.nuget.org/packages/Gera.Chess/)
+
+Take your chess app to the next level with the Gera Chess Library! This chess logic library is made with **C# .NET 6.0** and is available on [NuGet](https://www.nuget.org/packages/Gera.Chess/), so you can start using it right away.
 
 The library includes a **ChessBoard** with a 2-dimensional array of **Pieces** and the ability to ***generate***, ***validate***, and ***execute*** moves with ease. You can also parse **Move** objects into Standard Algebraic Notation **[(SAN)](https://en.wikipedia.org/wiki/Algebraic_notation_(chess))** and back. Plus, you can load and play a chess game from Forsyth-Edwards Notation **[(FEN)](https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation)** and Portable Game Notation **[(PGN)](https://en.wikipedia.org/wiki/Portable_Game_Notation)** and vice versa.
 
