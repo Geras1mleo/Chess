@@ -2,9 +2,9 @@
 
 # Gera Chess Library
 
-Program chess like a pro with C# and &hearts; by Geras1mleo
+Develop your chess app with C# lib and &hearts; from Geras1mleo
 
-Take your C# chess app to the next level with the Gera Chess Library! This chess logic library is made with **C# net6.0** and &hearts; by Geras1mleo and is available on [NuGet](https://www.nuget.org/packages/Gera.Chess/), so you can start using it right away.
+![GitHub last commit](https://img.shields.io/github/last-commit/geras1mleo/chess?label=Last%20commit&logo=git&style=for-the-badge) [![Nuget](https://img.shields.io/nuget/dt/gera.chess?logo=nuget&style=for-the-badge&label=Downloads&logoColor=blue)](https://www.nuget.org/packages/Gera.Chess/)
 
 The library includes a **ChessBoard** with a 2-dimensional array of **Pieces** and the ability to ***generate***, ***validate***, and ***execute*** moves with ease. You can also parse **Move** objects into Standard Algebraic Notation **[(SAN)](https://en.wikipedia.org/wiki/Algebraic_notation_(chess))** and back. Plus, you can load and play a chess game from Forsyth-Edwards Notation **[(FEN)](https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation)** and Portable Game Notation **[(PGN)](https://en.wikipedia.org/wiki/Portable_Game_Notation)** and vice versa.
 
@@ -217,11 +217,11 @@ board.EndGame // => { EndgameType = Resigned, WonSide = White }
 
 As mentioned before, **[InsufficientMaterial](https://www.chessprogramming.org/Material#InsufficientMaterial)**, **[FiftyMoveRule](https://www.chessprogramming.org/Fifty-move_Rule)** and **[Repetition](https://www.chessprogramming.org/Repetitions)** rules are available.
 
-## [Unit Tests](/Chess.Tests/MoveTests.cs)
-Here you can see all the tests that have been used to test and improve chess library. Also useful for code examples.
+## Unit Tests
+[Here](https://github.com/Geras1mleo/Chess/tree/master/Chess.Tests) you can see all the tests that have been used to test and improve chess library. Also useful for code examples.
 
-## [Benchmarks](/ChessBenchmarks/Benchmarks.cs)
-Here you can see the evolution of performance of chess library
+## Benchmarks
+[Here](https://github.com/Geras1mleo/Chess/blob/master/ChessBenchmarks/Benchmarks.cs) you can see the evolution of performance of chess library
 
 ## Like the project?
 
