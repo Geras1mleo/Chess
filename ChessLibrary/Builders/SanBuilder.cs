@@ -173,43 +173,43 @@ internal static class SanBuilder
             return (false, new ChessArgumentException(board, "Given move is null or doesn't have valid positions values"));
 
         Span<char> span = stackalloc char[10];
-        int index = 0;
+        int offset = 0;
 
         if (move.Parameter is MoveCastle)
         {
-            index = span.InsertSpanFromIndex(index, move.Parameter.ShortStr.AsSpan());
+            offset = span.InsertSpan(offset, move.Parameter.ShortStr.AsSpan());
         }
         else
         {
             if (move.Piece.Type != PieceType.Pawn)
             {
-                span[index++] = char.ToUpper(move.Piece.Type.AsChar);
+                span[offset++] = char.ToUpper(move.Piece.Type.AsChar);
 
                 // Only rooks, knights, bishops(second from promotion) and queens(second from promotion) can have ambiguous moves
                 if (move.Piece.Type != PieceType.King)
-                    index = span.InsertSpanFromIndex(index, HandleAmbiguousMovesNotation(move, board));
+                    offset = span.InsertSpan(offset, HandleAmbiguousMovesNotation(move, board));
             }
 
             if (move.CapturedPiece is not null)
             {
                 if (move.Piece.Type == PieceType.Pawn)
-                    span[index++] = move.OriginalPosition.File();
+                    span[offset++] = move.OriginalPosition.File();
 
-                span[index++] = 'x';
+                span[offset++] = 'x';
             }
 
             // Destination position
-            index = span.InsertSpanFromIndex(index, move.NewPosition.ToString().AsSpan());
+            offset = span.InsertSpan(offset, move.NewPosition.ToString().AsSpan());
 
             if (move.Parameter is MovePromotion)
-                index = span.InsertSpanFromIndex(index, move.Parameter.ShortStr.AsSpan());
+                offset = span.InsertSpan(offset, move.Parameter.ShortStr.AsSpan());
         }
 
-        if (move.IsCheck && move.IsMate) span[index++] = '#';
-        else if (move.IsCheck) span[index++] = '+';
-        else if (move.IsMate) span[index++] = '$';
+        if (move.IsCheck && move.IsMate) span[offset++] = '#';
+        else if (move.IsCheck) span[offset++] = '+';
+        else if (move.IsMate) span[offset++] = '$';
 
-        san = new string(span.Slice(0, index));
+        san = new string(span.Slice(0, offset));
         move.San = san;
 
         return (true, null);

@@ -55,14 +55,14 @@ internal static class Extensions
         }
 
         var piecesFlat = new Piece[nonNullCount];
-        int index = 0;
-        for (int i = 0; i < piecesLength1 && index < piecesFlat.Length; i++)
+        int offset = 0;
+        for (int i = 0; i < piecesLength1 && offset < piecesFlat.Length; i++)
         {
-            for (int j = 0; j < piecesLength2 && index < piecesFlat.Length; j++)
+            for (int j = 0; j < piecesLength2 && offset < piecesFlat.Length; j++)
             {
                 if (pieces[i, j] != null)
                 {
-                    piecesFlat[index++] = pieces[i, j];
+                    piecesFlat[offset++] = pieces[i, j];
                 }
             }
         }
@@ -71,12 +71,12 @@ internal static class Extensions
     }
 
 
-    public static int InsertSpanFromIndex(this Span<char> span, int index, ReadOnlySpan<char> source)
+    public static int InsertSpan(this Span<char> span, int offset, ReadOnlySpan<char> source)
     {
         for (int i = 0; i < source.Length; i++)
         {
-            span[index++] = source[i];
+            span[offset++] = source[i];
         }
-        return index;
+        return offset;
     }
 }

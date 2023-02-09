@@ -206,14 +206,14 @@ internal class FenBoardBuilder
     private string GetPiecePlacement()
     {
         Span<char> span = stackalloc char[71]; // Max lenght is 71
-        int index = 0;
+        int offset = 0;
 
         int i = 7;
-        while (i >= 0 && index < span.Length)
+        while (i >= 0 && offset < span.Length)
         {
             int emptySquaresCount = 0;
 
-            for (int j = 0; j < 8 && index < span.Length; j++)
+            for (int j = 0; j < 8 && offset < span.Length; j++)
             {
                 if (pieces[i, j] is null)
                     emptySquaresCount++;
@@ -221,24 +221,24 @@ internal class FenBoardBuilder
                 {
                     if (emptySquaresCount > 0)
                     {
-                        span[index++] = (char)('0' + emptySquaresCount);
+                        span[offset++] = (char)('0' + emptySquaresCount);
                         emptySquaresCount = 0;
                     }
 
-                    span[index++] = pieces[i, j]!.ToFenChar();
+                    span[offset++] = pieces[i, j]!.ToFenChar();
                 }
             }
 
             if (emptySquaresCount > 0)
-                span[index++] = (char)('0' + emptySquaresCount);
+                span[offset++] = (char)('0' + emptySquaresCount);
 
             if (i - 1 >= 0)
-                span[index++] = '/';
+                span[offset++] = '/';
 
             i--;
         }
 
-        return new string(span.Slice(0, index));
+        return new string(span.Slice(0, offset));
     }
 
     private string GetActiveColor()
@@ -249,17 +249,17 @@ internal class FenBoardBuilder
     private string GetCastlingAvailability()
     {
         Span<char> span = stackalloc char[4]; // Max lenght is 4
-        int index = 0;
+        int offset = 0;
 
-        if (CastleWK) span[index++] = 'K';
-        if (CastleWQ) span[index++] = 'Q';
-        if (CastleBK) span[index++] = 'k';
-        if (CastleBQ) span[index++] = 'q';
+        if (CastleWK) span[offset++] = 'K';
+        if (CastleWQ) span[offset++] = 'Q';
+        if (CastleBK) span[offset++] = 'k';
+        if (CastleBQ) span[offset++] = 'q';
 
         // Castling not available
-        if (index == 0) span[index++] = '-';
+        if (offset == 0) span[offset++] = '-';
 
-        return new string(span.Slice(0, index));
+        return new string(span.Slice(0, offset));
     }
 
     private string GetEnPassantTargetSquare()
