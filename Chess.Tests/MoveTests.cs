@@ -60,9 +60,7 @@ public class MoveTests
     [InlineData("rnb1kbnr/pppppppp/8/2q5/8/8/PP1PPPPP/R3K2R w KQkq - 0 1", "O-O-O", false)]
     public void TestCheckOnCastle(string fen, string sanMove, bool isValid)
     {
-        var board = new ChessBoard();
-
-        board = ChessBoard.LoadFromFen(fen);
+        var board = ChessBoard.LoadFromFen(fen);
         Assert.True(board.IsValidMove(sanMove) == isValid);
     }
 
