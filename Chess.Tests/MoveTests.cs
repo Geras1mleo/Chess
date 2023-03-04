@@ -447,4 +447,17 @@ public class MoveTests
 
         Assert.Equal(fen, board.ToFen());
     }
+
+    [Fact]
+    public void Moves_QueenPromotion_ShouldHaveSan()
+    {
+        var board = ChessBoard.LoadFromFen("8/6P1/8/2k5/8/8/8/K7 w - - 0 1");
+        var moves = board.Moves(generateSan: true);
+
+        Assert.All(moves, m => Assert.NotNull(m.San));
+
+        var move = moves.Single(m => m.NewPosition == new Position("g8") && m.Parameter is MovePromotion mp && mp.PromotionType == PromotionType.ToQueen);
+
+        Assert.Equal("g8=Q", move.San);
+    }
 }

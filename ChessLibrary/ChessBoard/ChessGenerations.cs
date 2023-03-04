@@ -66,6 +66,10 @@ public partial class ChessBoard
         if (skipPromotion == PromotionType.Default) skipPromotion = PromotionType.ToQueen;
         
         moves.Add(new Move(move, skipPromotion));
+        if (generateSan)
+        {
+            ParseToSan(moves[^1]);
+        }
 
         // IsCheck and IsMate depends on promotion type so we have to reset those properties for each promotion type
         var promotions = new List<PromotionType>
