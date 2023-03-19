@@ -41,7 +41,7 @@ internal class EndGameProvider
             else if (!blackHasMoves && board.BlackKingChecked)
                 endgameInfo = new EndGameInfo(EndgameType.Checkmate, PieceColor.White);
 
-            else if (!whiteHasMoves || !blackHasMoves)
+            else if ((!whiteHasMoves && board.Turn == PieceColor.White) || (!blackHasMoves && board.Turn == PieceColor.Black))
                 endgameInfo = new EndGameInfo(EndgameType.Stalemate, null);
         }
 

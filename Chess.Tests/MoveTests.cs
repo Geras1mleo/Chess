@@ -47,7 +47,7 @@ public class MoveTests
             Assert.True(board.Move(moves[i]));
 
         // Stalemate here
-        board = ChessBoard.LoadFromFen("rnb1kbnr/pppppppp/8/8/8/8/5q2/7K b kq - 0 1");
+        board = ChessBoard.LoadFromFen("rnb1kbnr/pppppppp/8/8/8/8/5q2/7K w kq - 0 1");
         Assert.Throws<ChessGameEndedException>(() => board.Move(new Move("f2", "e2")));
     }
 

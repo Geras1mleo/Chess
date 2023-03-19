@@ -119,5 +119,17 @@ public class EndGameTests
 
         Assert.False(board.IsEndGame);
     }
+
+    [Fact]
+    public void EndGame_Stalemate_FromFen()
+    {
+        var board = ChessBoard.LoadFromFen("1r5k/8/3b4/8/8/8/7r/K7 b - - 0 1", AutoEndgameRules.All);
+        Assert.False(board.IsEndGame); // black has moves, and it's black's turn
+        Assert.Null(board.EndGame);
+
+        board = ChessBoard.LoadFromFen("1r5k/8/3b4/8/8/8/7r/K7 w - - 0 1", AutoEndgameRules.All);
+        Assert.True(board.IsEndGame); // same board but with white to move, it's a stalemate
+        Assert.Equal(EndgameType.Stalemate, board.EndGame.EndgameType);
+    }
 }
 
