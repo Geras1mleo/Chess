@@ -131,5 +131,15 @@ public class EndGameTests
         Assert.True(board.IsEndGame); // same board but with white to move, it's a stalemate
         Assert.Equal(EndgameType.Stalemate, board.EndGame.EndgameType);
     }
+
+    [Fact]
+    public void EndGame_Checkmate_CastlingEscape()
+    {
+        var board = ChessBoard.LoadFromFen("rn1qk2r/ppp1bQpp/5n2/4N3/3pP3/8/PP3PPP/RNB1K2R b KQ - 0 1", AutoEndgameRules.All);
+        Assert.True(board.IsEndGame);
+        Assert.NotNull(board.EndGame);
+        Assert.Equal(EndgameType.Checkmate, board.EndGame.EndgameType);
+        Assert.Equal(PieceColor.White, board.EndGame.WonSide);
+    }
 }
 
