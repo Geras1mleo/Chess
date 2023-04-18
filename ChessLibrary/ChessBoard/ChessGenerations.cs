@@ -189,22 +189,22 @@ public partial class ChessBoard
         {
             // Castle options
 
-            var piece = board[new Position() { X = 0, Y = piecePosition.Y }];
+            var rook = board[new Position() { X = 0, Y = piecePosition.Y }];
 
             if (board[1, piecePosition.Y] is null && board[2, piecePosition.Y] is null && board[3, piecePosition.Y] is null)
-                if (piece?.Type == PieceType.Rook && piece.Color == board[piecePosition].Color)
+                if (rook?.Type == PieceType.Rook && rook.Color == board[piecePosition].Color)
                 {
-                    positions.Add(new Position() { X = 0, Y = piecePosition.Y });
+                    positions.Add(new Position() { X = 0, Y = piecePosition.Y }); // TODO verbose option
                     positions.Add(new Position() { X = 2, Y = piecePosition.Y });
                 }
 
-            piece = board[new Position() { X = 7, Y = piecePosition.Y }];
+            rook = board[new Position() { X = 7, Y = piecePosition.Y }];
 
             if (board[5, piecePosition.Y] is null && board[6, piecePosition.Y] is null)
-                if (piece?.Type == PieceType.Rook && piece.Color == board[piecePosition].Color)
+                if (rook?.Type == PieceType.Rook && rook.Color == board[piecePosition].Color)
                 {
                     positions.Add(new Position() { X = 6, Y = piecePosition.Y });
-                    positions.Add(new Position() { X = 7, Y = piecePosition.Y });
+                    positions.Add(new Position() { X = 7, Y = piecePosition.Y }); // TODO verbose option
                 }
         }
     }

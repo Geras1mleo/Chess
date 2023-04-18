@@ -93,7 +93,7 @@ public partial class ChessBoard
         {
             // Capture
             if (board.pieces[move.NewPosition.Y, move.NewPosition.X] is not null
-             && board.pieces[move.NewPosition.Y, move.NewPosition.X].Color != move.Piece.Color)
+                && board.pieces[move.NewPosition.Y, move.NewPosition.X].Color != move.Piece.Color)
             {
                 move.CapturedPiece = board.pieces[move.NewPosition.Y, move.NewPosition.X];
             }
@@ -146,7 +146,7 @@ public partial class ChessBoard
     }
 
     /// <summary>
-    /// Basically checking if after the move will been performed 
+    /// Basically checking if after the move has been executed
     /// the next move onto position of king is valid for one of pieces of opponent
     /// </summary>
     internal static bool IsKingCheckedValidation(Move move, PieceColor side, ChessBoard board)
@@ -155,7 +155,7 @@ public partial class ChessBoard
 
         // If validating castle move
         if (move.Parameter is MoveCastle castle && move.Piece.Color == side
-         && move.Piece is not null) // move.Piece is null only when calling recursively
+                                                && move.Piece is not null) // move.Piece is null only when calling recursively
         {
             var kingPos = GetKingPosition(side, board);
             short step = (short)(castle.CastleType == CastleType.King ? 1 : -1);
@@ -252,22 +252,23 @@ public partial class ChessBoard
         {
             // 1 step forward
             if (stepH == 0 && stepV == 1
-             && board.pieces[move.NewPosition.Y, move.NewPosition.X] is null)
+                           && board.pieces[move.NewPosition.Y, move.NewPosition.X] is null)
             {
                 ValidHandle();
                 return true;
             }
             // 2 steps forward if in the beginning
             else if (stepH == 0 && stepV == 2
-                && ((move.OriginalPosition.Y == 1 && board.pieces[2, move.NewPosition.X] is null && board.pieces[3, move.NewPosition.X] is null)
-                 || (move.OriginalPosition.Y == 6 && board.pieces[5, move.NewPosition.X] is null && board.pieces[4, move.NewPosition.X] is null)))
+                                && ((move.OriginalPosition.Y == 1 && board.pieces[2, move.NewPosition.X] is null && board.pieces[3, move.NewPosition.X] is null)
+                                    || (move.OriginalPosition.Y == 6 && board.pieces[5, move.NewPosition.X] is null &&
+                                        board.pieces[4, move.NewPosition.X] is null)))
             {
                 return true;
             }
             // Second condition horizontal taking piece
             else if (stepV == 1 && stepH == 1
-                  && board.pieces[move.NewPosition.Y, move.NewPosition.X] is not null
-                  && move.Piece.Color != board.pieces[move.NewPosition.Y, move.NewPosition.X].Color)
+                                && board.pieces[move.NewPosition.Y, move.NewPosition.X] is not null
+                                && move.Piece.Color != board.pieces[move.NewPosition.Y, move.NewPosition.X].Color)
             {
                 ValidHandle();
                 return true;
@@ -321,8 +322,8 @@ public partial class ChessBoard
 
             // A bit too difficult for loop to explain
             for (int i = move.OriginalPosition.Y + stepV, j = move.OriginalPosition.X + stepH;
-                Math.Abs(i - move.NewPosition.Y - (j - move.NewPosition.X)) >= 0;
-                i += stepV, j += stepH)
+                 Math.Abs(i - move.NewPosition.Y - (j - move.NewPosition.X)) >= 0;
+                 i += stepV, j += stepH)
             {
                 if (pieces[i, j] is not null || (i == move.NewPosition.Y && j == move.NewPosition.X))
                 {
@@ -339,7 +340,7 @@ public partial class ChessBoard
     {
         // New position must be with stepH = 1 and steV = 2 or vice versa
         if ((Math.Abs(move.NewPosition.X - move.OriginalPosition.X) == 2 && Math.Abs(move.NewPosition.Y - move.OriginalPosition.Y) == 1)
-         || (Math.Abs(move.NewPosition.X - move.OriginalPosition.X) == 1 && Math.Abs(move.NewPosition.Y - move.OriginalPosition.Y) == 2))
+            || (Math.Abs(move.NewPosition.X - move.OriginalPosition.X) == 1 && Math.Abs(move.NewPosition.Y - move.OriginalPosition.Y) == 2))
         {
             return pieces[move.NewPosition.Y, move.NewPosition.X]?.Color != move.Piece.Color;
         }
@@ -382,12 +383,12 @@ public partial class ChessBoard
 
         // Check if king is on begin pos
         if (move.OriginalPosition.X == 4 && move.OriginalPosition.Y % 7 == 0
-         && move.OriginalPosition.Y == move.NewPosition.Y)
+                                         && move.OriginalPosition.Y == move.NewPosition.Y)
         {
             // if drop on rooks position to castle
             // OR drop on kings new position after castle
             if ((move.NewPosition.X % 7 == 0 && move.NewPosition.Y % 7 == 0)
-             || (Math.Abs(move.NewPosition.X - move.OriginalPosition.X) == 2))
+                || (Math.Abs(move.NewPosition.X - move.OriginalPosition.X) == 2))
             {
                 switch (move.Piece.Color)
                 {
@@ -486,9 +487,9 @@ public partial class ChessBoard
             };
 
             return board.pieces[rookpos.Y, rookpos.X] is not null
-                && board.pieces[rookpos.Y, rookpos.X].Type == PieceType.Rook
-                && board.pieces[rookpos.Y, rookpos.X].Color == side
-                && !PieceEverMoved(kingpos, board) && !PieceEverMoved(rookpos, board);
+                   && board.pieces[rookpos.Y, rookpos.X].Type == PieceType.Rook
+                   && board.pieces[rookpos.Y, rookpos.X].Color == side
+                   && !PieceEverMoved(kingpos, board) && !PieceEverMoved(rookpos, board);
         }
     }
 
@@ -524,7 +525,7 @@ public partial class ChessBoard
             var lastMove = board.DisplayedMoves.Last();
 
             if (lastMove.Piece.Type == PieceType.Pawn
-             && Math.Abs(lastMove.NewPosition.Y - lastMove.OriginalPosition.Y) == 2) // If last move is a pawn moving 2 squares forward
+                && Math.Abs(lastMove.NewPosition.Y - lastMove.OriginalPosition.Y) == 2) // If last move is a pawn moving 2 squares forward
             {
                 pos = new() { X = lastMove.NewPosition.X, Y = (short)((lastMove.NewPosition.Y + lastMove.OriginalPosition.Y) / 2) };
             }
