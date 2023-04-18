@@ -1,4 +1,4 @@
-﻿// *****************************************************
+// *****************************************************
 // *                                                   *
 // * O Lord, Thank you for your goodness in our lives. *
 // *     Please bless this code to our compilers.      *
@@ -225,6 +225,7 @@ public partial class ChessBoard
                     foreach (var position in GeneratePositions(fromPosition, board))
                     {
                         var move = new Move(fromPosition, position) { Piece = board.pieces[i, j]! };
+                        board.IsValidMove(move);
                         if (!IsKingCheckedValidation(move, side, board))
                             return true;
                     }
@@ -391,52 +392,48 @@ public partial class ChessBoard
                         // Queen Castle
                         if (move.NewPosition.X == 0 || move.NewPosition.X == 2)
                         {
+                            move.Parameter = new MoveCastle(CastleType.Queen);
+
                             if (!HasRightToCastle(PieceColor.White, CastleType.Queen, board))
                                 return false;
 
                             if (board.pieces[0, 1] is null && board.pieces[0, 2] is null && board.pieces[0, 3] is null)
-                            {
-                                move.Parameter = new MoveCastle(CastleType.Queen);
                                 return true;
-                            }
                         }
                         // King Castle
                         else if (move.NewPosition.X == 7 || move.NewPosition.X == 6)
                         {
+                            move.Parameter = new MoveCastle(CastleType.King);
+
                             if (!HasRightToCastle(PieceColor.White, CastleType.King, board))
                                 return false;
 
                             if (board.pieces[0, 5] is null && board.pieces[0, 6] is null)
-                            {
-                                move.Parameter = new MoveCastle(CastleType.King);
                                 return true;
-                            }
                         }
                         break;
                     case var e when e.Equals(PieceColor.Black):
                         // Queen Castle
                         if (move.NewPosition.X == 0 || move.NewPosition.X == 2)
                         {
+                            move.Parameter = new MoveCastle(CastleType.Queen);
+
                             if (!HasRightToCastle(PieceColor.Black, CastleType.Queen, board))
                                 return false;
 
                             if (board.pieces[7, 1] is null && board.pieces[7, 2] is null && board.pieces[7, 3] is null)
-                            {
-                                move.Parameter = new MoveCastle(CastleType.Queen);
                                 return true;
-                            }
                         }
                         // King Castle
                         else if (move.NewPosition.X == 7 || move.NewPosition.X == 6)
                         {
+                            move.Parameter = new MoveCastle(CastleType.King);
+
                             if (!HasRightToCastle(PieceColor.Black, CastleType.King, board))
                                 return false;
 
                             if (board.pieces[7, 5] is null && board.pieces[7, 6] is null)
-                            {
-                                move.Parameter = new MoveCastle(CastleType.King);
                                 return true;
-                            }
                         }
                         break;
                 }
