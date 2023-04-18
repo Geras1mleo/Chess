@@ -225,7 +225,10 @@ public partial class ChessBoard
                     foreach (var position in GeneratePositions(fromPosition, board))
                     {
                         var move = new Move(fromPosition, position) { Piece = board.pieces[i, j]! };
-                        board.IsValidMove(move);
+
+                        if (board.pieces[i, j]!.Type == PieceType.King)
+                            KingValidation(move, board); // Needed to specify castling options that are required in the IsKingCheckedValidation
+
                         if (!IsKingCheckedValidation(move, side, board))
                             return true;
                     }
