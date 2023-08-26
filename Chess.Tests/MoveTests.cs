@@ -469,8 +469,8 @@ public class MoveTests
 
         Assert.All(moves, m => Assert.NotNull(m.San));
 
-        var move = moves.Single(m => m.NewPosition == new Position("g8") && m.Parameter is MovePromotion mp && mp.PromotionType == PromotionType.ToQueen);
+        var move = moves.Single(m => m.NewPosition == new Position("g6") && m.Parameter is MoveEnPassant);
 
-        Assert.Equal("g8=Q", move.San);
+        Assert.Equal("hxg6", move.San);
     }
 }
