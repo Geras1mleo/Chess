@@ -460,4 +460,17 @@ public class MoveTests
 
         Assert.Equal("g8=Q", move.San);
     }
+
+    [Fact]
+    public void En_Passant_recognized_as_valid_move_on_check()
+    {
+        var board = ChessBoard.LoadFromFen("8/7p/3Bp2k/p2pP1pP/P3p1PK/8/r4R2/8 w - g6 0 39");
+        var moves = board.Moves(generateSan: true);
+
+        Assert.All(moves, m => Assert.NotNull(m.San));
+
+        var move = moves.Single(m => m.NewPosition == new Position("g8") && m.Parameter is MovePromotion mp && mp.PromotionType == PromotionType.ToQueen);
+
+        Assert.Equal("g8=Q", move.San);
+    }
 }
