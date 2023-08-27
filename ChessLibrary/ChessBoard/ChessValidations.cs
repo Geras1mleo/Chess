@@ -166,6 +166,12 @@ public partial class ChessBoard
 
             return false;
         }
+        else if (move.Parameter is MoveEnPassant)
+        {
+            fboard.executedMoves.Add(move);
+            fboard.Remove(((MoveEnPassant)move.Parameter).CapturedPawnPosition);
+            fboard.DropPieceToNewPosition(new Move(move));
+        }
         else if (move.OriginalPosition != move.NewPosition)
         {
             fboard.executedMoves.Add(move);
