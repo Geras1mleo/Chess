@@ -11,7 +11,8 @@ namespace Chess;
 
 internal class EndGameProvider
 {
-    private ChessBoard board;
+    private readonly ChessBoard board;
+    private readonly List<EndGameRule> rules = new();
 
     public EndGameProvider(ChessBoard board)
     {
@@ -22,8 +23,7 @@ internal class EndGameProvider
     {
         EndGameInfo? endgameInfo = null;
 
-        if (board.moveIndex >= 0
-         && board.executedMoves[board.moveIndex].IsMate)
+        if (board.moveIndex >= 0 && board.executedMoves[board.moveIndex].IsMate)
         {
             if (board.executedMoves[board.moveIndex].IsCheck)
                 endgameInfo = new EndGameInfo(EndgameType.Checkmate, board.Turn.OppositeColor());
@@ -31,7 +31,8 @@ internal class EndGameProvider
                 endgameInfo = new EndGameInfo(EndgameType.Stalemate, null);
         }
         else if (board.LoadedFromFen)
-        { // TODO need to check both???
+        {
+            // TODO need to check both???
             var whiteHasMoves = ChessBoard.PlayerHasMoves(PieceColor.White, board);
             var blackHasMoves = ChessBoard.PlayerHasMoves(PieceColor.Black, board);
 
@@ -47,26 +48,15 @@ internal class EndGameProvider
 
         if (endgameInfo is null)
         {
-            endgameInfo = ResolveDrawRules(board.AutoEndgameRules);
+            endgameInfo = ResolveDrawRules();
         }
 
         return endgameInfo;
     }
 
-    private EndGameInfo? ResolveDrawRules(AutoEndgameRules autoEndgameRules)
+    private EndGameInfo? ResolveDrawRules()
     {
         EndGameInfo? endgameInfo = null;
-
-        var rules = new List<EndGameRule>();
-
-        if ((autoEndgameRules & AutoEndgameRules.InsufficientMaterial) == AutoEndgameRules.InsufficientMaterial)
-            rules.Add(new InsufficientMaterialRule(board));
-
-        if ((autoEndgameRules & AutoEndgameRules.Repetition) == AutoEndgameRules.Repetition)
-            rules.Add(new RepetitionRule(board));
-
-        if ((autoEndgameRules & AutoEndgameRules.FiftyMoveRule) == AutoEndgameRules.FiftyMoveRule)
-            rules.Add(new FiftyMoveRule(board));
 
         for (int i = 0; i < rules.Count && endgameInfo is null; i++)
         {
@@ -78,5 +68,18 @@ internal class EndGameProvider
 
         return endgameInfo;
     }
-}
 
+    public void UpdateRules()
+    {
+        rules.Clear();
+
+        if ((board.AutoEndgameRules & AutoEndgameRules.InsufficientMaterial) == AutoEndgameRules.InsufficientMaterial)
+            rules.Add(new InsufficientMaterialRule(board));
+
+        if ((board.AutoEndgameRules & AutoEndgameRules.Repetition) == AutoEndgameRules.Repetition)
+            rules.Add(new RepetitionRule(board));
+
+        if ((board.AutoEndgameRules & AutoEndgameRules.FiftyMoveRule) == AutoEndgameRules.FiftyMoveRule)
+            rules.Add(new FiftyMoveRule(board));
+    }
+}

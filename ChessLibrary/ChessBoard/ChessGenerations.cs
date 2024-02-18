@@ -12,6 +12,42 @@ namespace Chess;
 public partial class ChessBoard
 {
     /// <summary>
+    /// Generate all moves that the player can make
+    /// </summary>
+    /// <param name="allowAmbiguousCastle">Whether Castle move will be e1-g1 AND also e1-h1 which is in fact the same O-O</param>
+    /// <param name="generateSan">San notation needs to be generated</param>
+    /// <returns>All generated moves</returns>
+    public Move[] Moves(bool allowAmbiguousCastle = false, bool generateSan = true)
+    {
+        var moves = new ConcurrentBag<Move>();
+        var tasks = new List<Task>();
+
+        for (short i = 0; i < MAX_ROWS; i++)
+        for (short j = 0; j < MAX_COLS; j++)
+        {
+            if (pieces[i, j] != null)
+            {
+                tasks.Add(MoveGenerationTask(allowAmbiguousCastle, generateSan, j, i, moves));
+            }
+        }
+
+        Task.WaitAll(tasks.ToArray());
+        return moves.ToArray();
+    }
+
+    private Task MoveGenerationTask(bool allowAmbiguousCastle, bool generateSan, short x, short y, ConcurrentBag<Move> moves)
+    {
+        return Task.Run(() =>
+        {
+            var generatedMoves = Moves(new Position { Y = y, X = x }, allowAmbiguousCastle, generateSan);
+            foreach (var move in generatedMoves)
+            {
+                moves.Add(move);
+            }
+        });
+    }
+
+    /// <summary>
     /// Returns all moves that the piece on given position can perform
     /// </summary>
     /// <param name="piecePosition">Position of piece</param>
@@ -41,7 +77,6 @@ public partial class ChessBoard
                 if (move.NewPosition.X % 7 == 0) // Dropping king on position of rook 
                     continue;
 
-                // Sketchy way of saving allowAmbiguous castle
                 if (moves.Exists(m => m.OriginalPosition == move.OriginalPosition && m.NewPosition == move.NewPosition))
                     continue;
             }
@@ -67,8 +102,9 @@ public partial class ChessBoard
 
     private void AddPromotionMoves(List<Move> moves, Move move, bool generateSan, PromotionType skipPromotion)
     {
-        if (skipPromotion == PromotionType.Default) skipPromotion = PromotionType.ToQueen;
-        
+        if (skipPromotion == PromotionType.Default)
+            skipPromotion = PromotionType.ToQueen;
+
         moves.Add(new Move(move, skipPromotion));
         if (generateSan)
         {
@@ -84,7 +120,7 @@ public partial class ChessBoard
             PromotionType.ToKnight
         };
         promotions.Remove(skipPromotion);
-        
+
         foreach (var promotion in promotions)
         {
             var newMove = new Move(move, promotion);
@@ -99,42 +135,6 @@ public partial class ChessBoard
                 ParseToSan(newMove);
             }
         }
-    }
-
-    /// <summary>
-    /// Generates all moves that the player whose turn it is can make
-    /// </summary>
-    /// <param name="allowAmbiguousCastle">Whether Castle move will be e1-g1 AND also e1-h1 which is in fact the same O-O</param>
-    /// <param name="generateSan">San notation needs to be generated</param>
-    /// <returns>All generated moves</returns>
-    public Move[] Moves(bool allowAmbiguousCastle = false, bool generateSan = true)
-    {
-        var moves = new ConcurrentBag<Move>();
-        var tasks = new List<Task>();
-
-        for (short i = 0; i < 8; i++)
-        {
-            for (short j = 0; j < 8; j++)
-            {
-                if (pieces[i, j] is not null)
-                {
-                    short x = j;
-                    short y = i;
-
-                    tasks.Add(Task.Run(() =>
-                    {
-                        var generatedMoves = Moves(new Position { Y = y, X = x }, allowAmbiguousCastle, generateSan);
-                        foreach (var move in generatedMoves)
-                        {
-                            moves.Add(move);
-                        }
-                    }));
-                }
-            }
-        }
-
-        Task.WaitAll(tasks.ToArray());
-        return moves.ToArray();
     }
 
     /// <summary>
@@ -155,7 +155,7 @@ public partial class ChessBoard
     {
         var positions = new List<Position>();
 
-        switch (board[piecePosition].Type)
+        switch (board[piecePosition]!.Type)
         {
             case var e when e == PieceType.Pawn:
                 GeneratePawnPositions(piecePosition, board, positions);
@@ -183,30 +183,34 @@ public partial class ChessBoard
 
     private static void GenerateKingPositions(Position piecePosition, ChessBoard board, List<Position> positions)
     {
-        for (short x = (short)Math.Max(0, piecePosition.X - 1); x <= Math.Min(7, piecePosition.X + 1); x++)
-        for (short y = (short)Math.Max(0, piecePosition.Y - 1); y <= Math.Min(7, piecePosition.Y + 1); y++)
-            if (x != piecePosition.X || y != piecePosition.Y)
-                if (board[x, y] == null || board[x, y].Color != board[piecePosition].Color)
-                    positions.Add(new Position(x, y));
+        int fromX = Math.Max(0, piecePosition.X - 1);
+        int toX = Math.Min(7, piecePosition.X + 1);
+        int fromY = Math.Max(0, piecePosition.Y - 1);
+        int toY = Math.Min(7, piecePosition.Y + 1);
 
+        for (int x = fromX; x <= toX; x++)
+        for (int y = fromY; y <= toY; y++)
+            if (x != piecePosition.X || y != piecePosition.Y)
+                if (board[x, y] == null || board[x, y]!.Color != board[piecePosition]!.Color)
+                    positions.Add(new Position((short)x, (short)y));
+
+        // Castle options
         if (piecePosition.Y % 7 == 0 && piecePosition.X == 4)
         {
-            // Castle options
-
-            var rook = board[new Position() { X = 0, Y = piecePosition.Y }];
+            var rook = board[0, piecePosition.Y];
 
             if (board[1, piecePosition.Y] is null && board[2, piecePosition.Y] is null && board[3, piecePosition.Y] is null)
-                if (rook?.Type == PieceType.Rook && rook.Color == board[piecePosition].Color)
+                if (rook?.Type == PieceType.Rook && rook.Color == board[piecePosition]!.Color)
                 {
                     positions.Add(new Position() { X = 2, Y = piecePosition.Y });
                     if (!board.StandardiseCastlingPositions)
                         positions.Add(new Position() { X = 0, Y = piecePosition.Y });
                 }
 
-            rook = board[new Position() { X = 7, Y = piecePosition.Y }];
+            rook = board[7, piecePosition.Y];
 
             if (board[5, piecePosition.Y] is null && board[6, piecePosition.Y] is null)
-                if (rook?.Type == PieceType.Rook && rook.Color == board[piecePosition].Color)
+                if (rook?.Type == PieceType.Rook && rook.Color == board[piecePosition]!.Color)
                 {
                     positions.Add(new Position() { X = 6, Y = piecePosition.Y });
                     if (!board.StandardiseCastlingPositions)
@@ -235,7 +239,7 @@ public partial class ChessBoard
         {
             if (pos.X >= 0 && pos.X < 8 && pos.Y >= 0 && pos.Y < 8)
             {
-                if (board[pos] is null || board[pos].Color != board[piecePosition].Color)
+                if (board[pos] is null || board[pos]!.Color != board[piecePosition]!.Color)
                 {
                     positions.Add(pos);
                 }
@@ -246,7 +250,7 @@ public partial class ChessBoard
 
     private static void GeneratePawnPositions(Position piecePosition, ChessBoard board, List<Position> positions)
     {
-        short step = (short)(board[piecePosition].Color == PieceColor.White ? 1 : -1);
+        short step = (short)(board[piecePosition]!.Color == PieceColor.White ? 1 : -1);
 
         var x = piecePosition.X;
         var y = piecePosition.Y;
@@ -278,8 +282,8 @@ public partial class ChessBoard
 
         // 2 forward
         if ((y == 1 && board[piecePosition].Color == PieceColor.White || y == 6 && board[piecePosition].Color == PieceColor.Black)
-            && board[x, nextY] is null
-            && board[x, (short)(y + step * 2)] is null)
+         && board[x, nextY] is null
+         && board[x, (short)(y + step * 2)] is null)
             positions.Add(new Position() { X = x, Y = (short)(y + step * 2) });
     }
 
@@ -288,35 +292,7 @@ public partial class ChessBoard
 
     private static void GenerateBishopPositions(Position piecePosition, ChessBoard board, List<Position> positions)
     {
-        // Iterate through each direction
-        foreach (var direction in BishopDirections)
-        {
-            // Start at the current piece position and move in the current direction
-            var currentPosition = (x: (short)(piecePosition.X + direction.x), y: (short)(piecePosition.Y + direction.y));
-
-            // Loop until the end of the board is reached or a piece is encountered
-            while (currentPosition.x >= 0 && currentPosition.x < 8 && currentPosition.y >= 0 && currentPosition.y < 8)
-            {
-                // Check if the current position has a piece
-                var currentPiece = board[currentPosition.x, currentPosition.y];
-                if (currentPiece != null)
-                {
-                    // If the current piece is not of the same color as the original piece, add it to the list of positions
-                    if (currentPiece.Color != board[piecePosition].Color)
-                        positions.Add(new Position() { X = currentPosition.x, Y = currentPosition.y });
-
-                    // Break out of the loop
-                    break;
-                }
-
-                // Add the current position to the list of positions
-                positions.Add(new Position() { X = currentPosition.x, Y = currentPosition.y });
-
-                // Move to the next position in the current direction
-                currentPosition.x += direction.x;
-                currentPosition.y += direction.y;
-            }
-        }
+        AddPositionsInDirections(BishopDirections, piecePosition, board, positions);
     }
 
     // Directions for which the rook can move
@@ -324,24 +300,31 @@ public partial class ChessBoard
 
     private static void GenerateRookPositions(Position piecePosition, ChessBoard board, List<Position> positions)
     {
-        foreach (var direction in RookDirections)
-        {
-            short x = (short)(piecePosition.X + direction.x);
-            short y = (short)(piecePosition.Y + direction.y);
+        AddPositionsInDirections(RookDirections, piecePosition, board, positions);
+    }
 
-            while (x >= 0 && x < 8 && y >= 0 && y < 8)
+    private static void AddPositionsInDirections(List<(short x, short y)> directions, Position piecePosition, ChessBoard board, List<Position> positions)
+    {
+        foreach (var direction in directions)
+        {
+            var currentPosition = (x: (short)(piecePosition.X + direction.x), y: (short)(piecePosition.Y + direction.y));
+
+            // Loop until the end of the board is reached or a piece is encountered
+            while (currentPosition.y >= 0 && currentPosition.y < MAX_ROWS && currentPosition.x >= 0 && currentPosition.x < MAX_COLS)
             {
-                if (board[x, y] is not null)
+                if (board.pieces[currentPosition.y, currentPosition.x] != null)
                 {
-                    if (board[x, y]!.Color != board[piecePosition]!.Color)
-                        positions.Add(new Position() { X = x, Y = y });
+                    // If the current piece is not of the same color as the original piece, add it to the list of positions
+                    if (board.pieces[currentPosition.y, currentPosition.x]!.Color != board[piecePosition]!.Color)
+                        positions.Add(new Position() { X = currentPosition.x, Y = currentPosition.y });
+
                     break;
                 }
 
-                positions.Add(new Position() { X = x, Y = y });
+                positions.Add(new Position() { X = currentPosition.x, Y = currentPosition.y });
 
-                x += direction.x;
-                y += direction.y;
+                currentPosition.y += direction.y;
+                currentPosition.x += direction.x;
             }
         }
     }

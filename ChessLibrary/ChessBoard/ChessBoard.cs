@@ -14,6 +14,16 @@ namespace Chess;
 /// </summary>
 public partial class ChessBoard
 {
+    /// <summary>
+    /// Board y-dimension
+    /// </summary>
+    public const int MAX_ROWS = 8;
+
+    /// <summary>
+    /// Board x-dimension
+    /// </summary>
+    public const int MAX_COLS = 8;
+
     internal Piece?[,] pieces;
 
     /// <summary>
@@ -43,7 +53,7 @@ public partial class ChessBoard
     /// </summary>
     /// <param name="x">0->8</param>
     /// <param name="y">0->8</param>
-    public Piece? this[short x, short y] => pieces[y, x];
+    public Piece? this[int x, int y] => pieces[y, x];
 
     internal readonly Dictionary<string, string> headers;
 
@@ -53,6 +63,7 @@ public partial class ChessBoard
     public IReadOnlyDictionary<string, string> Headers => new Dictionary<string, string>(headers);
 
     internal FenBoardBuilder? FenBuilder;
+
     /// <summary>
     /// Whether board has been loaded from Forsyth-Edwards Notation
     /// </summary>
@@ -69,11 +80,11 @@ public partial class ChessBoard
                 return DisplayedMoves.Count % 2 == 0 ? FenBuilder.Turn : FenBuilder.Turn.OppositeColor();
             else
                 return DisplayedMoves.Count % 2 == 0 ? PieceColor.White : PieceColor.Black;
-
         }
     }
 
     private bool whiteKingChecked = false;
+
     /// <summary>
     /// Returns the state of White king (Checked or not)
     /// </summary>
@@ -91,6 +102,7 @@ public partial class ChessBoard
     }
 
     private bool blackKingChecked = false;
+
     /// <summary>
     /// Returns the state of Black king (Checked or not)
     /// </summary>
@@ -111,6 +123,7 @@ public partial class ChessBoard
     /// Returns White king position on chess board
     /// </summary>
     public Position WhiteKing => GetKingPosition(PieceColor.White, this);
+
     /// <summary>
     /// Returns Black king position on chess board
     /// </summary>
@@ -129,7 +142,7 @@ public partial class ChessBoard
                 captured.AddRange(FenBuilder!.WhiteCaptured);
 
             captured.AddRange(DisplayedMoves.Where(m => m.CapturedPiece?.Color == PieceColor.White)
-                                            .Select(m => new Piece(m.CapturedPiece.Color, m.CapturedPiece.Type)));
+                                  .Select(m => new Piece(m.CapturedPiece.Color, m.CapturedPiece.Type)));
 
             return captured.ToArray();
         }
@@ -148,13 +161,14 @@ public partial class ChessBoard
                 captured.AddRange(FenBuilder!.BlackCaptured);
 
             captured.AddRange(DisplayedMoves.Where(m => m.CapturedPiece?.Color == PieceColor.Black)
-                                            .Select(m => new Piece(m.CapturedPiece.Color, m.CapturedPiece.Type)));
+                                  .Select(m => new Piece(m.CapturedPiece.Color, m.CapturedPiece.Type)));
 
             return captured.ToArray();
         }
     }
 
     private EndGameInfo? endGame;
+
     /// <summary>
     /// Represents End of game state(or null), won side(or null if draw) and type of end game
     /// </summary>
@@ -164,15 +178,18 @@ public partial class ChessBoard
         private set
         {
             endGame = value;
-            if (value is not null) OnEndGameEvent();
+            if (value is not null)
+                OnEndGameEvent();
         }
     }
+
     /// <summary>
     /// When true => use: EndGame. for more info on endgame(type, won side)
     /// </summary>
     public bool IsEndGame => EndGame is not null;
 
     internal readonly List<Move> executedMoves;
+
     /// <summary>
     /// Executed moves on this chess board<br/>
     /// </summary>
@@ -184,6 +201,9 @@ public partial class ChessBoard
     public List<string> MovesToSan => new List<Move>(executedMoves).Select(m => m.San).ToList();
 
     internal int moveIndex = -1;
+    private readonly EndGameProvider endGameProvider;
+    private bool standardiseCastlingPositions;
+
     /// <summary>
     /// Index of displayed move on this chess board
     /// </summary>
@@ -232,17 +252,28 @@ public partial class ChessBoard
         }
     }
 
-    private AutoEndgameRules autoEndgameRules = AutoEndgameRules.None;
-
+    private readonly AutoEndgameRules autoEndgameRules = AutoEndgameRules.None;
     /// <summary>
     /// This property keeps track of auto-draw (endgame) rules that will be used to check for endgame
     /// </summary>
-    public AutoEndgameRules AutoEndgameRules { get => autoEndgameRules; set => autoEndgameRules = value; }
+    public AutoEndgameRules AutoEndgameRules
+    {
+        get => autoEndgameRules;
+        init
+        {
+            autoEndgameRules = value;
+            endGameProvider.UpdateRules();
+        }
+    }
 
     /// <summary>
     /// Whether to standardise move like {e1 - h1} into {e1 - g1} during validation
     /// </summary>
-    public bool StandardiseCastlingPositions { get; set; } = false;
+    public bool StandardiseCastlingPositions
+    {
+        get => standardiseCastlingPositions;
+        set => standardiseCastlingPositions = value;
+    }
 
     /// <summary>
     /// Creates new chess board with default pieces positions
@@ -250,6 +281,7 @@ public partial class ChessBoard
     public ChessBoard()
     {
         executedMoves = new List<Move>();
+        endGameProvider = new EndGameProvider(this);
         headers = new Dictionary<string, string>();
         SetChessBeginSituation();
     }
@@ -287,28 +319,27 @@ public partial class ChessBoard
             throw new ChessGameEndedException(this, EndGame);
 
         if (!IsLastMoveDisplayed)
-            throw new ChessInvalidMoveException(this, "Please use board.DisplayLastMove(); to be able to perform new moves in this chess game", move);
+            throw new ChessInvalidMoveException(this, "Please use first board.DisplayLastMove(); to be able to perform new moves on this chess board", move);
 
-        if (IsValidMove(move, this, true, true))
-        {
-            if (move.San is null)
-                ParseToSan(move);
+        if (!IsValidMove(move, this, true, true))
+            return false;
 
-            executedMoves.Add(move);
+        if (move.San is null)
+            ParseToSan(move);
 
-            if (move.CapturedPiece is not null)
-                OnCapturedEvent(move.CapturedPiece);
+        executedMoves.Add(move);
 
-            DropPieceToNewPosition(move);
+        if (move.CapturedPiece is not null)
+            OnCapturedEvent(move.CapturedPiece);
 
-            moveIndex = executedMoves.Count - 1;
+        DropPieceToNewPosition(move);
 
-            HandleKingChecked();
-            HandleEndGame();
+        moveIndex = executedMoves.Count - 1;
 
-            return true;
-        }
-        else return false;
+        HandleKingChecked();
+        HandleEndGame();
+
+        return true;
     }
 
     /// <summary>
@@ -472,7 +503,8 @@ public partial class ChessBoard
     internal static void DropPiece(Move move, ChessBoard board)
     {
         // Moving piece to its new position
-        board.pieces[move.NewPosition.Y, move.NewPosition.X] = new(board.pieces[move.OriginalPosition.Y, move.OriginalPosition.X].Color, board.pieces[move.OriginalPosition.Y, move.OriginalPosition.X].Type);
+        var piece = board.pieces[move.OriginalPosition.Y, move.OriginalPosition.X]!;
+        board.pieces[move.NewPosition.Y, move.NewPosition.X] = new(piece.Color, piece.Type);
 
         // Clearing old position
         board.pieces[move.OriginalPosition.Y, move.OriginalPosition.X] = null;
@@ -481,7 +513,8 @@ public partial class ChessBoard
     internal static void RestorePiece(Move move, ChessBoard board)
     {
         // Moving piece to its original position
-        board.pieces[move.OriginalPosition.Y, move.OriginalPosition.X] = new(board.pieces[move.NewPosition.Y, move.NewPosition.X].Color, board.pieces[move.NewPosition.Y, move.NewPosition.X].Type);
+        var piece = board.pieces[move.NewPosition.Y, move.NewPosition.X]!;
+        board.pieces[move.OriginalPosition.Y, move.OriginalPosition.X] = new(piece.Color, piece.Type);
 
         // Clearing new position / or setting captured piece back
         board.pieces[move.NewPosition.Y, move.NewPosition.X] = move.CapturedPiece;
@@ -490,12 +523,12 @@ public partial class ChessBoard
     private void DisplayMoves(List<Move> moves)
     {
         if (LoadedFromFen)
-            pieces = FenBuilder.Pieces;
+            pieces = FenBuilder!.Pieces;
         else
             SetChessBeginSituation();
 
-        for (int i = 0; i < moves.Count; i++)
-            DropPieceToNewPosition(moves[i]);
+        foreach (var move in moves)
+            DropPieceToNewPosition(move);
 
         moveIndex = moves.Count - 1;
 
@@ -532,7 +565,7 @@ public partial class ChessBoard
     /// </summary>
     internal void HandleEndGame()
     {
-        EndGame = new EndGameProvider(this).GetEndGameInfo();
+        EndGame = endGameProvider.GetEndGameInfo();
     }
 
     private void SetChessBeginSituation()

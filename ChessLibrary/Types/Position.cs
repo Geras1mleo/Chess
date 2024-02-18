@@ -10,29 +10,30 @@
 namespace Chess;
 
 /// <summary>
-/// Position on Chess table counting from 0
+/// Coordinate like Position on Chess table counting from 0
 /// </summary>
 public struct Position
 {
     /// <summary>
-    /// Whether X is between 0 and 7<br/>
-    /// And Y is between 0 and 7
+    /// Whether X and Y are in valid range [0; ChessBoard.MAX_COLS/MAX_ROWS[
     /// </summary>
     public bool HasValue => HasValueX & HasValueY;
 
     /// <summary>
-    /// Whether X is between 0 and 7
+    /// Whether X is in range [0; ChessBoard.MAX_COLS[
     /// </summary>
-    public bool HasValueX => X >= 0 && X <= 7;
+    public bool HasValueX => X >= 0 && X < ChessBoard.MAX_COLS;
+
     /// <summary>
-    /// Whether Y is between 0 and 7
+    /// Whether Y is in range [0; ChessBoard.MAX_ROWS[
     /// </summary>
-    public bool HasValueY => Y >= 0 && Y <= 7;
+    public bool HasValueY => Y >= 0 && Y < ChessBoard.MAX_ROWS;
 
     /// <summary>
     /// Horizontal position (File) on chess board
     /// </summary>
     public short X { get; internal set; } = -1;
+
     /// <summary>
     /// Vertical position (Rank) on chess board
     /// </summary>
@@ -84,18 +85,10 @@ public struct Position
     /// </summary>
     public static short FromFile(char file)
     {
-        return char.ToLower(file) switch
-        {
-            'a' => 0,
-            'b' => 1,
-            'c' => 2,
-            'd' => 3,
-            'e' => 4,
-            'f' => 5,
-            'g' => 6,
-            'h' => 7,
-            _ => throw new ChessArgumentException(null, nameof(file), nameof(Position.FromFile)),
-        };
+        if (file < 'a' || file > 'h')
+            throw new ChessArgumentException(null, nameof(file), nameof(Position.FromFile));
+
+        return (short)(file - 'a');
     }
 
     /// <summary>
@@ -110,23 +103,15 @@ public struct Position
     /// '8' => 7<br/>
     /// </summary>
     public static short FromRank(char rank)
-    {   // This code is faster than conversion to short with short.TryParse(...)
-        return rank switch
-        {
-            '1' => 0,
-            '2' => 1,
-            '3' => 2,
-            '4' => 3,
-            '5' => 4,
-            '6' => 5,
-            '7' => 6,
-            '8' => 7,
-            _ => throw new ChessArgumentException(null, nameof(rank), nameof(Position.FromRank)),
-        };
+    {
+        if (rank < '1' || rank > '8')
+            throw new ChessArgumentException(null, nameof(rank), nameof(Position.FromRank));
+
+        return (short)(rank - '1');
     }
 
     /// <summary>
-    /// Char from X<br/>
+    /// Convert X coordinate into file on board:<br/>
     /// 0 => 'a'<br/>
     /// 1 => 'b'<br/>
     /// 2 => 'c'<br/>
@@ -138,18 +123,10 @@ public struct Position
     /// </summary>
     public char File()
     {
-        return X switch
-        {
-            0 => 'a',
-            1 => 'b',
-            2 => 'c',
-            3 => 'd',
-            4 => 'e',
-            5 => 'f',
-            6 => 'g',
-            7 => 'h',
-            _ => throw new ChessArgumentException(null, nameof(X), nameof(Position.File))
-        };
+        if (!HasValueX)
+            throw new ChessArgumentException(null, nameof(X), nameof(Position.File));
+
+        return (char)(X + 'a');
     }
 
     /// <summary>
@@ -164,19 +141,11 @@ public struct Position
     /// 7 => '8'<br/>
     /// </summary>
     public char Rank()
-    {   // This code is faster than conversion to char
-        return Y switch
-        {
-            0 => '1',
-            1 => '2',
-            2 => '3',
-            3 => '4',
-            4 => '5',
-            5 => '6',
-            6 => '7',
-            7 => '8',
-            _ => throw new ChessArgumentException(null, nameof(Y), nameof(Position.Rank))
-        };
+    {
+        if (!HasValueY)
+            throw new ChessArgumentException(null, nameof(Y), nameof(Position.Rank));
+
+        return (char)(Y + '1');
     }
 
     /// <summary>
@@ -187,20 +156,23 @@ public struct Position
     public override string ToString() => File().ToString() + Rank();
 
     /// <summary>
-    /// Equals
+    /// Equalizing 2 Positions
     /// </summary>
-    public override bool Equals(object obj) => base.Equals(obj);
-    /// <summary>
-    /// HashCode
-    /// </summary>
-    public override int GetHashCode() => base.GetHashCode();
+    public static bool operator ==(Position a, Position b) => a.X == b.X && a.Y == b.Y;
 
     /// <summary>
     /// Equalizing 2 Positions
     /// </summary>
-    public static bool operator ==(Position a, Position b) => (a.X == b.X && a.Y == b.Y);
+    public static bool operator !=(Position a, Position b) => !(a.X == b.X && a.Y == b.Y);
+
     /// <summary>
     /// Equalizing 2 Positions
     /// </summary>
-    public static bool operator !=(Position a, Position b) => !(a.X == b.X && a.Y == b.Y);
+    public bool Equals(Position other) => X == other.X && Y == other.Y;
+
+    /// <inheritdoc />
+    public override bool Equals(object? obj) => obj is Position other && Equals(other);
+
+    /// <inheritdoc />
+    public override int GetHashCode() => HashCode.Combine(X, Y);
 }
