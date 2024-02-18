@@ -306,5 +306,26 @@ public class ConversionsTests
         Assert.Equal(EndgameType.Stalemate, board.EndGame.EndgameType);
     }
 
-}
+    [Fact]
+    public void TestCastlingConversion()
+    {
+        var moves = new[]
+        {
+            "e3", "d6",
+            "Be2", "Be6",
+            "Nf3", "Qd7",
+            "O-O", "Nc6",
+            "d3", "O-O-O"
+        };
+        var board = new ChessBoard();
 
+        foreach (var move in moves)
+        {
+            board.Move(move);
+            if (move == "O-O")
+                Assert.Equal("g1", board.ExecutedMoves[^1].NewPosition.ToString());
+            if (move == "O-O-0")
+                Assert.Equal("c8", board.ExecutedMoves[^1].NewPosition.ToString());
+        }
+    }
+}

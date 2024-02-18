@@ -240,6 +240,11 @@ public partial class ChessBoard
     public AutoEndgameRules AutoEndgameRules { get => autoEndgameRules; set => autoEndgameRules = value; }
 
     /// <summary>
+    /// Whether to standardise move like {e1 - h1} into {e1 - g1} during validation
+    /// </summary>
+    public bool StandardiseCastlingPositions { get; set; } = false;
+
+    /// <summary>
     /// Creates new chess board with default pieces positions
     /// </summary>
     public ChessBoard()

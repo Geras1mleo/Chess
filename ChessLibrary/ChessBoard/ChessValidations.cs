@@ -387,69 +387,45 @@ public partial class ChessBoard
             return board.pieces[move.NewPosition.Y, move.NewPosition.X]?.Color != move.Piece.Color;
         }
 
-        // Check if king is on begin pos
-        if (move.OriginalPosition.X == 4 && move.OriginalPosition.Y % 7 == 0
-                                         && move.OriginalPosition.Y == move.NewPosition.Y)
-        {
-            // if drop on rooks position to castle
-            // OR drop on kings new position after castle
-            if ((move.NewPosition.X % 7 == 0 && move.NewPosition.Y % 7 == 0)
-                || (Math.Abs(move.NewPosition.X - move.OriginalPosition.X) == 2))
-            {
-                switch (move.Piece.Color)
-                {
-                    case var e when e.Equals(PieceColor.White):
-                        // Queen Castle
-                        if (move.NewPosition.X == 0 || move.NewPosition.X == 2)
-                        {
-                            move.Parameter = new MoveCastle(CastleType.Queen);
+        // Castle validation:
 
-                            if (!HasRightToCastle(PieceColor.White, CastleType.Queen, board))
-                                return false;
+        bool kingMovesHorizontally = move.OriginalPosition.Y == move.NewPosition.Y;
+        bool kingOnBeginPos = move.OriginalPosition.X == 4 && move.OriginalPosition.Y % 7 == 0;
 
-                            if (board.pieces[0, 1] is null && board.pieces[0, 2] is null && board.pieces[0, 3] is null)
-                                return true;
-                        }
-                        // King Castle
-                        else if (move.NewPosition.X == 7 || move.NewPosition.X == 6)
-                        {
-                            move.Parameter = new MoveCastle(CastleType.King);
+        if (!kingOnBeginPos || !kingMovesHorizontally)
+            return false;
 
-                            if (!HasRightToCastle(PieceColor.White, CastleType.King, board))
-                                return false;
+        bool kingMoves2Tiles = Math.Abs(move.NewPosition.X - move.OriginalPosition.X) == 2;
+        bool kingMovesOnRook = move.NewPosition.X % 7 == 0;
 
-                            if (board.pieces[0, 5] is null && board.pieces[0, 6] is null)
-                                return true;
-                        }
-                        break;
-                    case var e when e.Equals(PieceColor.Black):
-                        // Queen Castle
-                        if (move.NewPosition.X == 0 || move.NewPosition.X == 2)
-                        {
-                            move.Parameter = new MoveCastle(CastleType.Queen);
+        if (!kingMovesOnRook && !kingMoves2Tiles)
+            return false;
 
-                            if (!HasRightToCastle(PieceColor.Black, CastleType.Queen, board))
-                                return false;
+        // Standardise x-pos for checks
+        int x = kingMovesOnRook ? (move.NewPosition.X == 0 ? 2 : 6) : move.NewPosition.X;
 
-                            if (board.pieces[7, 1] is null && board.pieces[7, 2] is null && board.pieces[7, 3] is null)
-                                return true;
-                        }
-                        // King Castle
-                        else if (move.NewPosition.X == 7 || move.NewPosition.X == 6)
-                        {
-                            move.Parameter = new MoveCastle(CastleType.King);
+        bool isKingSideCastle = x == 6;
+        bool isQueenSideCastle = x == 2;
 
-                            if (!HasRightToCastle(PieceColor.Black, CastleType.King, board))
-                                return false;
+        MoveCastle moveCastle = isKingSideCastle ? new MoveCastle(CastleType.King) : new MoveCastle(CastleType.Queen);
+        move.Parameter = moveCastle;
 
-                            if (board.pieces[7, 5] is null && board.pieces[7, 6] is null)
-                                return true;
-                        }
-                        break;
-                }
-            }
-        }
-        return false;
+        int y = move.NewPosition.Y;
+
+        bool hasObstacles = true;
+
+        if (isQueenSideCastle)
+            hasObstacles = board.pieces[y, 1] != null || board.pieces[y, 2] != null || board.pieces[y, 3] != null;
+        else if (isKingSideCastle)
+            hasObstacles = board.pieces[y, 5] != null || board.pieces[y, 6] != null;
+
+        bool isValid = !hasObstacles && HasRightToCastle(move.Piece.Color, moveCastle.CastleType, board);
+
+        // Standardise castling position
+        if (board.StandardiseCastlingPositions && isValid && kingMovesOnRook)
+            move.NewPosition = new Position((short)(move.NewPosition.X == 0 ? 2 : 6), move.NewPosition.Y);
+
+        return isValid;
     }
 
     internal static bool HasRightToCastle(PieceColor side, CastleType castleType, ChessBoard board)

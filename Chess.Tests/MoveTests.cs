@@ -473,4 +473,13 @@ public class MoveTests
 
         Assert.Equal("hxg6", move.San);
     }
+
+    [Fact]
+    public void Castle_Should_Standardise_e1h1_to_e1g8()
+    {
+        var board = ChessBoard.LoadFromFen("r3kbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w KQkq - 0 1");
+        board.StandardiseCastlingPositions = true;
+        board.Move(new Move(new Position("e1"), new Position("h1")));
+        Assert.Equal("g1", board.ExecutedMoves[^1].NewPosition.ToString());
+    }
 }

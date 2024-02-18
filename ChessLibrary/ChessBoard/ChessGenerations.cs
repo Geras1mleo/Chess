@@ -40,6 +40,10 @@ public partial class ChessBoard
             {
                 if (move.NewPosition.X % 7 == 0) // Dropping king on position of rook 
                     continue;
+
+                // Sketchy way of saving allowAmbiguous castle
+                if (moves.Exists(m => m.OriginalPosition == move.OriginalPosition && m.NewPosition == move.NewPosition))
+                    continue;
             }
 
             // If promotion => 4 different moves for each promotion type
@@ -194,8 +198,9 @@ public partial class ChessBoard
             if (board[1, piecePosition.Y] is null && board[2, piecePosition.Y] is null && board[3, piecePosition.Y] is null)
                 if (rook?.Type == PieceType.Rook && rook.Color == board[piecePosition].Color)
                 {
-                    positions.Add(new Position() { X = 0, Y = piecePosition.Y }); // TODO verbose option
                     positions.Add(new Position() { X = 2, Y = piecePosition.Y });
+                    if (!board.StandardiseCastlingPositions)
+                        positions.Add(new Position() { X = 0, Y = piecePosition.Y });
                 }
 
             rook = board[new Position() { X = 7, Y = piecePosition.Y }];
@@ -204,7 +209,8 @@ public partial class ChessBoard
                 if (rook?.Type == PieceType.Rook && rook.Color == board[piecePosition].Color)
                 {
                     positions.Add(new Position() { X = 6, Y = piecePosition.Y });
-                    positions.Add(new Position() { X = 7, Y = piecePosition.Y }); // TODO verbose option
+                    if (!board.StandardiseCastlingPositions)
+                        positions.Add(new Position() { X = 7, Y = piecePosition.Y });
                 }
         }
     }
