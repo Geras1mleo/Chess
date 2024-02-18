@@ -8,7 +8,7 @@
 	</p>
 </div>
 
-![GitHub top language](https://img.shields.io/github/languages/top/geras1mleo/chess?color=blueviolet&label=C%23%20.NET%206.0&style=for-the-badge) ![GitHub last commit](https://img.shields.io/github/last-commit/geras1mleo/chess?label=Last%20commit&logo=git&style=for-the-badge) [![Nuget](https://img.shields.io/nuget/dt/gera.chess?logo=nuget&style=for-the-badge&label=Downloads&logoColor=blue)](https://www.nuget.org/packages/Gera.Chess/)
+![GitHub top language](https://img.shields.io/github/languages/top/geras1mleo/chess?style=for-the-badge&label=C%23%20.NET&color=blueviolet) ![GitHub last commit](https://img.shields.io/github/last-commit/geras1mleo/chess?label=Last%20commit&logo=git&style=for-the-badge) [![Nuget](https://img.shields.io/nuget/dt/gera.chess?logo=nuget&style=for-the-badge&label=Downloads&logoColor=blue)](https://www.nuget.org/packages/Gera.Chess/)
 
 [![Nuget](https://img.shields.io/nuget/v/gera.chess?logo=nuget&style=for-the-badge)](https://www.nuget.org/packages/Gera.Chess/)
 
