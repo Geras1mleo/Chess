@@ -6,6 +6,7 @@
 		<Nullable>enable</Nullable>
                 <Description>Chess logic made with C# dotnet 6 and ♥ by Geras1mleo. SAN and FEN parsing/generation, moves validation, legal positions generations, auto endgame detection (insufficient material, threefold repetition, fifty move rule), event handlers and much more!</Description>
                 <Title>Gera.Chess</Title>
+                <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -17,6 +18,10 @@
 		<None Include="..\LICENSE.md">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
+		</None>
+		<None Update="knight.png">
+		  <Pack>True</Pack>
+		  <PackagePath></PackagePath>
 		</None>
 	</ItemGroup>
 
@@ -36,17 +41,16 @@
 		<OutputType>Library</OutputType>
 		<RootNamespace>Chess</RootNamespace>
 		<Authors>Geras1mleo</Authors>
-		<Copyright>Copyright (c) 2023 Geras1mleo</Copyright>
+		<Copyright>Copyright (c) 2024 Geras1mleo</Copyright>
 		<PackageProjectUrl></PackageProjectUrl>
 		<PackageReadmeFile>README_NUGET.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/Geras1mleo/Chess</RepositoryUrl>
 		<PackageTags>chess;chessboard;chess-game;chess-position;standard-algebraic-notation;chess-move;forsyth-edwards-notation;chess-validator;chess-variations</PackageTags>
-                <PackageReleaseNotes>Endgame/Draw detection added: InsufficientMaterial rule, Threefold repetition rule and Fiftymove rule. Use AutoEndgameRules property to configure needed rules.
-Significant performance improvements, almost all methods are now x2 faster due to the use of Spans.</PackageReleaseNotes>
+                <PackageReleaseNotes>Bug fix, some minor changes in the method signatures</PackageReleaseNotes>
 		<PackageIcon>knight.png</PackageIcon>
 		<PackageId>Gera.Chess</PackageId>
 		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
 		<RepositoryType>git</RepositoryType>
-		<Version>1.0.5</Version>
+		<Version>1.1.0</Version>
 	</PropertyGroup>
 </Project>
