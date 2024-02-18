@@ -31,7 +31,7 @@ internal class EndGameProvider
                 endgameInfo = new EndGameInfo(EndgameType.Stalemate, null);
         }
         else if (board.LoadedFromFen)
-        {
+        { // TODO need to check both???
             var whiteHasMoves = ChessBoard.PlayerHasMoves(PieceColor.White, board);
             var blackHasMoves = ChessBoard.PlayerHasMoves(PieceColor.Black, board);
 
