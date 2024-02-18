@@ -219,12 +219,52 @@ public class ConversionsTests
     }
 
     [Fact]
+    public void Test_Pgn_With_EnPassant()
+    {
+        string pgn = @"[Variant ""From Position""]
+        [FEN ""rnbqkbnr/pppp1ppp/8/4pP2/8/8/PPPPP1PP/RNBQKBNR w KQkq e6 0 1""]
+        1. fxe6";
+
+        var board = ChessBoard.LoadFromPgn(pgn);
+        Assert.Null(board["e5"]);
+        Assert.True(board.ExecutedMoves[^1].Parameter is MoveEnPassant);
+    }
+
+    [Fact]
+    public void Test_Pgn_With_EnPassant_Extended_Original_Position()
+    {
+        string pgn = @"[Variant ""From Position""]
+        [FEN ""rnbqkbnr/pppp1ppp/8/4pP2/8/8/PPPPP1PP/RNBQKBNR w KQkq e6 0 1""]
+        1. f5xe6";
+
+        var board = ChessBoard.LoadFromPgn(pgn);
+        Assert.Null(board["e5"]);
+        Assert.True(board.ExecutedMoves[^1].Parameter is MoveEnPassant);
+    }
+
+    [Fact]
+    public void Test_Pgn_Should_Load()
+    {
+        // Issue #19
+        string pgn = @"1.e4 e6 2.d4 d5 3.Nc3 Nf6 4.Bg5 dxe4 5.Nxe4 Be7 6.Bxf6 gxf6 7.Nf3 f5 8.Nc3 a6
+        9.Qd2 b5 10.O-O-O b4 11.Na4 Bb7 12.Bc4 Bd5 13.Qe2 Nc6 14.Rhe1 Na5 15.Bxd5 Qxd5
+        16.b3 Nc6 17.c4 bxc3 18.Nxc3 Qa5 19.Qc4 Nb4 20.Kb1 O-O 21.Ne5 Rad8 22.g4 f4
+        23.Nd3 Nxd3 24.Rxd3 Bf6 25.Red1 Bg7 26.Qc5 Qxc5 27.dxc5 Rxd3 28.Rxd3 f5 29.gxf5 Bxc3
+        30.Rxc3 Rxf5 31.Kc2 Rg5 32.Kd3 Rg2 33.Ke2 Rxh2 34.Rd3 e5 35.Rd5 e4 36.Rg5+ Kh8
+        37.Rg4 e3 38.Rxf4 exf2 39.Rf7 c6 40.a4 Kg8 41.Rc7 Rh3 42.Rxc6 Rxb3 43.Rxa6 Rb2+
+        44.Kf1 Kf7 45.a5 Ke8 46.Ra8+ Kd7 47.a6 Ra2 48.a7 Kc7 1/2-1/2";
+
+        var board = ChessBoard.LoadFromPgn(pgn);
+        Assert.True(board.IsEndGame);
+    }
+
+    [Fact]
     public void TestPgnLoadFromPosition()
     {
         var board = new ChessBoard();
         // From Position
         board = ChessBoard.LoadFromPgn(
-        @"[Variant ""From Position""]
+            @"[Variant ""From Position""]
         [FEN ""rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1""]
             
         1.exd5 e6 2.dxe6 fxe6");

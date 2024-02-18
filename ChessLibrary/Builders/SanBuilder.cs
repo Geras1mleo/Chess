@@ -64,13 +64,11 @@ internal static class SanBuilder
         if (isCapture && board[moveOut.NewPosition] is not null)
             moveOut.CapturedPiece = board[moveOut.NewPosition];
 
-        if (!originalPos.HasValue)
-        {
-            var (succeeded, exception) = ParseOriginalPosition(board, san, moveOut, ref originalPos);
-            if (!succeeded) return (false, exception);
-        }
-
         moveOut.OriginalPosition = originalPos;
+
+        var (succeeded, exception) = ParseOriginalPosition(board, san, moveOut);
+        if (!succeeded)
+            return (false, exception);
 
         if (resetSan)
         {
@@ -81,39 +79,8 @@ internal static class SanBuilder
         return (true, null);
     }
 
-    private static (bool succeeded, ChessException? exception) ParseOriginalPosition(ChessBoard board, string san, Move moveOut, ref Position originalPos)
+    private static (bool succeeded, ChessException? exception) ParseOriginalPosition(ChessBoard board, string san, Move move)
     {
-        var ambiguousMoves = GetMovesOfPieceOnPosition(moveOut.Piece, moveOut.NewPosition, board).ToList();
-
-        if (originalPos.HasValueX)
-        {
-            var originalPosX = originalPos.X;
-            ambiguousMoves = ambiguousMoves.Where(m => m.OriginalPosition.X == originalPosX).ToList();
-
-            if (ambiguousMoves.Count != 1)
-                return (false, GetException(ambiguousMoves.Count, ambiguousMoves));
-
-            originalPos.Y = ambiguousMoves.ElementAt(0).OriginalPosition.Y;
-        }
-        else if (originalPos.HasValueY)
-        {
-            var originalPosY = originalPos.Y;
-            ambiguousMoves = ambiguousMoves.Where(m => m.OriginalPosition.Y == originalPosY).ToList();
-
-            if (ambiguousMoves.Count != 1)
-                return (false, GetException(ambiguousMoves.Count, ambiguousMoves));
-
-            originalPos.X = ambiguousMoves.ElementAt(0).OriginalPosition.X;
-        }
-        else
-        {
-            if (ambiguousMoves.Count != 1)
-                return (false, GetException(ambiguousMoves.Count, ambiguousMoves));
-
-            originalPos.X = ambiguousMoves.ElementAt(0).OriginalPosition.X;
-            originalPos.Y = ambiguousMoves.ElementAt(0).OriginalPosition.Y;
-        }
-
         ChessException? GetException(int count, List<Move> moves)
         {
             return count switch
@@ -122,6 +89,25 @@ internal static class SanBuilder
                 > 1 => new ChessSanTooAmbiguousException(board, san, moves.ToArray()),
                 _ => null
             };
+        }
+
+        var ambiguousMoves = GetMovesOfPieceOnPosition(move.Piece, move.NewPosition, board).ToList();
+
+        if (move.OriginalPosition.HasValueX)
+            ambiguousMoves.RemoveAll(m => m.OriginalPosition.X != move.OriginalPosition.X);
+        else if (move.OriginalPosition.HasValueY)
+            ambiguousMoves.RemoveAll(m => m.OriginalPosition.Y != move.OriginalPosition.Y);
+
+        if (ambiguousMoves.Count != 1)
+            return (false, GetException(ambiguousMoves.Count, ambiguousMoves));
+
+        move.OriginalPosition = ambiguousMoves[0].OriginalPosition;
+
+        // EnPassant
+        if (ambiguousMoves[0].Parameter is MoveEnPassant enPassant)
+        {
+            move.Parameter = enPassant;
+            move.CapturedPiece = ambiguousMoves[0].CapturedPiece;
         }
 
         return (true, null);
@@ -144,25 +130,26 @@ internal static class SanBuilder
         }
     }
 
-    private static void ParseCastling(ChessBoard board, Group group, Move moveOut, ref Position originalPos)
+    private static void ParseCastling(ChessBoard board, Group group, Move move, ref Position originalPos)
     {
-        moveOut.Parameter = IMoveParameter.FromString(group.Value);
+        move.Parameter = IMoveParameter.FromString(group.Value);
         if (board.Turn == PieceColor.White)
         {
             originalPos = new Position("e1");
             if (group.Value == "O-O")
-                moveOut.NewPosition = new Position("g1");
+                move.NewPosition = new Position("g1");
             else if (group.Value == "O-O-O")
-                moveOut.NewPosition = new Position("c1");
+                move.NewPosition = new Position("c1");
         }
         else if (board.Turn == PieceColor.Black)
         {
             originalPos = new Position("e8");
             if (group.Value == "O-O")
-                moveOut.NewPosition = new Position("g8");
+                move.NewPosition = new Position("g8");
             else if (group.Value == "O-O-O")
-                moveOut.NewPosition = new Position("c8");
+                move.NewPosition = new Position("c8");
         }
+        move.Piece = board[originalPos] ?? new Piece(board.Turn, PieceType.King);
     }
 
     public static (bool succeeded, ChessException? exception) TryParse(ChessBoard board, Move move, out string? san)
