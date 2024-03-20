@@ -10,7 +10,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Include="..\..\knight.png">
+		<None Include="..\knight.png">
 		  <Pack>True</Pack>
 		  <PackagePath>\</PackagePath>
 		</None>
@@ -18,10 +18,6 @@
 		<None Include="..\LICENSE.md">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
-		</None>
-		<None Update="knight.png">
-		  <Pack>True</Pack>
-		  <PackagePath></PackagePath>
 		</None>
 	</ItemGroup>
 
