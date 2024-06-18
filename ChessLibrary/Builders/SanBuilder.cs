@@ -95,7 +95,7 @@ internal static class SanBuilder
 
         if (move.OriginalPosition.HasValueX)
             ambiguousMoves.RemoveAll(m => m.OriginalPosition.X != move.OriginalPosition.X);
-        else if (move.OriginalPosition.HasValueY)
+        if (move.OriginalPosition.HasValueY)
             ambiguousMoves.RemoveAll(m => m.OriginalPosition.Y != move.OriginalPosition.Y);
 
         if (ambiguousMoves.Count != 1)
