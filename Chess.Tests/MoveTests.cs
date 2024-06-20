@@ -109,6 +109,19 @@ public class MoveTests
         Assert.Equal(expectedSan, board.ExecutedMoves[0].San);
     }
 
+    [Theory]
+    [InlineData("4k3/8/8/8/3N4/8/3N4/4K1N1 w - - 0 1", "N2f3", "4k3/8/8/8/3N4/5N2/8/4K1N1 b - - 1 1")]
+    [InlineData("4k3/8/8/8/3N4/8/3N4/4K1N1 w - - 0 1", "Nd2f3", "4k3/8/8/8/3N4/5N2/8/4K1N1 b - - 1 1")]
+    [InlineData("4k3/8/8/8/8/8/3N3N/4K1N1 w - - 0 1", "Ndf3", "4k3/8/8/8/8/5N2/7N/4K1N1 b - - 1 1")]
+    [InlineData("4k3/8/8/8/8/8/3N3N/4K1N1 w - - 0 1", "Nd2f3", "4k3/8/8/8/8/5N2/7N/4K1N1 b - - 1 1")]
+    [InlineData("4k3/8/8/8/3N4/8/3N3N/4K3 w - - 0 1", "Nd2f3", "4k3/8/8/8/3N4/5N2/7N/4K3 b - - 1 1")]
+    public void TestAmbiguousMoveExecution(string fen, string san, string expectedFen)
+    {
+        var board = ChessBoard.LoadFromFen(fen);
+        board.Move(san);
+        Assert.Equal(expectedFen, board.ToFen());
+    }
+
     [Fact]
     public void TestParseToSan()
     {
