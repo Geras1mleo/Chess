@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-                <Description>Chess logic made with C# dotnet 6 and ♥ by Geras1mleo. SAN and FEN parsing/generation, moves validation, legal positions generations, auto endgame detection (insufficient material, threefold repetition, fifty move rule), event handlers and much more!</Description>
+                <Description>Chess logic made with C# and ♥ by Geras1mleo. SAN and FEN parsing/generation, moves validation, legal positions generations, auto endgame detection (insufficient material, threefold repetition, fifty move rule), event handlers and much more!</Description>
                 <Title>Gera.Chess</Title>
                 <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+                <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -38,15 +38,15 @@
 		<RootNamespace>Chess</RootNamespace>
 		<Authors>Geras1mleo</Authors>
 		<Copyright>Copyright (c) 2024 Geras1mleo</Copyright>
-		<PackageProjectUrl></PackageProjectUrl>
+		<PackageProjectUrl>https://www.nuget.org/packages/Gera.Chess/</PackageProjectUrl>
 		<PackageReadmeFile>README_NUGET.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/Geras1mleo/Chess</RepositoryUrl>
 		<PackageTags>chess;chessboard;chess-game;chess-position;standard-algebraic-notation;chess-move;forsyth-edwards-notation;chess-validator;chess-variations</PackageTags>
-                <PackageReleaseNotes>Bug fix</PackageReleaseNotes>
+                <PackageReleaseNotes>Release for net8.0</PackageReleaseNotes>
 		<PackageIcon>knight.png</PackageIcon>
 		<PackageId>Gera.Chess</PackageId>
 		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
 		<RepositoryType>git</RepositoryType>
-		<Version>1.1.1</Version>
+		<Version>1.2.0</Version>
 	</PropertyGroup>
 </Project>
