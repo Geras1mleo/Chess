@@ -141,5 +141,12 @@ public class EndGameTests
         Assert.Equal(EndgameType.Checkmate, board.EndGame.EndgameType);
         Assert.Equal(PieceColor.White, board.EndGame.WonSide);
     }
-}
 
+    [Fact]
+    public void King_Has_Moves_After_En_Passant()
+    {
+        var board = ChessBoard.LoadFromFen("8/2R2p1p/4k1p1/6P1/5PKP/r7/8/8 b - - 2 35");
+        board.Move("h5+");
+        Assert.False(board.IsEndGame);
+    }
+}

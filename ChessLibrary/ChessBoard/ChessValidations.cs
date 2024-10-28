@@ -178,6 +178,7 @@ public partial class ChessBoard
 
         newBoard.executedMoves.Add(move);
         newBoard.DropPieceToNewPosition(new Move(move));
+        newBoard.moveIndex = newBoard.executedMoves.Count - 1;
 
         return IsKingChecked(side, newBoard);
     }
@@ -226,12 +227,13 @@ public partial class ChessBoard
 
     private static bool PlayerHasMovesValidation(Move move, PieceColor side, ChessBoard board)
     {
-        var newBoard = new ChessBoard(board.pieces, board.executedMoves);
+        var newBoard = new ChessBoard(board.pieces, board.executedMoves) { FenBuilder = board.FenBuilder, moveIndex = board.MoveIndex };
 
         if (move.OriginalPosition != move.NewPosition)
         {
             newBoard.executedMoves.Add(move);
             newBoard.DropPieceToNewPosition(new Move(move));
+            newBoard.moveIndex = newBoard.executedMoves.Count - 1;
         }
         return PlayerHasMoves(side, newBoard);
     }
@@ -254,6 +256,8 @@ public partial class ChessBoard
 
                     if (piece.Type == PieceType.King)
                         KingValidation(move, board); // Needed to specify castling options that are required in the IsKingCheckedValidation
+                    if (piece.Type == PieceType.Pawn)
+                        PawnValidation(move, board); // Needed to specify e.p. options that are required in the IsKingCheckedValidation
 
                     if (!IsKingCheckedValidation(move, side, board))
                         return true;
