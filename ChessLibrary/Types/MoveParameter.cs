@@ -196,6 +196,15 @@ public class MovePromotion : IMoveParameter
         }
     }
 
+    public PieceType PromotionResult => PromotionType switch
+    {
+        PromotionType.ToQueen or PromotionType.Default => PieceType.Queen,
+        PromotionType.ToRook => PieceType.Rook,
+        PromotionType.ToBishop => PieceType.Bishop,
+        PromotionType.ToKnight => PieceType.Knight,
+        _ => throw new ChessArgumentException(null, nameof(PromotionType), nameof(MovePromotion.PromotionResult))
+    };
+
     void IMoveParameter.Execute(Move move, ChessBoard board)
     {
         ChessBoard.DropPiece(move, board);

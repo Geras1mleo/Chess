@@ -61,6 +61,26 @@ public class Move
     public string? San { get; internal set; }
 
     /// <summary>
+    /// Move is En Passant
+    /// </summary>
+    public bool IsEnPassant => this.Parameter is MoveEnPassant;
+
+    /// <summary>
+    /// Move is castling
+    /// </summary>
+    public bool IsCastling => this.Parameter is MoveCastle;
+
+    /// <summary>
+    /// Move is promotion
+    /// </summary>
+    public bool IsPromotion => this.Parameter is MovePromotion;
+
+    /// <summary>
+    /// Promoted piece or null when there is no promotion.
+    /// </summary>
+    public Piece? Promotion => this.Parameter is MovePromotion promotion ? new Piece(Piece.Color, promotion.PromotionResult) : null;
+
+    /// <summary>
     /// Initializes new Move object by given positions
     /// </summary>
     public Move(Position originalPosition, Position newPosition)
