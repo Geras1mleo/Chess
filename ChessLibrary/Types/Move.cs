@@ -40,7 +40,12 @@ public class Move
     public Piece? CapturedPiece { get; internal set; }
 
     /// <summary>
-    /// Move additional parameter   
+    /// Move additional parameter
+    /// This property gives move information about a move
+    /// When one of the following moves occurs, we need info about:
+    /// 1. Promotion: To which figure (Queen or another)?
+    /// 2. Castle: King/Queen side castle?
+    /// 3. En Passant: What is the position of the pawn that has been captured?
     /// </summary>
     public IMoveParameter? Parameter { get; internal set; }
 
