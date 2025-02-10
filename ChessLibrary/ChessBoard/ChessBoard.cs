@@ -474,6 +474,19 @@ public partial class ChessBoard
     }
 
     /// <summary>
+    /// When the timer of one of the players runs out, declare an endgame by timeout
+    /// </summary>
+    /// <param name="timeOutSide">The side that lost by timeout</param>
+    /// <exception cref="ChessGameEndedException"></exception>
+    public void EndByTimeout(PieceColor timeOutSide)
+    {
+        if (IsEndGame)
+            throw new ChessGameEndedException(this, EndGame);
+
+        EndGame = new EndGameInfo(EndgameType.Timeout, timeOutSide.OppositeColor());
+    }
+
+    /// <summary>
     /// Declares draw in current chess game
     /// </summary>
     /// <exception cref="ChessGameEndedException"></exception>
