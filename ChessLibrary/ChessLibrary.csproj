@@ -6,7 +6,7 @@
                 <Description>Chess logic made with C# and ♥ by Geras1mleo. SAN and FEN parsing/generation, moves validation, legal positions generations, auto endgame detection (insufficient material, threefold repetition, fifty move rule), event handlers and much more!</Description>
                 <Title>Gera.Chess</Title>
                 <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-                <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
+                <TargetFramework>net8.0</TargetFramework>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -26,10 +26,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="README_NUGET.md">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
+	  <None Include="README_NUGET.md" Pack="true" PackagePath=""/>
 	</ItemGroup>
 	<PropertyGroup>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -42,7 +39,7 @@
 		<PackageReadmeFile>README_NUGET.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/Geras1mleo/Chess</RepositoryUrl>
 		<PackageTags>chess;chessboard;chess-game;chess-position;standard-algebraic-notation;chess-move;forsyth-edwards-notation;chess-validator;chess-variations</PackageTags>
-                <PackageReleaseNotes>Release for net8.0</PackageReleaseNotes>
+                <PackageReleaseNotes>End of support for 6.0, migration to 8.0, fix small issues</PackageReleaseNotes>
 		<PackageIcon>knight.png</PackageIcon>
 		<PackageId>Gera.Chess</PackageId>
 		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
