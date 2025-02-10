@@ -12,7 +12,7 @@
 
 [![Nuget](https://img.shields.io/nuget/v/gera.chess?logo=nuget&style=for-the-badge)](https://www.nuget.org/packages/Gera.Chess/)
 
-Take your chess app to the next level with the Gera Chess Library! This chess logic library is made with **C# .NET 6.0/8.0** and is available on [NuGet](https://www.nuget.org/packages/Gera.Chess/), so you can start using it right away.
+Take your chess app to the next level with the Gera Chess Library! This chess logic library is made with **C# .NET 8.0** and is available on [NuGet](https://www.nuget.org/packages/Gera.Chess/), so you can start using it right away.
 
 The library includes a **ChessBoard** with a 2-dimensional array of **Pieces** and the ability to ***generate***, ***validate***, and ***execute*** moves with ease. You can also parse **Move** objects into Standard Algebraic Notation **[(SAN)](https://en.wikipedia.org/wiki/Algebraic_notation_(chess))** and back. Plus, you can load and play a chess game from Forsyth-Edwards Notation **[(FEN)](https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation)** and Portable Game Notation **[(PGN)](https://en.wikipedia.org/wiki/Portable_Game_Notation)** and vice versa.
 
