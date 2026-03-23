@@ -12,9 +12,9 @@
 namespace Chess;
 
 /// <summary>
-/// Smart enum for Piece color in chess game
+/// Enum for Piece color in chess game
 /// </summary>
-public class PieceColor : SmartEnum<PieceColor>
+public class PieceColor : SimpleEnum<PieceColor>
 {
     public static readonly PieceColor White = new("White", 1, 'w');
     public static readonly PieceColor Black = new("Black", 2, 'b');
@@ -25,46 +25,47 @@ public class PieceColor : SmartEnum<PieceColor>
     /// </summary>
     public char AsChar { get; }
 
-    /// <summary>
-    /// Opposite color <br/>
-    /// White => Black<br/>
-    /// Black => White<br/>
-    /// </summary>
-    public PieceColor OppositeColor()
-    {
-        return Value switch
-        {
-            1 => Black,
-            2 => White,
-            _ => throw new ChessArgumentException(null, nameof(Value), nameof(PieceColor.OppositeColor)),
-        };
-    }
-
     private PieceColor(string name, int value, char asChar) : base(name, value)
     {
         AsChar = asChar;
     }
 
     /// <summary>
-    /// PieceColor object from char<br/>
+    /// Convert to char representation<br/>
+    /// White => 'w'<br/>
+    /// Black => 'b'<br/>
+    /// </summary>
+    public char ToChar() => AsChar;
+
+    /// <summary>
+    /// Get opposite color <br/>
+    /// White => Black<br/>
+    /// Black => White<br/>
+    /// </summary>
+    public PieceColor OppositeColor() => this.Value switch
+    {
+        1 => Black,
+        2 => White,
+        _ => throw new ChessArgumentException(null, nameof(Value), nameof(PieceColor.OppositeColor)),
+    };
+
+    /// <summary>
+    /// PieceColor from char<br/>
     /// 'w' => White<br/>
     /// 'b' => Black<br/>
     /// </summary>
-    public static PieceColor FromChar(char color)
+    public static PieceColor FromChar(char color) => char.ToLower(color) switch
     {
-        return char.ToLower(color) switch
-        {
-            'w' => White,
-            'b' => Black,
-            _ => throw new ChessArgumentException(null, nameof(color), nameof(PieceColor.FromChar)),
-        };
-    }
+        'w' => White,
+        'b' => Black,
+        _ => throw new ChessArgumentException(null, nameof(color), nameof(PieceColor.FromChar)),
+    };
 }
 
 /// <summary>
-/// Smart enum for Piece type in chess game
+/// Enum for Piece type in chess game
 /// </summary>
-public class PieceType : SmartEnum<PieceType>
+public class PieceType : SimpleEnum<PieceType>
 {
     public static readonly PieceType Pawn = new("Pawn", 1, 'p');
     public static readonly PieceType Rook = new("Rook", 2, 'r');
@@ -89,7 +90,18 @@ public class PieceType : SmartEnum<PieceType>
     }
 
     /// <summary>
-    /// PieceType object from char<br/>
+    /// Convert to char representation<br/>
+    /// Pawn => 'p'<br/>
+    /// Rook => 'r'<br/>
+    /// Knight => 'n'<br/>
+    /// Bishop => 'b'<br/>
+    /// Queen => 'q'<br/>
+    /// King => 'k'<br/>
+    /// </summary>
+    public char ToChar() => AsChar;
+
+    /// <summary>
+    /// PieceType from char<br/>
     /// 'p' => Pawn<br/>
     /// 'r' => Rook<br/>
     /// 'n' => Knight<br/>
@@ -97,19 +109,16 @@ public class PieceType : SmartEnum<PieceType>
     /// 'q' => Queen<br/>
     /// 'k' => King<br/>
     /// </summary>
-    public static PieceType FromChar(char type)
+    public static PieceType FromChar(char type) => char.ToLower(type) switch
     {
-        return char.ToLower(type) switch
-        {
-            'p' => Pawn,
-            'r' => Rook,
-            'n' => Knight,
-            'b' => Bishop,
-            'q' => Queen,
-            'k' => King,
-            _ => throw new ChessArgumentException(null, nameof(type), nameof(PieceType.FromChar)),
-        };
-    }
+        'p' => Pawn,
+        'r' => Rook,
+        'n' => Knight,
+        'b' => Bishop,
+        'q' => Queen,
+        'k' => King,
+        _ => throw new ChessArgumentException(null, nameof(type), nameof(PieceType.FromChar)),
+    };
 }
 
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

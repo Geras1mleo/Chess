@@ -6,7 +6,7 @@
                 <Description>Chess logic made with C# and ♥ by Geras1mleo. SAN and FEN parsing/generation, moves validation, legal positions generations, auto endgame detection (insufficient material, threefold repetition, fifty move rule), event handlers and much more!</Description>
                 <Title>Gera.Chess</Title>
                 <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-                <TargetFramework>net8.0</TargetFramework>
+                <TargetFramework>net10.0</TargetFramework>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -22,11 +22,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Ardalis.SmartEnum" Version="2.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Include="README_NUGET.md" Pack="true" PackagePath=""/>
+	  <None Include="README_NUGET.md" Pack="true" PackagePath="" />
 	</ItemGroup>
 	<PropertyGroup>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
