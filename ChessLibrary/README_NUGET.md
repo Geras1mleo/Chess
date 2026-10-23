@@ -1,10 +1,13 @@
 ![knight](https://user-images.githubusercontent.com/67554762/171267199-45341351-5968-4f68-802d-2e80136ea4ab.png)
 
-# Gera Chess Library
+# Gera Chess Library (Serinus1 Fork)
 
 Develop your chess app with C# lib and &hearts; from Geras1mleo
 
-![GitHub last commit](https://img.shields.io/github/last-commit/geras1mleo/chess?label=Last%20commit&logo=git&style=for-the-badge) [![Nuget](https://img.shields.io/nuget/dt/gera.chess?logo=nuget&style=for-the-badge&label=Downloads&logoColor=blue)](https://www.nuget.org/packages/Gera.Chess/)
+> **Note:** This is a maintained fork of [Geras1mleo/Chess](https://github.com/Geras1mleo/Chess) (originally published as `Gera.Chess` on NuGet). 
+> It is published on NuGet as `Serinus1.Chess` and updated to support dotnet 10 and the latest dependencies.
+
+![GitHub last commit](https://img.shields.io/github/last-commit/geras1mleo/chess?label=Last%20commit&logo=git&style=for-the-badge) [![Nuget](https://img.shields.io/nuget/dt/gera.chess?logo=nuget&style=for-the-badge&label=Downloads&logoColor=blue)](https://www.nuget.org/packages/Serinus1.Chess/)
 
 The library includes a **ChessBoard** with a 2-dimensional array of **Pieces** and the ability to ***generate***, ***validate***, and ***execute*** moves with ease. You can also parse **Move** objects into Standard Algebraic Notation **[(SAN)](https://en.wikipedia.org/wiki/Algebraic_notation_(chess))** and back. Plus, you can load and play a chess game from Forsyth-Edwards Notation **[(FEN)](https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation)** and Portable Game Notation **[(PGN)](https://en.wikipedia.org/wiki/Portable_Game_Notation)** and vice versa.
 

@@ -18,6 +18,9 @@ public partial class ChessBoard
     /// <returns>Whether given move is valid</returns>
     public bool IsValidMove(string san)
     {
+        if (san is "1-0" or "0-1" or "1/2-1/2" or "½–½")
+            return true;
+
         var (succeeded, exception) = SanBuilder.TryParse(this, san, out var move, false);
 
         if (!succeeded && exception is not null)

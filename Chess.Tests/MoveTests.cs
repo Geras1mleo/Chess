@@ -7,6 +7,18 @@ namespace ChessUnitTests;
 
 public class MoveTests
 {
+    [Theory]
+    [InlineData("1-0")]
+    [InlineData("0-1")]
+    [InlineData("1/2-1/2")]
+    [InlineData("½–½")]
+    public void TestGameEndingMarkersAreAcceptedByMoveValidation(string marker)
+    {
+        var board = new ChessBoard();
+
+        Assert.True(board.IsValidMove(marker));
+    }
+
     [Fact]
     public void TestMove()
     {

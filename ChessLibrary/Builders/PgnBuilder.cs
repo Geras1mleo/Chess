@@ -79,7 +79,7 @@ internal static class PgnBuilder
             else if (pgn.Contains("0-1"))
                 board.Resign(PieceColor.White);
 
-            else if (pgn.Contains("1/2-1/2"))
+            else if (pgn.Contains("1/2-1/2") || pgn.Contains("½–½"))
                 board.Draw();
         }
 

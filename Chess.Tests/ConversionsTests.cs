@@ -6,6 +6,15 @@ namespace ChessUnitTests;
 public class ConversionsTests
 {
     [Fact]
+    public void TestPgnLoadUnicodeDrawMarker()
+    {
+        var board = ChessBoard.LoadFromPgn("1. e4 ½–½");
+
+        Assert.True(board.IsEndGame);
+        Assert.Equal(EndgameType.DrawDeclared, board.EndGame.EndgameType);
+    }
+
+    [Fact]
     public void TestPgnLoad()
     {
         var board = new ChessBoard();

@@ -3,8 +3,8 @@
 	<PropertyGroup>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-                <Description>Chess logic made with C# and ♥ by Geras1mleo. SAN and FEN parsing/generation, moves validation, legal positions generations, auto endgame detection (insufficient material, threefold repetition, fifty move rule), event handlers and much more!</Description>
-                <Title>Gera.Chess</Title>
+                <Description>A fork of the Gera.Chess library by Geras1mleo. This fork is maintained by Serinus1 to support dotnet 10 and the latest dependencies. Original MIT License applies.</Description>
+                <Title>Serinus1.Chess</Title>
                 <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
                 <TargetFramework>net10.0</TargetFramework>
 	</PropertyGroup>
@@ -32,19 +32,19 @@
 		<DebugType>embedded</DebugType>
 		<OutputType>Library</OutputType>
 		<RootNamespace>Chess</RootNamespace>
-		<Authors>Geras1mleo</Authors>
-		<Copyright>Copyright (c) 2024 Geras1mleo</Copyright>
-		<PackageProjectUrl>https://www.nuget.org/packages/Gera.Chess/</PackageProjectUrl>
+		<Authors>Geras1mleo, Serinus1</Authors>
+		<Copyright>Copyright (c) 2024 Geras1mleo, (c) 2026 Serinus1</Copyright>
+		<PackageProjectUrl>https://github.com/Serinus1/GeraChess</PackageProjectUrl>
 		<PackageReadmeFile>README_NUGET.md</PackageReadmeFile>
-		<RepositoryUrl>https://github.com/Geras1mleo/Chess</RepositoryUrl>
+		<RepositoryUrl>https://github.com/Serinus1/GeraChess</RepositoryUrl>
 		<PackageTags>chess;chessboard;chess-game;chess-position;standard-algebraic-notation;chess-move;forsyth-edwards-notation;chess-validator;chess-variations</PackageTags>
-                <PackageReleaseNotes>End of support for 6.0, migration to 8.0, fix small issues</PackageReleaseNotes>
+								<PackageReleaseNotes>Updated dependencies</PackageReleaseNotes>
 		<PackageIcon>knight.png</PackageIcon>
-		<PackageId>Gera.Chess</PackageId>
+		<PackageId>Serinus1.Chess</PackageId>
 		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
 		<RepositoryType>git</RepositoryType>
-		<Version>1.3.0</Version>
-		<AssemblyVersion>1.3.0</AssemblyVersion>
-		<FileVersion>1.3.0</FileVersion>
+		<Version>1.3.2</Version>
+		<AssemblyVersion>1.3.2</AssemblyVersion>
+		<FileVersion>1.3.2</FileVersion>
 	</PropertyGroup>
 </Project>
