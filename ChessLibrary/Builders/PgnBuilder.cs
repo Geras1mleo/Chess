@@ -42,8 +42,9 @@ internal static class PgnBuilder
             }
         }
 
-        pgn = Regexes.RegexAlternatives.Replace(pgn, ""); // Remove all alternative branches
         pgn = Regexes.RegexComments.Replace(pgn, ""); // Remove all comments
+        while (Regexes.RegexAlternatives.IsMatch(pgn)) // Remove all alternative branches, innermost first
+            pgn = Regexes.RegexAlternatives.Replace(pgn, "");
 
         // Todo Save Alternative moves(branches) and comments for moves
 
