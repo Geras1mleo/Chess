@@ -19,7 +19,7 @@ internal static class Regexes
 
     internal const string AlternativesPattern = @"\([^)]*\)";
 
-    internal const string CommentsPattern = @"\{[^}]*\}";
+    internal const string CommentsPattern = @"\{[^}]*\}|;[^\n]*";
 
     internal const string FenPattern = @"^(((?:[rnbqkpRNBQKP1-8]+\/){7})[rnbqkpRNBQKP1-8]+) ([bw]) (-|[KQkq]{1,4}) (-|[a-h][36]) (\d+ \d+)$";
 
