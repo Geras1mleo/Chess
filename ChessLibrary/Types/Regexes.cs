@@ -17,7 +17,7 @@ internal static class Regexes
 
     internal const string HeadersPattern = @"\[([^ ]+) ""([^""]*)""\]";
 
-    internal const string AlternativesPattern = @"\([^)]*\)";
+    internal const string AlternativesPattern = @"\([^()]*\)";
 
     internal const string CommentsPattern = @"\{[^}]*\}";
 
